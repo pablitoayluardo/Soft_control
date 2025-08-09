@@ -1,0 +1,38 @@
+# Archivos de configuración PHP
+config.php
+*.log
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+
+# Directorios de dependencias
+vendor/
+node_modules/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Archivos de base de datos locales
+*.db
+*.sqlite
+*.sqlite3
+
+# Archivos de caché
+cache/
+tmp/
+
+# Archivos de logs
+logs/
+*.log
+error.log
+access.log

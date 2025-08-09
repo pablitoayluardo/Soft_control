@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Frontend Facturas</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 TEST FRONTEND FACTURAS</h1>
+        <p>Este archivo de prueba verifica si el problema está en el frontend o en la API.</p>
+        
+        <div class="info">
+            <h3>Instrucciones:</h3>
+            <ol>
+                <li>Haz clic en "Probar API" para verificar si la API funciona</li>
+                <li>Haz clic en "Probar Frontend" para verificar si el JavaScript funciona</li>
+                <li>Revisa la consola del navegador (F12) para ver errores</li>
+            </ol>
+        </div>
+        
+        <button onclick="testAPI()">🔍 Probar API</button>
+        <button onclick="testFrontend()">🎨 Probar Frontend</button>
+        <button onclick="clearResults()">🗑️ Limpiar Resultados</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function testAPI() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="info">🔄 Probando API...</div>';
+            
+            fetch('api/get_facturas_simple.php', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.json();
+            })
+            .then(data => {
+                console.log('API Response:', data);
+                
+                let html = '<div class="container">';
+                html += '<h3>📊 RESULTADO DE LA API</h3>';
+                
+                if (data.success) {
+                    html += '<div class="success">✅ API funcionando correctamente</div>';
+                    html += '<div class="info">';
+                    html += '<p><strong>Total de facturas:</strong> ' + (data.data ? data.data.length : 0) + '</p>';
+                    html += '<p><strong>Paginación:</strong> ' + JSON.stringify(data.pagination) + '</p>';
+                    html += '</div>';
+                    
+                    if (data.data && data.data.length > 0) {
+                        html += '<h4>📋 Facturas encontradas:</h4>';
+                        html += '<table>';
+                        html += '<tr><th>ESTAB</th><th>PTO EMI</th><th>SECUENCIAL</th><th>CLIENTE</th><th>TOTAL</th><th>ESTATUS</th></tr>';
+                        
+                        data.data.forEach(factura => {
+                            html += '<tr>';
+                            html += '<td>' + (factura.estab || 'N/A') + '</td>';
+                            html += '<td>' + (factura.pto_emi || 'N/A') + '</td>';
+                            html += '<td>' + (factura.secuencial || 'N/A') + '</td>';
+                            html += '<td>' + (factura.cliente || 'N/A') + '</td>';
+                            html += '<td>$' + (factura.total || '0.00') + '</td>';
+                            html += '<td>' + (factura.estatus || 'N/A') + '</td>';
+                            html += '</tr>';
+                        });
+                        
+                        html += '</table>';
+                    } else {
+                        html += '<div class="warning">⚠️ No hay facturas registradas en la base de datos</div>';
+                    }
+                } else {
+                    html += '<div class="error">❌ Error en la API</div>';
+                    html += '<div class="info">';
+                    html += '<p><strong>Mensaje:</strong> ' + (data.message || 'Error desconocido') + '</p>';
+                    html += '<p><strong>Debug:</strong> ' + JSON.stringify(data.debug || {}) + '</p>';
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                resultsDiv.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error testing API:', error);
+                resultsDiv.innerHTML = '<div class="error">❌ Error al conectar con la API: ' + error.message + '</div>';
+            });
+        }
+        
+        function testFrontend() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="info">🔄 Probando Frontend...</div>';
+            
+            // Simular la función loadFacturasList
+            const container = document.createElement('div');
+            container.id = 'test-container';
+            document.body.appendChild(container);
+            
+            // Simular la llamada a la API
+            fetch('api/get_facturas_simple.php', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                let html = '<div class="container">';
+                html += '<h3>🎨 RESULTADO DEL FRONTEND</h3>';
+                
+                if (data.success) {
+                    html += '<div class="success">✅ Frontend funcionando correctamente</div>';
+                    
+                    // Simular displayFacturasTable
+                    if (data.data && data.data.length > 0) {
+                        html += '<h4>📋 Tabla generada por el frontend:</h4>';
+                        html += '<table class="facturas-table">';
+                        html += '<thead><tr>';
+                        html += '<th>ESTAB</th><th>PTO EMI</th><th>SECUENCIAL</th><th>FECHA CREACIÓN</th><th>CLIENTE</th><th>DIRECCIÓN</th><th>TOTAL</th><th>ESTATUS</th>';
+                        html += '</tr></thead><tbody>';
+                        
+                        data.data.forEach(factura => {
+                            html += '<tr>';
+                            html += '<td>' + (factura.estab || 'N/A') + '</td>';
+                            html += '<td>' + (factura.pto_emi || 'N/A') + '</td>';
+                            html += '<td>' + (factura.secuencial || 'N/A') + '</td>';
+                            html += '<td>' + (factura.fecha_creacion || 'N/A') + '</td>';
+                            html += '<td>' + (factura.cliente || 'N/A') + '</td>';
+                            html += '<td>' + (factura.direccion || 'N/A') + '</td>';
+                            html += '<td>$' + (factura.total || '0.00') + '</td>';
+                            html += '<td style="color: ' + (factura.estatus === 'REGISTRADA' ? '#28a745' : '#dc3545') + ';">' + (factura.estatus || 'PENDIENTE') + '</td>';
+                            html += '</tr>';
+                        });
+                        
+                        html += '</tbody></table>';
+                    } else {
+                        html += '<div class="warning">⚠️ No hay facturas para mostrar</div>';
+                        html += '<div style="text-align: center; padding: 40px;">';
+                        html += '<i style="font-size: 4rem; color: #007bff; margin-bottom: 20px;">📄</i>';
+                        html += '<h3>No hay facturas registradas</h3>';
+                        html += '<p>Sube facturas individuales para verlas aquí</p>';
+                        html += '</div>';
+                    }
+                } else {
+                    html += '<div class="error">❌ Error en el frontend</div>';
+                    html += '<div class="info">';
+                    html += '<p><strong>Mensaje:</strong> ' + (data.message || 'Error desconocido') + '</p>';
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                resultsDiv.innerHTML = html;
+                
+                // Limpiar el contenedor temporal
+                document.body.removeChild(container);
+            })
+            .catch(error => {
+                console.error('Error testing frontend:', error);
+                resultsDiv.innerHTML = '<div class="error">❌ Error al probar el frontend: ' + error.message + '</div>';
+                
+                // Limpiar el contenedor temporal
+                if (document.getElementById('test-container')) {
+                    document.body.removeChild(document.getElementById('test-container'));
+                }
+            });
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // Cargar automáticamente al abrir la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Test Frontend Facturas cargado');
+            console.log('📍 URL actual:', window.location.href);
+            console.log('🔍 Verificando disponibilidad de la API...');
+            
+            // Verificar si la API está disponible
+            fetch('api/get_facturas_simple.php', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('✅ API disponible, status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('📊 Datos iniciales de la API:', data);
+            })
+            .catch(error => {
+                console.error('❌ Error al verificar API:', error);
+            });
+        });
+    </script>
+</body>
+</html> 

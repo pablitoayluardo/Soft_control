@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Control - Menú Principal</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header del Dashboard -->
+    <header class="dashboard-header">
+        <div class="header-left">
+            <h1><i class="fas fa-shield-alt"></i> Sistema de Control</h1>
+        </div>
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">A</div>
+            <span class="user-name" id="userName">Administrador</span>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="dashboard-main">
+        <!-- Mensaje de Bienvenida -->
+        <div class="welcome-section">
+            <div class="welcome-message">
+                <h2>ELIGE UNA CATEGORÍA</h2>
+                <p>Selecciona el módulo que deseas gestionar</p>
+            </div>
+        </div>
+
+        <!-- Menú Principal con Categorías -->
+        <div class="modules-grid">
+            <!-- Categoría Facturación -->
+            <div class="module-card" onclick="openModule('facturacion')">
+                <div class="module-icon">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <div class="module-content">
+                    <h3>Facturación</h3>
+                    <p>Gestión de facturas y documentos comerciales</p>
+                    <div class="module-stats">
+                        <span class="stat">
+                            <i class="fas fa-file-alt"></i>
+                            <span id="facturacion-total">0</span> facturas
+                        </span>
+                    </div>
+                </div>
+                <div class="module-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Categoría Inventarios -->
+            <div class="module-card" onclick="openModule('inventarios')">
+                <div class="module-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <div class="module-content">
+                    <h3>Inventarios</h3>
+                    <p>Control de inventarios y stock</p>
+                    <div class="module-stats">
+                        <span class="stat">
+                            <i class="fas fa-cube"></i>
+                            <span id="inventarios-total">0</span> productos
+                        </span>
+                    </div>
+                </div>
+                <div class="module-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Categoría Pagos -->
+            <div class="module-card" onclick="openModule('pagos')">
+                <div class="module-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="module-content">
+                    <h3>Pagos</h3>
+                    <p>Gestión de pagos y transacciones</p>
+                    <div class="module-stats">
+                        <span class="stat">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span id="pagos-total">0</span> transacciones
+                        </span>
+                    </div>
+                </div>
+                <div class="module-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Categoría Gastos -->
+            <div class="module-card" onclick="openModule('gastos')">
+                <div class="module-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="module-content">
+                    <h3>Gastos</h3>
+                    <p>Control de gastos y egresos</p>
+                    <div class="module-stats">
+                        <span class="stat">
+                            <i class="fas fa-chart-line"></i>
+                            <span id="gastos-total">0</span> registros
+                        </span>
+                    </div>
+                </div>
+                <div class="module-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Categoría Productos -->
+            <div class="module-card" onclick="openModule('productos')">
+                <div class="module-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <div class="module-content">
+                    <h3>Productos</h3>
+                    <p>Gestión de productos y catálogo</p>
+                    <div class="module-stats">
+                        <span class="stat">
+                            <i class="fas fa-tag"></i>
+                            <span id="productos-total">0</span> items
+                        </span>
+                    </div>
+                </div>
+                <div class="module-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Módulo Configuración (Siempre disponible) -->
+            <div class="module-card config-module" onclick="openModule('configuracion')">
+                <div class="module-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="module-content">
+                    <h3>Configuración</h3>
+                    <p>Configuraciones del sistema</p>
+                    <div class="module-stats">
+                        <span class="stat">
+                            <i class="fas fa-shield-alt"></i>
+                            Sistema
+                        </span>
+                    </div>
+                </div>
+                <div class="module-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Actividad Reciente -->
+        <div class="recent-activity-panel">
+            <div class="panel-header">
+                <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
+                <button class="refresh-btn" onclick="refreshActivity()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="activity-list" id="recentActivity">
+                <!-- La actividad se cargará dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Footer con Redes Sociales -->
+        <div class="social-footer">
+            <div class="social-icons">
+                <a href="#" class="social-icon">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="social-icon">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="#" class="social-icon">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notificaciones -->
+    <div class="notifications-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js"></script>
+    <script>
+        // Funciones específicas del menú principal
+        function openModule(moduleName) {
+            // Por ahora, mostrar una notificación
+            showNotification(`Categoría ${moduleName} en desarrollo`, 'info');
+            
+            // Aquí puedes agregar la lógica para abrir cada módulo
+            switch(moduleName) {
+                case 'facturacion':
+                    window.location.href = 'facturacion.html';
+                    break;
+                case 'inventarios':
+                    showNotification('Sistema de gestión de inventarios próximamente disponible', 'info');
+                    break;
+                case 'pagos':
+                    showNotification('Sistema de gestión de pagos próximamente disponible', 'info');
+                    break;
+                case 'gastos':
+                    showNotification('Sistema de gestión de gastos próximamente disponible', 'info');
+                    break;
+                case 'productos':
+                    showNotification('Sistema de gestión de productos próximamente disponible', 'info');
+                    break;
+                case 'configuracion':
+                    showSection('configuracion');
+                    showNotification('Configuración del sistema', 'info');
+                    break;
+            }
+        }
+
+        function refreshActivity() {
+            loadRecentActivity();
+            showNotification('Actividad actualizada', 'success');
+        }
+
+        // Cargar estadísticas de los módulos
+        function loadModuleStats() {
+            // Simular estadísticas para cada categoría
+            document.getElementById('facturacion-total').textContent = Math.floor(Math.random() * 50) + 10;
+            document.getElementById('inventarios-total').textContent = Math.floor(Math.random() * 30) + 15;
+            document.getElementById('pagos-total').textContent = Math.floor(Math.random() * 40) + 20;
+            document.getElementById('gastos-total').textContent = Math.floor(Math.random() * 25) + 8;
+            document.getElementById('productos-total').textContent = Math.floor(Math.random() * 35) + 12;
+        }
+
+        // Cargar estadísticas al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadModuleStats();
+        });
+    </script>
+</body>
+</html> 
