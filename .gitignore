@@ -1,0 +1,707 @@
+# =====================================================
+# ARCHIVOS Y CARPETAS A IGNORAR EN GIT
+# =====================================================
+
+# Archivos de configuración con datos sensibles
+config.php
+.env
+.env.local
+.env.production
+
+# Directorios de logs y datos temporales
+logs/
+cache/
+temp/
+uploads/
+backups/
+
+# Archivos de sesión PHP
+sessions/
+
+# Archivos de configuración del sistema
+.htaccess
+web.config
+
+# Archivos de IDE y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Archivos de dependencias (si usas npm/composer)
+node_modules/
+vendor/
+composer.lock
+package-lock.json
+
+# Archivos de build y distribución
+dist/
+build/
+*.min.js
+*.min.css
+
+# Archivos de backup y temporales
+*.bak
+*.tmp
+*.temp
+*.log
+
+# Archivos de base de datos
+*.sql
+*.db
+*.sqlite
+
+# Archivos de certificados SSL
+*.pem
+*.key
+*.crt
+*.csr
+
+# Archivos de configuración de servidor
+nginx.conf
+apache.conf
+
+# Archivos de Docker (si usas contenedores)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Archivos de testing
+coverage/
+.phpunit.result.cache
+tests/
+
+# Archivos de documentación generada
+docs/build/
+docs/_build/
+
+# Archivos de cache del navegador
+.cache/
+.browser-cache/
+
+# Archivos de configuración local
+local.config.php
+local.env
+
+# Archivos de migración de base de datos
+migrations/
+
+# Archivos de seed de base de datos
+seeds/
+
+# Archivos de configuración de CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Archivos de configuración de servidores
+deploy/
+production/
+staging/
+
+# Archivos de monitoreo y analytics
+analytics/
+monitoring/
+
+# Archivos de seguridad
+security/
+firewall/
+
+# Archivos de backup automático
+auto-backup/
+scheduled-backups/
+
+# Archivos de configuración de email
+mail/
+smtp/
+
+# Archivos de configuración de notificaciones
+notifications/
+alerts/
+
+# Archivos de configuración de API
+api/
+endpoints/
+
+# Archivos de configuración de autenticación
+auth/
+jwt/
+tokens/
+
+# Archivos de configuración de caché
+redis/
+memcached/
+
+# Archivos de configuración de CDN
+cdn/
+assets/
+
+# Archivos de configuración de SEO
+sitemap.xml
+robots.txt
+
+# Archivos de configuración de analytics
+google-analytics/
+facebook-pixel/
+
+# Archivos de configuración de redes sociales
+social/
+sharing/
+
+# Archivos de configuración de pagos
+payments/
+stripe/
+paypal/
+
+# Archivos de configuración de SMS
+sms/
+twilio/
+
+# Archivos de configuración de push notifications
+push/
+notifications/
+
+# Archivos de configuración de webhooks
+webhooks/
+callbacks/
+
+# Archivos de configuración de APIs externas
+external-apis/
+third-party/
+
+# Archivos de configuración de microservicios
+microservices/
+services/
+
+# Archivos de configuración de contenedores
+containers/
+kubernetes/
+
+# Archivos de configuración de orquestación
+orchestration/
+docker-swarm/
+
+# Archivos de configuración de monitoreo
+monitoring/
+grafana/
+prometheus/
+
+# Archivos de configuración de logging
+logging/
+logstash/
+fluentd/
+
+# Archivos de configuración de backup
+backup/
+rsync/
+
+# Archivos de configuración de seguridad
+security/
+firewall/
+waf/
+
+# Archivos de configuración de SSL
+ssl/
+certificates/
+
+# Archivos de configuración de DNS
+dns/
+domain/
+
+# Archivos de configuración de CDN
+cdn/
+cloudflare/
+
+# Archivos de configuración de balanceo de carga
+load-balancer/
+nginx-lb/
+
+# Archivos de configuración de alta disponibilidad
+ha/
+failover/
+
+# Archivos de configuración de disaster recovery
+disaster-recovery/
+dr/
+
+# Archivos de configuración de compliance
+compliance/
+gdpr/
+hipaa/
+
+# Archivos de configuración de auditoría
+audit/
+audit-logs/
+
+# Archivos de configuración de reporting
+reports/
+analytics-reports/
+
+# Archivos de configuración de dashboards
+dashboards/
+grafana-dashboards/
+
+# Archivos de configuración de alertas
+alerts/
+alerting/
+
+# Archivos de configuración de escalabilidad
+scaling/
+auto-scaling/
+
+# Archivos de configuración de performance
+performance/
+optimization/
+
+# Archivos de configuración de testing
+testing/
+qa/
+test-data/
+
+# Archivos de configuración de staging
+staging/
+pre-production/
+
+# Archivos de configuración de development
+development/
+dev-environment/
+
+# Archivos de configuración de debugging
+debug/
+debugging/
+
+# Archivos de configuración de profiling
+profiling/
+performance-profiling/
+
+# Archivos de configuración de tracing
+tracing/
+distributed-tracing/
+
+# Archivos de configuración de observabilidad
+observability/
+observability-stack/
+
+# Archivos de configuración de telemetría
+telemetry/
+metrics/
+
+# Archivos de configuración de eventos
+events/
+event-streaming/
+
+# Archivos de configuración de mensajería
+messaging/
+message-queue/
+
+# Archivos de configuración de streaming
+streaming/
+real-time/
+
+# Archivos de configuración de websockets
+websockets/
+socket.io/
+
+# Archivos de configuración de GraphQL
+graphql/
+apollo/
+
+# Archivos de configuración de REST API
+rest-api/
+api-gateway/
+
+# Archivos de configuración de gRPC
+grpc/
+protobuf/
+
+# Archivos de configuración de microservicios
+microservices/
+service-mesh/
+
+# Archivos de configuración de serverless
+serverless/
+lambda/
+functions/
+
+# Archivos de configuración de edge computing
+edge/
+edge-computing/
+
+# Archivos de configuración de IoT
+iot/
+internet-of-things/
+
+# Archivos de configuración de blockchain
+blockchain/
+smart-contracts/
+
+# Archivos de configuración de machine learning
+ml/
+machine-learning/
+ai/
+
+# Archivos de configuración de data science
+data-science/
+jupyter/
+
+# Archivos de configuración de big data
+big-data/
+hadoop/
+spark/
+
+# Archivos de configuración de data warehouse
+data-warehouse/
+snowflake/
+redshift/
+
+# Archivos de configuración de data lake
+data-lake/
+s3/
+
+# Archivos de configuración de ETL
+etl/
+data-pipeline/
+
+# Archivos de configuración de data governance
+data-governance/
+data-catalog/
+
+# Archivos de configuración de data quality
+data-quality/
+data-validation/
+
+# Archivos de configuración de data lineage
+data-lineage/
+data-tracking/
+
+# Archivos de configuración de data privacy
+data-privacy/
+data-protection/
+
+# Archivos de configuración de data retention
+data-retention/
+data-archival/
+
+# Archivos de configuración de data backup
+data-backup/
+data-recovery/
+
+# Archivos de configuración de data migration
+data-migration/
+data-transformation/
+
+# Archivos de configuración de data integration
+data-integration/
+data-sync/
+
+# Archivos de configuración de data analytics
+data-analytics/
+business-intelligence/
+
+# Archivos de configuración de data visualization
+data-visualization/
+charts/
+dashboards/
+
+# Archivos de configuración de data reporting
+data-reporting/
+reports/
+
+# Archivos de configuración de data mining
+data-mining/
+pattern-recognition/
+
+# Archivos de configuración de predictive analytics
+predictive-analytics/
+forecasting/
+
+# Archivos de configuración de prescriptive analytics
+prescriptive-analytics/
+optimization/
+
+# Archivos de configuración de descriptive analytics
+descriptive-analytics/
+reporting/
+
+# Archivos de configuración de diagnostic analytics
+diagnostic-analytics/
+root-cause-analysis/
+
+# Archivos de configuración de real-time analytics
+real-time-analytics/
+streaming-analytics/
+
+# Archivos de configuración de batch analytics
+batch-analytics/
+batch-processing/
+
+# Archivos de configuración de interactive analytics
+interactive-analytics/
+ad-hoc-queries/
+
+# Archivos de configuración de self-service analytics
+self-service-analytics/
+citizen-data-scientists/
+
+# Archivos de configuración de embedded analytics
+embedded-analytics/
+embedded-reports/
+
+# Archivos de configuración de mobile analytics
+mobile-analytics/
+mobile-reporting/
+
+# Archivos de configuración de web analytics
+web-analytics/
+website-analytics/
+
+# Archivos de configuración de social media analytics
+social-media-analytics/
+social-analytics/
+
+# Archivos de configuración de marketing analytics
+marketing-analytics/
+campaign-analytics/
+
+# Archivos de configuración de customer analytics
+customer-analytics/
+customer-insights/
+
+# Archivos de configuración de product analytics
+product-analytics/
+user-analytics/
+
+# Archivos de configuración de financial analytics
+financial-analytics/
+financial-reporting/
+
+# Archivos de configuración de operational analytics
+operational-analytics/
+operational-intelligence/
+
+# Archivos de configuración de supply chain analytics
+supply-chain-analytics/
+logistics-analytics/
+
+# Archivos de configuración de healthcare analytics
+healthcare-analytics/
+clinical-analytics/
+
+# Archivos de configuración de retail analytics
+retail-analytics/
+point-of-sale-analytics/
+
+# Archivos de configuración de manufacturing analytics
+manufacturing-analytics/
+industrial-analytics/
+
+# Archivos de configuración de energy analytics
+energy-analytics/
+utility-analytics/
+
+# Archivos de configuración de transportation analytics
+transportation-analytics/
+logistics-analytics/
+
+# Archivos de configuración de telecommunications analytics
+telecommunications-analytics/
+network-analytics/
+
+# Archivos de configuración de banking analytics
+banking-analytics/
+financial-services-analytics/
+
+# Archivos de configuración de insurance analytics
+insurance-analytics/
+risk-analytics/
+
+# Archivos de configuración de government analytics
+government-analytics/
+public-sector-analytics/
+
+# Archivos de configuración de education analytics
+education-analytics/
+learning-analytics/
+
+# Archivos de configuración de sports analytics
+sports-analytics/
+performance-analytics/
+
+# Archivos de configuración de gaming analytics
+gaming-analytics/
+player-analytics/
+
+# Archivos de configuración de entertainment analytics
+entertainment-analytics/
+media-analytics/
+
+# Archivos de configuración de travel analytics
+travel-analytics/
+hospitality-analytics/
+
+# Archivos de configuración de real estate analytics
+real-estate-analytics/
+property-analytics/
+
+# Archivos de configuración de legal analytics
+legal-analytics/
+case-analytics/
+
+# Archivos de configuración de consulting analytics
+consulting-analytics/
+advisory-analytics/
+
+# Archivos de configuración de research analytics
+research-analytics/
+academic-analytics/
+
+# Archivos de configuración de nonprofit analytics
+nonprofit-analytics/
+charity-analytics/
+
+# Archivos de configuración de startup analytics
+startup-analytics/
+growth-analytics/
+
+# Archivos de configuración de enterprise analytics
+enterprise-analytics/
+corporate-analytics/
+
+# Archivos de configuración de small business analytics
+small-business-analytics/
+sme-analytics/
+
+# Archivos de configuración de e-commerce analytics
+e-commerce-analytics/
+online-retail-analytics/
+
+# Archivos de configuración de B2B analytics
+b2b-analytics/
+business-to-business-analytics/
+
+# Archivos de configuración de B2C analytics
+b2c-analytics/
+business-to-consumer-analytics/
+
+# Archivos de configuración de C2C analytics
+c2c-analytics/
+consumer-to-consumer-analytics/
+
+# Archivos de configuración de marketplace analytics
+marketplace-analytics/
+platform-analytics/
+
+# Archivos de configuración de SaaS analytics
+saas-analytics/
+software-as-a-service-analytics/
+
+# Archivos de configuración de PaaS analytics
+paas-analytics/
+platform-as-a-service-analytics/
+
+# Archivos de configuración de IaaS analytics
+iaas-analytics/
+infrastructure-as-a-service-analytics/
+
+# Archivos de configuración de FaaS analytics
+faas-analytics/
+function-as-a-service-analytics/
+
+# Archivos de configuración de DaaS analytics
+daas-analytics/
+data-as-a-service-analytics/
+
+# Archivos de configuración de AaaS analytics
+aaas-analytics/
+analytics-as-a-service-analytics/
+
+# Archivos de configuración de MaaS analytics
+maas-analytics/
+monitoring-as-a-service-analytics/
+
+# Archivos de configuración de LaaS analytics
+laas-analytics/
+logging-as-a-service-analytics/
+
+# Archivos de configuración de BaaS analytics
+baas-analytics/
+backend-as-a-service-analytics/
+
+# Archivos de configuración de MBaaS analytics
+mbaas-analytics/
+mobile-backend-as-a-service-analytics/
+
+# Archivos de configuración de DBaaS analytics
+dbaas-analytics/
+database-as-a-service-analytics/
+
+# Archivos de configuración de STaaS analytics
+staas-analytics/
+storage-as-a-service-analytics/
+
+# Archivos de configuración de NaaS analytics
+naas-analytics/
+network-as-a-service-analytics/
+
+# Archivos de configuración de CaaS analytics
+caas-analytics/
+container-as-a-service-analytics/
+
+# Archivos de configuración de SECaaS analytics
+secaas-analytics/
+security-as-a-service-analytics/
+
+# Archivos de configuración de DRaaS analytics
+draas-analytics/
+disaster-recovery-as-a-service-analytics/
+
+# Archivos de configuración de BaaS analytics
+baas-analytics/
+backup-as-a-service-analytics/
+
+# Archivos de configuración de AaaS analytics
+aaas-analytics/
+authentication-as-a-service-analytics/
+
+# Archivos de configuración de IaaS analytics
+iaas-analytics/
+identity-as-a-service-analytics/
+
+# Archivos de configuración de MaaS analytics
+maas-analytics/
+messaging-as-a-service-analytics/
+
+# Archivos de configuración de NaaS analytics
+naas-analytics/
+notification-as-a-service-analytics/
+
+# Archivos de configuración de PaaS analytics
+paas-analytics/
+payment-as-a-service-analytics/
+
+# Archivos de configuración de RaaS analytics
+raas-analytics/
+reporting-as-a-service-analytics/
+
+# Archivos de configuración de TaaS analytics
+taas-analytics/
+testing-as-a-service-analytics/
+
+# Archivos de configuración de VaaS analytics
+vaas-analytics/
+video-as-a-service-analytics/
+
+# Archivos de configuración de WaaS analytics
+waas-analytics/
+webinar-as-a-service-analytics/
+
+# Archivos de configuración de XaaS analytics
+xaas-analytics/
+everything-as-a-service-analytics/
+
+# =====================================================
+# FIN DEL ARCHIVO .gitignore
+# ===================================================== 

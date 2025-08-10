@@ -1,0 +1,186 @@
+<?php
+// Script de prueba para verificar la resolución 1920x1080
+echo "<!DOCTYPE html>";
+echo "<html lang='es'>";
+echo "<head>";
+echo "<meta charset='UTF-8'>";
+echo "<meta name='viewport' content='width=device-width, initial-scale=1.0'>";
+echo "<title>Test Resolución 1920x1080</title>";
+echo "<style>";
+echo "body { margin: 0; padding: 0; font-family: Arial, sans-serif; }";
+echo ".test-container {";
+echo "    width: 100vw;";
+echo "    height: 100vh;";
+echo "    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);";
+echo "    display: flex;";
+echo "    flex-direction: column;";
+echo "    padding: 20px;";
+echo "    box-sizing: border-box;";
+echo "}";
+echo ".test-header {";
+echo "    background: rgba(255, 255, 255, 0.9);";
+echo "    padding: 15px 20px;";
+echo "    border-radius: 12px;";
+echo "    margin-bottom: 20px;";
+echo "    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);";
+echo "    flex-shrink: 0;";
+echo "}";
+echo ".test-content {";
+echo "    flex: 1;";
+echo "    background: rgba(255, 255, 255, 0.9);";
+echo "    border-radius: 12px;";
+echo "    padding: 20px;";
+echo "    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);";
+echo "    overflow: auto;";
+echo "}";
+echo ".resolution-info {";
+echo "    background: #e7f3ff;";
+echo "    border: 1px solid #b3d9ff;";
+echo "    padding: 15px;";
+echo "    border-radius: 8px;";
+echo "    margin-bottom: 20px;";
+echo "}";
+echo ".test-grid {";
+echo "    display: grid;";
+echo "    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));";
+echo "    gap: 20px;";
+echo "    margin-bottom: 20px;";
+echo "}";
+echo ".test-card {";
+echo "    background: white;";
+echo "    border: 1px solid #ddd;";
+echo "    border-radius: 8px;";
+echo "    padding: 20px;";
+echo "    box-shadow: 0 2px 4px rgba(0,0,0,0.1);";
+echo "}";
+echo ".test-table {";
+echo "    width: 100%;";
+echo "    border-collapse: collapse;";
+echo "    margin-top: 15px;";
+echo "}";
+echo ".test-table th, .test-table td {";
+echo "    border: 1px solid #ddd;";
+echo "    padding: 8px;";
+echo "    text-align: left;";
+echo "}";
+echo ".test-table th {";
+echo "    background: #007bff;";
+echo "    color: white;";
+echo "}";
+echo "</style>";
+echo "</head>";
+echo "<body>";
+
+echo "<div class='test-container'>";
+echo "<div class='test-header'>";
+echo "<h1>🧪 Test de Resolución 1920x1080</h1>";
+echo "<p>Verificando que la interfaz se adapte correctamente a tu pantalla</p>";
+echo "</div>";
+
+echo "<div class='test-content'>";
+echo "<div class='resolution-info'>";
+echo "<h3>📊 Información de Resolución</h3>";
+echo "<ul>";
+echo "<li><strong>Resolución objetivo:</strong> 1920x1080</li>";
+echo "<li><strong>Altura de ventana:</strong> <span id='window-height'>Calculando...</span></li>";
+echo "<li><strong>Ancho de ventana:</strong> <span id='window-width'>Calculando...</span></li>";
+echo "<li><strong>Zoom del navegador:</strong> <span id='browser-zoom'>Calculando...</span></li>";
+echo "<li><strong>Scroll vertical:</strong> <span id='scroll-status'>Verificando...</span></li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<div class='test-grid'>";
+echo "<div class='test-card'>";
+echo "<h3>✅ Estado Actual</h3>";
+echo "<p>La interfaz debería:</p>";
+echo "<ul>";
+echo "<li>Ocupar toda la pantalla sin scroll vertical</li>";
+echo "<li>Mostrar la barra de desplazamiento solo cuando sea necesario</li>";
+echo "<li>Adaptarse correctamente a 1920x1080</li>";
+echo "<li>No requerir reducir el zoom del navegador</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<div class='test-card'>";
+echo "<h3>🔧 Correcciones Implementadas</h3>";
+echo "<ul>";
+echo "<li>HTML y body con height: 100% y overflow: hidden</li>";
+echo "<li>Contenedor principal con height: 100vh</li>";
+echo "<li>Flexbox para distribución correcta del espacio</li>";
+echo "<li>Contenido con overflow-y: auto solo cuando sea necesario</li>";
+echo "<li>Elementos con flex-shrink: 0 para evitar compresión</li>";
+echo "</ul>";
+echo "</div>";
+echo "</div>";
+
+echo "<div class='test-card'>";
+echo "<h3>📋 Tabla de Prueba (Simulando Facturas)</h3>";
+echo "<table class='test-table'>";
+echo "<thead>";
+echo "<tr>";
+echo "<th>ESTAB</th>";
+echo "<th>PTO EMI</th>";
+echo "<th>SECUENCIAL</th>";
+echo "<th>FECHA CREACIÓN</th>";
+echo "<th>CLIENTE</th>";
+echo "<th>DIRECCIÓN</th>";
+echo "<th>TOTAL</th>";
+echo "<th>ESTATUS</th>";
+echo "</tr>";
+echo "</thead>";
+echo "<tbody>";
+
+// Generar datos de prueba
+for ($i = 1; $i <= 10; $i++) {
+    echo "<tr>";
+    echo "<td>001</td>";
+    echo "<td>001</td>";
+    echo "<td>0000000" . $i . "</td>";
+    echo "<td>2024-01-" . str_pad($i, 2, '0', STR_PAD_LEFT) . "</td>";
+    echo "<td>Cliente Prueba " . $i . "</td>";
+    echo "<td>Dirección de Prueba " . $i . "</td>";
+    echo "<td>$" . number_format(rand(100, 1000), 2) . "</td>";
+    echo "<td>REGISTRADA</td>";
+    echo "</tr>";
+}
+
+echo "</tbody>";
+echo "</table>";
+echo "</div>";
+
+echo "<div class='test-card'>";
+echo "<h3>🎯 Próximos Pasos</h3>";
+echo "<ul>";
+echo "<li><a href='facturacion.html' target='_blank'>📊 Ir a Facturación (NUEVA VENTANA)</a></li>";
+echo "<li><a href='test_paginacion.php' target='_blank'>🔍 Probar Paginación</a></li>";
+echo "<li>Verificar que no hay scroll vertical innecesario</li>";
+echo "<li>Confirmar que la interfaz se adapta correctamente</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "</div>";
+echo "</div>";
+
+echo "<script>";
+echo "// Detectar información de la ventana";
+echo "function updateWindowInfo() {";
+echo "    document.getElementById('window-height').textContent = window.innerHeight + 'px';";
+echo "    document.getElementById('window-width').textContent = window.innerWidth + 'px';";
+echo "    document.getElementById('browser-zoom').textContent = Math.round(window.devicePixelRatio * 100) + '%';";
+echo "    ";
+echo "    const hasVerticalScroll = document.documentElement.scrollHeight > document.documentElement.clientHeight;";
+echo "    document.getElementById('scroll-status').textContent = hasVerticalScroll ? '❌ Hay scroll vertical' : '✅ Sin scroll vertical';";
+echo "    document.getElementById('scroll-status').style.color = hasVerticalScroll ? '#dc3545' : '#28a745';";
+echo "}";
+echo "";
+echo "// Actualizar información al cargar y al cambiar el tamaño";
+echo "window.addEventListener('load', updateWindowInfo);";
+echo "window.addEventListener('resize', updateWindowInfo);";
+echo "";
+echo "// Actualizar cada 2 segundos para detectar cambios";
+echo "setInterval(updateWindowInfo, 2000);";
+echo "</script>";
+
+echo "</body>";
+echo "</html>";
+?> 

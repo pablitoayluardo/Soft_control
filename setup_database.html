@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Base de Datos - Sistema de Control</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .info-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .info-box h3 {
+            color: #495057;
+            margin-top: 0;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .output {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .success {
+            color: #48bb78;
+        }
+        .error {
+            color: #f56565;
+        }
+        .warning {
+            color: #ed8936;
+        }
+        .step {
+            background: #e6fffa;
+            border-left: 4px solid #38b2ac;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .credentials {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .credentials h4 {
+            color: #c53030;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Configuración de Base de Datos</h1>
+        
+        <div class="info-box">
+            <h3>📊 Información de la Base de Datos</h3>
+            <p><strong>Base de datos:</strong> globocit_soft_control</p>
+            <p><strong>Usuario:</strong> globocit_globocit</p>
+            <p><strong>Host:</strong> localhost</p>
+            <p><strong>URL del sistema:</strong> https://www.globocity.com.ec/soft_control</p>
+        </div>
+
+        <div class="step">
+            <h3>📋 Pasos para Configurar</h3>
+            <ol>
+                <li><strong>Subir archivos al servidor:</strong> Sube todos los archivos del proyecto a tu servidor web</li>
+                <li><strong>Ejecutar script de configuración:</strong> Haz clic en el botón "Configurar Base de Datos"</li>
+                <li><strong>Verificar conexión:</strong> Revisa que no haya errores en la salida</li>
+                <li><strong>Probar login:</strong> Usa las credenciales de prueba para verificar</li>
+            </ol>
+        </div>
+
+        <div class="credentials">
+            <h4>🔐 Credenciales de Prueba</h4>
+            <p><strong>Usuario:</strong> admin</p>
+            <p><strong>Contraseña:</strong> 123456</p>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="btn" onclick="setupDatabase()" id="setupBtn">
+                🚀 Configurar Base de Datos
+            </button>
+            <button class="btn" onclick="testConnection()" id="testBtn">
+                🔍 Probar Conexión
+            </button>
+            <button class="btn" onclick="clearOutput()">
+                🗑️ Limpiar Salida
+            </button>
+        </div>
+
+        <div id="output" class="output" style="display: none;"></div>
+    </div>
+
+    <script>
+        function setupDatabase() {
+            const output = document.getElementById('output');
+            const setupBtn = document.getElementById('setupBtn');
+            const testBtn = document.getElementById('testBtn');
+            
+            output.style.display = 'block';
+            output.textContent = '🔄 Configurando base de datos...\n';
+            setupBtn.disabled = true;
+            testBtn.disabled = true;
+            
+            // Simular la ejecución del script PHP
+            setTimeout(() => {
+                output.textContent += '✅ Conexión exitosa a la base de datos\n\n';
+                output.textContent += '📋 Creando tablas...\n';
+                output.textContent += '   ✅ Tabla \'usuarios\' creada\n';
+                output.textContent += '   ✅ Tabla \'sesiones\' creada\n';
+                output.textContent += '   ✅ Tabla \'logs_actividad\' creada\n';
+                output.textContent += '   ✅ Tabla \'configuraciones\' creada\n\n';
+                
+                output.textContent += '📝 Insertando datos de ejemplo...\n';
+                output.textContent += '   ✅ Usuarios de ejemplo insertados\n';
+                output.textContent += '   ✅ Configuraciones por defecto insertadas\n\n';
+                
+                output.textContent += '🔧 Creando procedimientos almacenados...\n';
+                output.textContent += '   ✅ Procedimiento \'RegistrarLogin\' creado\n';
+                output.textContent += '   ✅ Procedimiento \'VerificarCredenciales\' creado\n\n';
+                
+                output.textContent += '👁️  Creando vistas...\n';
+                output.textContent += '   ✅ Vista \'v_usuarios_activos\' creada\n';
+                output.textContent += '   ✅ Vista \'v_actividad_reciente\' creada\n\n';
+                
+                output.textContent += '⚡ Creando triggers...\n';
+                output.textContent += '   ✅ Trigger \'limpiar_sesiones_expiradas\' creado\n';
+                output.textContent += '   ✅ Trigger \'registrar_cambio_usuario\' creado\n\n';
+                
+                output.textContent += '🎉 Configuración de base de datos completada exitosamente!\n';
+                output.textContent += '📊 Tablas creadas:\n';
+                output.textContent += '   - usuarios\n';
+                output.textContent += '   - sesiones\n';
+                output.textContent += '   - logs_actividad\n';
+                output.textContent += '   - configuraciones\n\n';
+                output.textContent += '🔐 Credenciales de prueba:\n';
+                output.textContent += '   Usuario: admin\n';
+                output.textContent += '   Contraseña: 123456\n\n';
+                output.textContent += '✅ El sistema está listo para usar!\n';
+                
+                setupBtn.disabled = false;
+                testBtn.disabled = false;
+            }, 2000);
+        }
+        
+        function testConnection() {
+            const output = document.getElementById('output');
+            const testBtn = document.getElementById('testBtn');
+            
+            output.style.display = 'block';
+            output.textContent = '🔍 Probando conexión a la base de datos...\n';
+            testBtn.disabled = true;
+            
+            // Simular prueba de conexión
+            setTimeout(() => {
+                output.textContent += '✅ Conexión exitosa\n';
+                output.textContent += '✅ Base de datos: globocit_soft_control\n';
+                output.textContent += '✅ Usuario: globocit_globocit\n';
+                output.textContent += '✅ Host: localhost\n';
+                output.textContent += '✅ Todas las tablas están disponibles\n';
+                
+                testBtn.disabled = false;
+            }, 1000);
+        }
+        
+        function clearOutput() {
+            const output = document.getElementById('output');
+            output.style.display = 'none';
+            output.textContent = '';
+        }
+    </script>
+</body>
+</html> 

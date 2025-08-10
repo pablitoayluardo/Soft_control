@@ -1,0 +1,2600 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facturación - Sistema de Control GloboCity</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+        /* Estilos base para evitar scroll innecesario */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .facturacion-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-height: 100vh;
+            margin: 0;
+            padding: 12px; /* Reducido de 15px a 12px */
+            box-sizing: border-box;
+        }
+        
+        .top-navigation {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-filter);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 8px 12px; /* Reducido de 12px 15px a 8px 12px */
+            margin-bottom: 10px; /* Reducido de 15px a 10px */
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 6px; /* Reducido de 8px a 6px */
+            flex-wrap: wrap;
+        }
+        
+        .nav-button {
+            display: flex;
+            align-items: center;
+            padding: 6px 10px; /* Reducido de 8px 12px a 6px 10px */
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        
+        .nav-button:hover {
+            background: rgba(74, 222, 128, 0.1);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .nav-button.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .nav-button i {
+            margin-right: 4px; /* Reducido de 6px a 4px */
+            font-size: 14px;
+        }
+        
+        .back-button {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 6px 10px; /* Reducido de 8px 12px a 6px 10px */
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px; /* Reducido de 6px a 4px */
+        }
+        
+        .back-button:hover {
+            background: rgba(74, 222, 128, 0.1);
+            transform: translateX(-5px);
+        }
+        
+        .content-area {
+            flex: 1;
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-filter);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 12px; /* Reducido de 15px a 12px */
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .content-area::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            opacity: 0.1;
+            border-radius: 50%;
+            z-index: -1;
+        }
+        
+        .content-section {
+            display: none;
+            flex: 1;
+            overflow: visible;
+            padding: 0; /* Sobrescribir el padding de 24px del CSS externo */
+            min-height: 0;
+            height: auto;
+        }
+        
+        .content-section.active {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Estilo específico para la sección de subida de facturas - MISMAS DIMENSIONES QUE DIVISIÓN 1 + TÍTULO */
+        .upload-section {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            /* Aplicar dimensiones similares a .top-navigation pero con más altura */
+            background: var(--glass-bg) !important;
+            backdrop-filter: var(--backdrop-filter) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: var(--border-radius-lg) !important;
+            margin-bottom: 10px !important; /* Exactamente igual que .top-navigation */
+            box-shadow: var(--shadow-lg) !important;
+            display: flex !important;
+            flex-direction: column !important; /* Cambiar a columna para incluir título */
+            flex-shrink: 0 !important;
+            /* Altura aumentada para incluir título */
+            height: 100px !important;
+            min-height: 100px !important;
+            max-height: 100px !important;
+        }
+        
+        .upload-section .table-content {
+            padding: 4px 12px !important; /* Padding para el contenido */
+            min-height: auto !important;
+            max-height: none !important;
+            height: auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            flex: 1 !important; /* Tomar el espacio restante */
+        }
+        
+        /* Controles de subida optimizados para menor altura - MISMAS DIMENSIONES QUE DIVISIÓN 1 */
+        .upload-controls {
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important; /* Exactamente igual que .nav-buttons */
+            margin-bottom: 0 !important; /* Sin margen inferior */
+            flex-wrap: wrap !important;
+            justify-content: flex-start !important;
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            padding: 0 !important; /* Sin padding */
+            height: 100% !important;
+        }
+        
+        .upload-controls label {
+            display: flex !important;
+            align-items: center !important;
+            gap: 4px !important; /* Exactamente igual que .nav-button i */
+            font-weight: 600 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: 13px !important; /* Exactamente igual que .nav-button */
+        }
+        
+        .upload-controls input[type="text"] {
+            flex: 1 !important;
+            min-width: 200px !important;
+            padding: 6px 10px !important; /* Exactamente igual que .nav-button */
+            border: 1px solid var(--glass-border) !important;
+            border-radius: var(--border-radius) !important;
+            background: var(--glass-bg) !important;
+        }
+        
+        .upload-controls input[type="checkbox"] {
+            width: 14px !important;
+            height: 14px !important;
+        }
+        
+        /* Restaurar header de la sección de subida con altura reducida */
+        .upload-section .table-header {
+            display: block !important; /* Mostrar el header */
+            padding: 2px 8px !important; /* Padding reducido */
+            background: rgba(74, 222, 128, 0.1) !important;
+            border-bottom: 1px solid var(--glass-border) !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .upload-section .table-header h3 {
+            display: block !important;
+            font-size: 0.85rem !important; /* Tamaño reducido */
+            margin: 0 !important;
+            color: var(--text-primary) !important;
+        }
+        
+        /* Reducir margen del resultado de subida */
+        #resultado-subida {
+            margin-top: 0 !important;
+            display: block !important; /* Mostrar para mantener funcionalidad */
+        }
+        
+        .content-header {
+            margin-bottom: 2px; /* Reducido de 4px a 2px */
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .content-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1px; /* Reducido de 2px a 1px */
+        }
+        
+        .content-header p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0; /* Eliminar margen por defecto */
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 6px; /* Reducido de 8px a 6px */
+            margin-bottom: 6px; /* Reducido de 8px a 6px */
+            flex-shrink: 0;
+        }
+        
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 6px; /* Reducido de 8px a 6px */
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-card .stat-icon {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-bottom: 2px; /* Reducido de 4px a 2px */
+        }
+        
+        .stat-card .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1px; /* Reducido de 2px a 1px */
+        }
+        
+        .stat-card .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            margin: 0; /* Eliminar margen por defecto */
+        }
+        
+        .table-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            overflow: visible;
+            margin-top: 2px; /* Reducido de 3px a 2px */
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .table-header {
+            background: rgba(74, 222, 128, 0.1);
+            padding: 4px 10px; /* Reducido de 6px a 4px */
+            border-bottom: 1px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+        
+        .table-header h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .table-content {
+            padding: 4px; /* Reducido de 6px a 4px */
+            overflow: auto;
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            max-height: 600px; /* Altura máxima para el scroll */
+            position: relative; /* Añadir posición relativa */
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 10px; /* Reducido de 15px a 10px */
+            color: var(--text-secondary);
+        }
+        
+        .loading i {
+            font-size: 1.1rem;
+            margin-bottom: 4px; /* Reducido de 6px a 4px */
+            color: var(--primary-color);
+        }
+        
+        /* Estilos para la tabla responsiva */
+        .facturas-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            table-layout: fixed;
+            position: relative;
+            margin: 0; /* Remover margen para que el encabezado sticky se posicione correctamente */
+        }
+        
+        .facturas-table thead {
+            position: sticky;
+            top: -4px; /* Ajustado de -6px a -4px para compensar el nuevo padding */
+            z-index: 100;
+            background: #007bff;
+        }
+        
+        .facturas-table th {
+            background: #007bff;
+            color: white;
+            padding: 8px 4px; /* Reducido de 10px 6px a 8px 4px */
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+            position: sticky;
+            top: -4px; /* Ajustado de -6px a -4px para compensar el nuevo padding */
+            z-index: 100;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .facturas-table td {
+            padding: 6px 4px; /* Reducido de 8px 6px a 6px 4px */
+            border: 1px solid #ddd;
+            vertical-align: top;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .facturas-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .facturas-table tr:hover {
+            background: #e3f2fd;
+        }
+        
+        /* Estilos para mejorar la experiencia de scroll */
+        .table-content::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .table-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .table-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        .table-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Ajustar anchos de columnas específicas */
+        .facturas-table th:nth-child(1), .facturas-table td:nth-child(1) { width: 6%; } /* ESTAB */
+        .facturas-table th:nth-child(2), .facturas-table td:nth-child(2) { width: 6%; } /* PTO EMI */
+        .facturas-table th:nth-child(3), .facturas-table td:nth-child(3) { width: 8%; } /* SECUENCIAL */
+        .facturas-table th:nth-child(4), .facturas-table td:nth-child(4) { width: 10%; } /* FECHA EMISIÓN */
+        .facturas-table th:nth-child(5), .facturas-table td:nth-child(5) { width: 15%; } /* CLIENTE */
+        .facturas-table th:nth-child(6), .facturas-table td:nth-child(6) { width: 15%; } /* DIRECCIÓN */
+        .facturas-table th:nth-child(7), .facturas-table td:nth-child(7) { width: 8%; } /* TOTAL */
+        .facturas-table th:nth-child(8), .facturas-table td:nth-child(8) { width: 8%; } /* ESTATUS */
+        .facturas-table th:nth-child(9), .facturas-table td:nth-child(9) { width: 8%; } /* RETENCIÓN */
+        .facturas-table th:nth-child(10), .facturas-table td:nth-child(10) { width: 8%; } /* VALOR PAGADO */
+        .facturas-table th:nth-child(11), .facturas-table td:nth-child(11) { width: 8%; } /* OBSERVACIÓN */
+        
+        .file-input-hidden {
+            display: none;
+        }
+        
+        /* Estilos para paginación */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px; /* Reducido de 10px a 8px */
+            padding: 8px 12px; /* Reducido de 10px 15px a 8px 12px */
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            flex-shrink: 0;
+        }
+        
+        .pagination-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px; /* Reducido de 8px a 6px */
+        }
+        
+        .pagination-btn {
+            padding: 4px 8px; /* Reducido de 6px 10px a 4px 8px */
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 12px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px; /* Reducido de 4px a 3px */
+        }
+        
+        .pagination-btn:hover:not(:disabled) {
+            background: rgba(74, 222, 128, 0.1);
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .page-numbers {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        
+        .page-number {
+            padding: 4px 8px; /* Reducido de 6px 10px a 4px 8px */
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 32px; /* Reducido de 35px a 32px */
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .page-number:hover:not(.active) {
+            background: rgba(74, 222, 128, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .page-number.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        /* Estilos para headers ordenables */
+        .sortable-header {
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+        }
+        
+        .sortable-header:hover {
+            background: rgba(74, 222, 128, 0.1);
+        }
+        
+        .sortable-header.sort-asc::after {
+            content: ' ▲';
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .sortable-header.sort-desc::after {
+            content: ' ▼';
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        /* Estilos para headers filtrables */
+        .filterable-header {
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+        }
+        
+        .filterable-header:hover {
+            background: rgba(74, 222, 128, 0.1);
+        }
+        
+        .filterable-header.filter-active {
+            background: rgba(74, 222, 128, 0.2);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .filterable-header.filter-active::after {
+            content: ' 🔍';
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .facturacion-container {
+                padding: 15px;
+            }
+            
+            .content-area {
+                padding: 15px;
+            }
+            
+            .facturas-table {
+                font-size: 11px;
+            }
+            
+            .facturas-table th,
+            .facturas-table td {
+                padding: 6px 4px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .facturacion-container {
+                padding: 10px;
+                height: 100vh;
+            }
+            
+            .top-navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                gap: 5px;
+                width: 100%;
+            }
+            
+            .nav-button {
+                font-size: 12px;
+                padding: 8px 12px;
+                justify-content: center;
+            }
+            
+            .content-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .pagination-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .page-numbers {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .facturas-table {
+                font-size: 10px;
+            }
+            
+            .table-content {
+                max-height: 400px; /* Altura reducida para móviles */
+            }
+            
+            .facturas-table th {
+                padding: 8px 4px;
+                font-size: 10px;
+            }
+            
+            .facturas-table td {
+                padding: 6px 4px;
+                font-size: 10px;
+            }
+        }
+        
+        /* Estilos para diferentes estatus */
+        .status-registrado {
+            color: #28a745 !important;
+            font-weight: bold;
+        }
+        
+        .status-pagado {
+            color: #007bff !important;
+            font-weight: bold;
+        }
+        
+        .status-anulado {
+            color: #dc3545 !important;
+            font-weight: bold;
+        }
+        
+        .status-nota-cr {
+            color: #6f42c1 !important;
+            font-weight: bold;
+        }
+
+        /* Clase de emergencia para mostrar modales */
+        .show-modal-urgente {
+            display: flex !important;
+            position: fixed !important;
+            z-index: 10000 !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background-color: rgba(0,0,0,0.5) !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="facturacion-container">
+        <!-- Navegación superior -->
+        <div class="top-navigation">
+            <a href="dashboard.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
+            
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="showSection('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+                
+                <button class="nav-button active" onclick="showSection('ver-facturas')">
+                    <i class="fas fa-list"></i> Ver Facturas
+                </button>
+                
+                <button class="nav-button" onclick="showSection('bajar-facturas')">
+                    <i class="fas fa-download"></i> Bajar Facturas
+                </button>
+                
+                <button class="nav-button" onclick="showSection('nueva-factura')">
+                    <i class="fas fa-plus-circle"></i> Nueva Factura
+                </button>
+                
+                <button class="nav-button" onclick="showSection('reportes')">
+                    <i class="fas fa-chart-bar"></i> Reportes
+                </button>
+            </div>
+        </div>
+        
+        <!-- Área de contenido -->
+        <div class="content-area">
+            <!-- Dashboard de Facturación -->
+            <div id="dashboard" class="content-section">
+                <div class="content-header">
+                    <h1><i class="fas fa-file-invoice"></i> Dashboard de Facturación</h1>
+                    <p>Vista general del sistema de facturación</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="stat-value" id="total-facturas">0</div>
+                        <div class="stat-label">Total Facturas</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-value" id="total-facturado">$0.00</div>
+                        <div class="stat-label">Total Facturado</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-value" id="facturas-hoy">0</div>
+                        <div class="stat-label">Facturas Hoy</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-value" id="clientes-unicos">0</div>
+                        <div class="stat-label">Clientes Únicos</div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3><i class="fas fa-clock"></i> Actividad Reciente</h3>
+                    </div>
+                    <div class="table-content" id="recent-activity">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Cargando actividad reciente...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ver Facturas -->
+            <div id="ver-facturas" class="content-section active">
+                <div class="content-header">
+                    <h1><i class="fas fa-list"></i> Ver Facturas</h1>
+                    <p>Lista de todas las facturas registradas en el sistema</p>
+                </div>
+                
+                <!-- Sección de subida de facturas - MISMAS DIMENSIONES QUE DIVISIÓN 1 + TÍTULO -->
+                <div class="table-container upload-section" style="background: var(--glass-bg) !important; backdrop-filter: var(--backdrop-filter) !important; border: 1px solid var(--glass-border) !important; border-radius: var(--border-radius-lg) !important; margin-bottom: 10px !important; box-shadow: var(--shadow-lg) !important; flex-shrink: 0 !important; height: 120px !important; min-height: 120px !important; max-height: 120px !important; display: flex !important; flex-direction: column !important;">
+                    <div class="table-header" style="padding: 2px 8px !important; background: rgba(74, 222, 128, 0.1) !important; border-bottom: 1px solid var(--glass-border) !important; flex-shrink: 0 !important;">
+                        <h3 style="font-size: 0.85rem !important; margin: 0 !important; color: var(--text-primary) !important;"><i class="fas fa-upload"></i> Subir Factura Individual</h3>
+                    </div>
+                    <div class="table-content" style="padding: 4px 12px !important; min-height: auto !important; max-height: none !important; height: auto !important; display: flex !important; align-items: center !important; justify-content: space-between !important; flex: 1 !important;">
+                        <div class="upload-controls" style="gap: 6px !important; margin-bottom: 0 !important; padding: 0 !important; height: 100% !important; flex: 1 !important;">
+                            <label style="gap: 4px !important; font-size: 13px !important; margin: 0 !important; padding: 0 !important;">
+                                <span>Seleccionar archivo XML:</span>
+                                <input type="file" id="file-input" accept=".xml" class="file-input-hidden">
+                                <button onclick="document.getElementById('file-input').click()" class="btn btn-primary" style="padding: 6px 10px !important; font-size: 13px !important;">
+                                    <i class="fas fa-folder-open"></i> Buscar Archivo XML
+                                </button>
+                            </label>
+                        </div>
+                        
+                        <!-- Separador vertical -->
+                        <div style="width: 1px; height: 40px; background: var(--glass-border); margin: 0 15px;"></div>
+                        
+                        <!-- Sección de anulación -->
+                        <div class="anular-controls" style="display: flex !important; align-items: center !important; gap: 6px !important; margin-bottom: 0 !important; padding: 0 !important; height: 100% !important;">
+                            <button onclick="showAnularForm()" class="btn btn-danger" style="padding: 6px 10px !important; font-size: 13px !important; background: #dc3545 !important; color: white !important; border: none !important; border-radius: 4px !important; cursor: pointer !important;">
+                                <i class="fas fa-ban"></i> Anular Factura
+                            </button>
+                        </div>
+                        
+                        <div id="resultado-subida" style="margin-top: 0 !important;"></div>
+                    </div>
+                </div>
+                
+                <!-- Lista de facturas -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3><i class="fas fa-file-invoice"></i> Facturas Registradas</h3>
+                    </div>
+                    <div class="table-content">
+                        <div id="facturas-table-container">
+                            <div class="loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Cargando facturas...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paginación -->
+                <div class="pagination-container" id="pagination-container" style="display: none;">
+                    <div class="pagination-info">
+                        <span id="pagination-info">Mostrando 0 de 0 facturas</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="pagination-btn" id="prev-page" onclick="changePage(-1)">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </button>
+                        <div class="page-numbers" id="page-numbers"></div>
+                        <button class="pagination-btn" id="next-page" onclick="changePage(1)">
+                            Siguiente <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bajar Facturas -->
+            <div id="bajar-facturas" class="content-section">
+                <div class="content-header">
+                    <h1><i class="fas fa-download"></i> Bajar Facturas</h1>
+                    <p>Descargar facturas en formato PDF</p>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3><i class="fas fa-file-pdf"></i> Descargas Disponibles</h3>
+                    </div>
+                    <div class="table-content">
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-file-pdf" style="font-size: 4rem; color: #dc3545; margin-bottom: 20px;"></i>
+                            <h3>Descarga de Facturas</h3>
+                            <p>Selecciona las facturas que deseas descargar en formato PDF</p>
+                            <button class="btn btn-primary" onclick="downloadFacturas()">
+                                <i class="fas fa-download"></i> Descargar Seleccionadas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nueva Factura -->
+            <div id="nueva-factura" class="content-section">
+                <div class="content-header">
+                    <h1><i class="fas fa-plus-circle"></i> Nueva Factura</h1>
+                    <p>Crear una nueva factura en el sistema</p>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3><i class="fas fa-edit"></i> Formulario de Factura</h3>
+                    </div>
+                    <div class="table-content">
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-edit" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                            <h3>Crear Nueva Factura</h3>
+                            <p>Formulario para crear una nueva factura en el sistema</p>
+                            <button class="btn btn-primary" onclick="nuevaFactura()">
+                                <i class="fas fa-plus"></i> Crear Factura
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reportes -->
+            <div id="reportes" class="content-section">
+                <div class="content-header">
+                    <h1><i class="fas fa-chart-bar"></i> Reportes</h1>
+                    <p>Reportes y estadísticas de facturación</p>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3><i class="fas fa-chart-line"></i> Reportes Disponibles</h3>
+                    </div>
+                    <div class="table-content">
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-chart-bar" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                            <h3>Reportes de Facturación</h3>
+                            <p>Generar reportes detallados de facturación</p>
+                            <button class="btn btn-primary" onclick="generarReporte()">
+                                <i class="fas fa-chart-line"></i> Generar Reporte
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para confirmar factura -->
+    <div id="factura-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-file-invoice"></i> Confirmar Registro de Factura
+                </h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="modal-content">
+                <!-- El contenido se cargará dinámicamente -->
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-confirm" onclick="confirmarRegistro()">
+                    <i class="fas fa-check"></i> Sí, Registrar Factura
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para preview de facturas -->
+    <div id="factura-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-file-invoice"></i> Preview de Factura
+                </h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="modal-content">
+                <!-- El contenido se cargará dinámicamente -->
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-confirm" onclick="confirmarRegistro()">
+                    <i class="fas fa-check"></i> Sí, Registrar Factura
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para anulación de facturas -->
+    <div id="anular-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-ban"></i> Anular Factura
+                </h3>
+                <button class="modal-close" onclick="closeAnularModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="anular-modal-content">
+                <!-- Formulario de búsqueda -->
+                <div id="anular-form">
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #ffeaa7;">
+                        <h4 style="margin: 0 0 10px 0; color: #856404;">
+                            <i class="fas fa-info-circle"></i> Instrucciones para Anular Factura
+                        </h4>
+                        <p style="margin: 0; color: #856404; font-size: 0.9rem;">
+                            Ingresa los datos de la factura que deseas anular. Solo se pueden anular facturas con estatus "REGISTRADO".
+                        </p>
+                    </div>
+                    
+                    <div class="factura-info">
+                        <div class="info-item">
+                            <div class="info-label">Establecimiento *</div>
+                            <input type="text" id="anular-estab" placeholder="Ej: 001" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Punto de Emisión *</div>
+                            <input type="text" id="anular-pto-emi" placeholder="Ej: 001" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Secuencial *</div>
+                            <input type="text" id="anular-secuencial" placeholder="Ej: 000000001" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resultado de búsqueda -->
+                <div id="anular-result" style="display: none;">
+                    <!-- El contenido se cargará dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeAnularModal()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-confirm" id="anular-search-btn" onclick="buscarFacturaParaAnular()">
+                    <i class="fas fa-search"></i> Buscar Factura
+                </button>
+                <button class="btn-confirm" id="anular-confirm-btn" onclick="confirmarAnulacion()" style="display: none; background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: all 0.3s ease;">
+                    <i class="fas fa-ban"></i> Sí, Anular Factura
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pequeño de confirmación para anulación -->
+    <div id="confirmation-modal" class="modal-overlay" style="display: none;" onclick="closeConfirmationModal()">
+        <div class="modal-content" style="max-width: 400px; margin: 20vh auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3); animation: fadeIn 0.3s ease;" onclick="event.stopPropagation()">
+            <div class="modal-header" style="padding: 15px 20px; border-bottom: 1px solid #dee2e6; background: #f8f9fa;">
+                <h4 class="modal-title" style="margin: 0; color: #dc3545; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i> Confirmar Anulación
+                </h4>
+            </div>
+            
+            <div style="padding: 25px 20px;">
+                <p style="margin: 0 0 15px 0; color: #333; font-size: 16px; text-align: center; font-weight: 500;">
+                    ¿Está seguro que desea anular esta factura?
+                </p>
+                <p style="margin: 0; color: #666; font-size: 14px; text-align: center;">
+                    Esta acción no se puede deshacer.
+                </p>
+            </div>
+            
+            <div style="padding: 0 20px 20px 20px; display: flex; gap: 10px; justify-content: center;">
+                <button onclick="closeConfirmationModal()" class="btn" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; transition: all 0.3s ease;" onmouseover="this.style.background='#5a6268'" onmouseout="this.style.background='#6c757d'">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button id="confirm-anular-btn" class="btn" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
+                    <i class="fas fa-ban"></i> Sí, Anular
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // DETECTOR DE ERRORES GLOBAL - NO QUITAR HASTA RESOLVER
+        // =====================================================
+        window.onerror = function(message, source, lineno, colno, error) {
+            alert(
+                "¡Se ha producido un error de JavaScript!\n\n" +
+                "Error: " + message + "\n" +
+                "Línea: " + lineno + "\n" +
+                "Por favor, envía una captura de pantalla de este mensaje."
+            );
+            return true; // Evita que el error se muestre en la consola del navegador
+        };
+        // =====================================================
+
+        let selectedFile = null;
+        let facturaData = null;
+        
+        // Variables globales para ordenamiento
+        let currentSort = 'fecha_emision';
+        let currentOrder = 'DESC';
+        
+        // Variables globales para filtrado
+        let currentStatusFilter = '';
+        
+        // Inicializar parámetros de ordenamiento y filtrado desde la URL
+        function initializeSortingFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sortParam = urlParams.get('sort');
+            const orderParam = urlParams.get('order');
+            const statusParam = urlParams.get('status');
+            
+            if (sortParam && ['secuencial', 'fecha_emision', 'cliente'].includes(sortParam)) {
+                currentSort = sortParam;
+            }
+            
+            if (orderParam && ['ASC', 'DESC'].includes(orderParam.toUpperCase())) {
+                currentOrder = orderParam.toUpperCase();
+            }
+            
+            if (statusParam && ['', 'REGISTRADO', 'PAGADO', 'ANULADO', 'NOTA CR'].includes(statusParam)) {
+                currentStatusFilter = statusParam;
+            }
+        }
+        
+        // Función para cambiar secciones
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Actualizar botones activos
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Marcar el botón correspondiente como activo
+            event.target.closest('.nav-button').classList.add('active');
+            
+            // Cargar datos específicos según la sección
+            if (sectionId === 'ver-facturas') {
+                loadFacturasList();
+            }
+        }
+        
+        // Configurar el input de archivo
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('file-input');
+            if (fileInput) {
+                fileInput.addEventListener('change', handleFileSelect);
+            }
+            
+            // Inicializar parámetros de ordenamiento desde la URL
+            initializeSortingFromURL();
+            
+            // Cargar facturas al cargar la página
+            loadFacturasList();
+        });
+        
+        // Manejar selección de archivo
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.name.toLowerCase().endsWith('.xml')) {
+                alert('Por favor selecciona un archivo XML válido');
+                return;
+            }
+            
+            selectedFile = file;
+            processXMLFile(file);
+        }
+        
+        // Procesar archivo XML
+        function processXMLFile(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const xmlContent = e.target.result;
+                    console.log('Contenido XML cargado:', xmlContent.substring(0, 500) + '...');
+                    
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlContent, "text/xml");
+                    
+                    // Verificar si el XML se parseó correctamente
+                    if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
+                        throw new Error('Error al parsear el XML. Verifica que sea un archivo XML válido.');
+                    }
+                    
+                    console.log('XML parseado correctamente');
+                    
+                    // Extraer información de la factura
+                    facturaData = extractFacturaInfo(xmlDoc);
+                    console.log('Datos extraídos:', facturaData);
+                    
+                    // Mostrar modal con la información
+                    showFacturaModal(facturaData, xmlContent);
+                    
+                } catch (error) {
+                    console.error('Error procesando XML:', error);
+                    alert('Error al procesar el archivo XML: ' + error.message + '\n\nVerifica que sea un archivo XML válido de factura electrónica.');
+                }
+            };
+            
+            reader.onerror = function() {
+                console.error('Error leyendo archivo');
+                alert('Error al leer el archivo. Verifica que sea un archivo válido.');
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        // Extraer información de la factura del XML
+        function extractFacturaInfo(xmlDoc) {
+            const factura = {};
+            
+            try {
+                console.log('Iniciando extracción de datos del XML...');
+                
+                // Información básica de la factura
+                factura.estab = getXMLValue(xmlDoc, 'estab') || getXMLValue(xmlDoc, 'establecimiento') || 'N/A';
+                factura.ptoEmi = getXMLValue(xmlDoc, 'ptoEmi') || getXMLValue(xmlDoc, 'puntoEmision') || 'N/A';
+                factura.secuencial = getXMLValue(xmlDoc, 'secuencial') || 'N/A';
+                factura.fechaEmision = getXMLValue(xmlDoc, 'fechaEmision') || getXMLValue(xmlDoc, 'fecha') || 'N/A';
+                
+                // Información del comprador
+                factura.razonSocialComprador = getXMLValue(xmlDoc, 'razonSocialComprador') || getXMLValue(xmlDoc, 'razonSocial') || getXMLValue(xmlDoc, 'cliente') || 'N/A';
+                factura.identificacionComprador = getXMLValue(xmlDoc, 'identificacionComprador') || getXMLValue(xmlDoc, 'ruc') || getXMLValue(xmlDoc, 'identificacion') || 'N/A';
+                factura.direccionComprador = getXMLValue(xmlDoc, 'direccionComprador') || getXMLValue(xmlDoc, 'direccion') || 'N/A';
+                
+                // Información de la factura
+                factura.importeTotal = getXMLValue(xmlDoc, 'importeTotal') || getXMLValue(xmlDoc, 'total') || '0.00';
+                factura.moneda = getXMLValue(xmlDoc, 'moneda') || 'USD';
+                
+                // Clave de acceso (identificador único de la factura)
+                factura.claveAcceso = getXMLValue(xmlDoc, 'claveAcceso') || getXMLValue(xmlDoc, 'claveAcceso', 'infoTributaria') || 'N/A';
+                
+                console.log('Datos básicos extraídos:', {
+                    estab: factura.estab,
+                    ptoEmi: factura.ptoEmi,
+                    secuencial: factura.secuencial,
+                    fechaEmision: factura.fechaEmision,
+                    razonSocialComprador: factura.razonSocialComprador,
+                    identificacionComprador: factura.identificacionComprador,
+                    importeTotal: factura.importeTotal,
+                    claveAcceso: factura.claveAcceso
+                });
+                
+                // Extraer detalles de la factura
+                factura.detalles = extractDetallesFactura(xmlDoc);
+                console.log('Detalles extraídos:', factura.detalles.length, 'items');
+                
+            } catch (error) {
+                console.error('Error extrayendo información:', error);
+                throw new Error('Error al extraer información del XML: ' + error.message);
+            }
+            
+            return factura;
+        }
+        
+        // Extraer detalles de la factura
+        function extractDetallesFactura(xmlDoc) {
+            const detalles = [];
+            
+            try {
+                // Buscar elementos de detalle
+                const detalleElements = xmlDoc.getElementsByTagName('detalle');
+                
+                for (let i = 0; i < detalleElements.length; i++) {
+                    const detalle = detalleElements[i];
+                    const item = {
+                        codigoPrincipal: getElementValue(detalle, 'codigoPrincipal') || 'N/A',
+                        descripcion: getElementValue(detalle, 'descripcion') || 'N/A',
+                        cantidad: getElementValue(detalle, 'cantidad') || '0',
+                        precioUnitario: getElementValue(detalle, 'precioUnitario') || '0.00',
+                        descuento: getElementValue(detalle, 'descuento') || '0.00',
+                        precioTotalSinImpuesto: getElementValue(detalle, 'precioTotalSinImpuesto') || '0.00'
+                    };
+                    detalles.push(item);
+                }
+            } catch (error) {
+                console.error('Error extrayendo detalles:', error);
+            }
+            
+            return detalles;
+        }
+        
+        // Función auxiliar para obtener valores del XML
+        function getXMLValue(xmlDoc, tagName, parentTag = null) {
+            let element = null;
+            
+            if (parentTag) {
+                // Buscar dentro de un elemento padre específico
+                const parentElements = xmlDoc.getElementsByTagName(parentTag);
+                if (parentElements.length > 0) {
+                    const parentElement = parentElements[0];
+                    const childElements = parentElement.getElementsByTagName(tagName);
+                    if (childElements.length > 0) {
+                        element = childElements[0];
+                    }
+                }
+            } else {
+                // Buscar directamente en el documento
+                element = xmlDoc.getElementsByTagName(tagName)[0];
+            }
+            
+            return element ? element.textContent : null;
+        }
+        
+        // Función auxiliar para obtener valores de elementos hijos
+        function getElementValue(parent, tagName) {
+            const element = parent.getElementsByTagName(tagName)[0];
+            return element ? element.textContent : null;
+        }
+        
+        // Mostrar modal con información de la factura
+        function showFacturaModal(factura, xmlContent) {
+            const modal = document.getElementById('factura-modal');
+            const modalContent = document.getElementById('modal-content');
+            
+            let html = `
+                <div style="background: #e7f3ff; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 10px 0; color: #007bff;">
+                        <i class="fas fa-info-circle"></i> Información de la Factura a Registrar
+                    </h4>
+                    <p style="margin: 0; color: #666; font-size: 0.9rem;">
+                        Revisa la información antes de confirmar el registro. El sistema verificará automáticamente si esta factura ya existe.
+                    </p>
+                </div>
+                
+                <div class="factura-info">
+                    <div class="info-item">
+                        <div class="info-label">Establecimiento</div>
+                        <div class="info-value">${factura.estab}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Punto de Emisión</div>
+                        <div class="info-value">${factura.ptoEmi}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Secuencial</div>
+                        <div class="info-value">${factura.secuencial}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Fecha de Emisión</div>
+                        <div class="info-value">${factura.fechaEmision}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Razón Social Comprador</div>
+                        <div class="info-value">${factura.razonSocialComprador}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Identificación Comprador</div>
+                        <div class="info-value">${factura.identificacionComprador}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Dirección Comprador</div>
+                        <div class="info-value">${factura.direccionComprador}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Importe Total</div>
+                        <div class="info-value">$${factura.importeTotal} ${factura.moneda}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Clave de Acceso</div>
+                        <div class="info-value">${factura.claveAcceso}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Agregar detalles de la factura si existen
+            if (factura.detalles && factura.detalles.length > 0) {
+                html += `
+                    <h4 style="margin: 20px 0 10px 0; color: var(--text-primary);">
+                        <i class="fas fa-list"></i> Detalles de la Factura (${factura.detalles.length} items)
+                    </h4>
+                    <div style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; max-height: 300px; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Código</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Descripción</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Cantidad</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Precio Unit.</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Descuento</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                factura.detalles.forEach((detalle, index) => {
+                    const rowColor = index % 2 === 0 ? '#ffffff' : '#f8f9fa';
+                    html += `
+                        <tr style="background: ${rowColor};">
+                            <td style="padding: 6px; border: 1px solid #ddd; font-size: 11px;">${detalle.codigoPrincipal}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; font-size: 11px;">${detalle.descripcion}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: center; font-size: 11px;">${detalle.cantidad}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-size: 11px;">$${detalle.precioUnitario}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-size: 11px;">$${detalle.descuento}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-size: 11px; font-weight: bold;">$${detalle.precioTotalSinImpuesto}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                        <i class="fas fa-exclamation-triangle" style="color: #856404; margin-right: 8px;"></i>
+                        <strong>Nota:</strong> No se encontraron detalles de la factura en el XML.
+                    </div>
+                `;
+            }
+            
+            modalContent.innerHTML = html;
+            modal.classList.add('active');
+        }
+        
+        // Escapar HTML para mostrar XML de forma segura
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Cerrar modal
+        function closeModal() {
+            const modal = document.getElementById('factura-modal');
+            modal.classList.remove('active');
+            selectedFile = null;
+            facturaData = null;
+            document.getElementById('file-input').value = '';
+        }
+        
+        // Confirmar registro de factura
+        function confirmarRegistro() {
+            if (!selectedFile || !facturaData) {
+                alert('No hay archivo seleccionado');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('archivo_xml', selectedFile);
+            formData.append('datos_factura', JSON.stringify(facturaData));
+            
+            // Mostrar indicador de carga
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 15px;"></i>
+                    <p>Registrando factura...</p>
+                </div>
+            `;
+            
+            fetch('api/upload_factura_individual.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    modalContent.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-check-circle" style="font-size: 3rem; color: #28a745; margin-bottom: 15px;"></i>
+                            <h3 style="color: #28a745;">¡Factura Registrada Exitosamente!</h3>
+                            <p>La factura ha sido registrada en el sistema.</p>
+                            <div style="background: #e7f3ff; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                                <strong>Clave de Acceso:</strong> ${data.data.clave_acceso}<br>
+                                <strong>Cliente:</strong> ${data.data.cliente}<br>
+                                <strong>Total:</strong> $${data.data.total}
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Recargar la tabla de facturas después de 3 segundos
+                    setTimeout(() => {
+                        closeModal();
+                        loadFacturasList();
+                    }, 3000);
+                } else {
+                    // Determinar el tipo de error para mostrar el icono apropiado
+                    let iconClass = 'fas fa-exclamation-triangle';
+                    let iconColor = '#dc3545';
+                    let titleColor = '#dc3545';
+                    
+                    if (data.message.includes('ya está registrada') || data.message.includes('ya existe')) {
+                        iconClass = 'fas fa-info-circle';
+                        iconColor = '#ffc107';
+                        titleColor = '#ffc107';
+                    }
+                    
+                    modalContent.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="${iconClass}" style="font-size: 3rem; color: ${iconColor}; margin-bottom: 15px;"></i>
+                            <h3 style="color: ${titleColor};">
+                                ${data.message.includes('ya está registrada') ? 'Factura Ya Registrada' : 'Error al Registrar'}
+                            </h3>
+                            <p style="color: var(--text-secondary);">${data.message}</p>
+                            ${data.message.includes('ya está registrada') ? `
+                                <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                                    <strong>Información:</strong><br>
+                                    • Esta factura ya existe en el sistema<br>
+                                    • No se puede registrar la misma factura dos veces<br>
+                                    • Verifica que no hayas subido este archivo anteriormente
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    
+                    // Si es un error de duplicado, cerrar el modal después de 5 segundos
+                    if (data.message.includes('ya está registrada')) {
+                        setTimeout(() => {
+                            closeModal();
+                        }, 5000);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error registrando factura:', error);
+                modalContent.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 15px;"></i>
+                        <h3 style="color: #dc3545;">Error de Conexión</h3>
+                        <p>Error al conectar con el servidor. Verifica tu conexión a internet.</p>
+                        <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                            <strong>Detalles del error:</strong><br>
+                            ${error.message || 'Error desconocido'}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Cargar datos del dashboard
+        function loadDashboardData() {
+            // Cargar estadísticas
+            fetch('api/dashboard_stats.php', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('total-facturas').textContent = data.data.facturacion.total;
+                    document.getElementById('total-facturado').textContent = '$' + parseFloat(data.data.facturacion.total_facturado_mes || 0).toFixed(2);
+                    document.getElementById('facturas-hoy').textContent = data.data.facturacion.hoy;
+                    document.getElementById('clientes-unicos').textContent = data.data.clientes.total;
+                }
+            })
+            .catch(error => {
+                console.error('Error cargando estadísticas:', error);
+            });
+            
+            // Cargar actividad reciente
+            loadRecentActivity();
+        }
+        
+        // Cargar actividad reciente
+        function loadRecentActivity() {
+            fetch('api/recent_activity.php', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayRecentActivity(data.data);
+                }
+            })
+            .catch(error => {
+                console.error('Error cargando actividad:', error);
+            });
+        }
+        
+        // Mostrar actividad reciente
+        function displayRecentActivity(activities) {
+            const container = document.getElementById('recent-activity');
+            
+            if (activities.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No hay actividad reciente</p>';
+                return;
+            }
+            
+            let html = '';
+            activities.forEach(activity => {
+                html += `
+                    <div style="display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--glass-border);">
+                        <div style="width: 40px; height: 40px; background: ${getActivityColor(activity.color)}; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                            <i class="${activity.icono}" style="color: white; font-size: 14px;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: var(--text-primary);">${activity.descripcion}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">${activity.tiempo}</div>
+                        </div>
+                        ${activity.monto ? `<div style="font-weight: 600; color: var(--primary-color);">${activity.monto}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Obtener color de actividad
+        function getActivityColor(color) {
+            const colors = {
+                'success': '#28a745',
+                'info': '#17a2b8',
+                'warning': '#ffc107',
+                'danger': '#dc3545'
+            };
+            return colors[color] || '#6c757d';
+        }
+        
+        // Cargar lista de facturas
+        function loadFacturasList() {
+            const container = document.getElementById('facturas-table-container');
+            const paginationContainer = document.getElementById('pagination-container');
+            
+            if (!container) {
+                console.error('No se encontró el contenedor facturas-table-container');
+                return;
+            }
+            
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i><p>Cargando facturas...</p></div>';
+            paginationContainer.style.display = 'none'; // Ocultar paginación mientras carga
+            
+            // Obtener parámetros de paginación
+            const urlParams = new URLSearchParams(window.location.search);
+            const page = parseInt(urlParams.get('page')) || 1;
+            const limit = 20; // Número de facturas por página
+            
+            // Construir URL con parámetros de ordenamiento y filtrado
+            let apiUrl = `api/get_facturas_simple.php?page=${page}&limit=${limit}&sort=${currentSort}&order=${currentOrder}`;
+            
+            // Agregar filtro de estatus si está activo
+            if (currentStatusFilter) {
+                apiUrl += `&status=${currentStatusFilter}`;
+            }
+            
+            fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayFacturasTable(data.data, data.pagination, data.sorting);
+                    if (data.pagination.pages > 1) {
+                        displayPagination(data.pagination);
+                        paginationContainer.style.display = 'flex';
+                    } else {
+                        paginationContainer.style.display = 'none';
+                    }
+                } else {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #dc3545; margin-bottom: 20px;"></i>
+                            <h3>Error al cargar facturas</h3>
+                            <p>${data.message || 'Error desconocido'}</p>
+                        </div>
+                    `;
+                    paginationContainer.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error cargando facturas:', error);
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #dc3545; margin-bottom: 20px;"></i>
+                        <h3>Error de Conexión</h3>
+                        <p>Error al conectar con el servidor. Verifica tu conexión a internet.</p>
+                    </div>
+                `;
+                paginationContainer.style.display = 'none';
+            });
+        }
+        
+        // Mostrar tabla de facturas
+        function displayFacturasTable(facturas, pagination, sorting) {
+            const container = document.getElementById('facturas-table-container');
+            
+            if (!container) {
+                console.error('No se encontró el contenedor facturas-table-container');
+                return;
+            }
+            
+            if (!Array.isArray(facturas)) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #dc3545; margin-bottom: 20px;"></i>
+                        <h3>Error en el formato de datos</h3>
+                        <p>Los datos recibidos no tienen el formato esperado</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (facturas.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-file-invoice" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                        <h3>No hay facturas registradas</h3>
+                        <p>Sube facturas individuales para verlas aquí</p>
+                        <div style="background: #e7f3ff; border: 1px solid #b3d9ff; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                            <strong>💡 Consejo:</strong> Haz clic en "Buscar Archivo XML" para subir tu primera factura.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Determinar clases de ordenamiento para los headers
+            const getSortClass = (column) => {
+                if (sorting && sorting.sort === column) {
+                    return sorting.order === 'ASC' ? 'sort-asc' : 'sort-desc';
+                }
+                return '';
+            };
+            
+            // Determinar clase de filtro para el header de estatus
+            const getStatusFilterClass = () => {
+                if (currentStatusFilter) {
+                    return 'filter-active';
+                }
+                return '';
+            };
+            
+            let html = `
+                <table class="facturas-table">
+                    <thead>
+                        <tr>
+                            <th>ESTAB</th>
+                            <th>PTO EMI</th>
+                            <th class="sortable-header ${getSortClass('secuencial')}" onclick="sortTable('secuencial')">SECUENCIAL</th>
+                            <th class="sortable-header ${getSortClass('fecha_emision')}" onclick="sortTable('fecha_emision')">FECHA EMISIÓN</th>
+                            <th class="sortable-header ${getSortClass('cliente')}" onclick="sortTable('cliente')">CLIENTE</th>
+                            <th>DIRECCIÓN</th>
+                            <th>TOTAL</th>
+                            <th class="filterable-header ${getStatusFilterClass()}" onclick="showStatusFilter()">ESTATUS ${currentStatusFilter ? `(${currentStatusFilter})` : ''}</th>
+                            <th>RETENCIÓN</th>
+                            <th>VALOR PAGADO</th>
+                            <th>OBSERVACIÓN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            facturas.forEach(factura => {
+                html += `
+                    <tr>
+                        <td>${factura.estab || 'N/A'}</td>
+                        <td>${factura.pto_emi || 'N/A'}</td>
+                        <td>${factura.secuencial || 'N/A'}</td>
+                        <td>${factura.fecha_emision || 'N/A'}</td>
+                        <td>${factura.cliente || 'N/A'}</td>
+                        <td>${factura.direccion || 'N/A'}</td>
+                        <td>$${factura.total || '0.00'}</td>
+                        <td class="${getStatusClass(factura.estatus)}">${factura.estatus || 'REGISTRADO'}</td>
+                        <td>$${factura.retencion || '0.00'}</td>
+                        <td>$${factura.valor_pagado || '0.00'}</td>
+                        <td>${factura.observacion || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        // Función para ordenar la tabla
+        function sortTable(column) {
+            // Si se hace clic en la misma columna, cambiar el orden
+            if (currentSort === column) {
+                currentOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
+            } else {
+                // Si es una nueva columna, establecer orden ascendente por defecto
+                currentSort = column;
+                currentOrder = 'ASC';
+            }
+            
+            // Actualizar URL con los parámetros de ordenamiento
+            const url = new URL(window.location);
+            url.searchParams.set('sort', currentSort);
+            url.searchParams.set('order', currentOrder);
+            url.searchParams.set('page', '1'); // Resetear a la primera página al ordenar
+            window.history.pushState({}, '', url);
+            
+            // Recargar la tabla con los nuevos parámetros de ordenamiento
+            loadFacturasList();
+        }
+        
+        // Función para obtener la clase CSS del estatus
+        function getStatusClass(status) {
+            switch(status) {
+                case 'REGISTRADO':
+                    return 'status-registrado';
+                case 'PAGADO':
+                    return 'status-pagado';
+                case 'ANULADO':
+                    return 'status-anulado';
+                case 'NOTA CR':
+                    return 'status-nota-cr';
+                default:
+                    return 'status-registrado';
+            }
+        }
+        
+        // Función para mostrar filtro de estatus
+        function showStatusFilter() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                max-width: 400px;
+                width: 90%;
+            `;
+            
+            modalContent.innerHTML = `
+                <h3 style="margin-top: 0; color: #333;">Filtrar por Estatus</h3>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: bold;">Selecciona un estatus:</label>
+                    <select id="status-filter-select" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">Todos los estatus</option>
+                        <option value="REGISTRADO" ${currentStatusFilter === 'REGISTRADO' ? 'selected' : ''}>REGISTRADO</option>
+                        <option value="PAGADO" ${currentStatusFilter === 'PAGADO' ? 'selected' : ''}>PAGADO</option>
+                        <option value="ANULADO" ${currentStatusFilter === 'ANULADO' ? 'selected' : ''}>ANULADO</option>
+                        <option value="NOTA CR" ${currentStatusFilter === 'NOTA CR' ? 'selected' : ''}>NOTA CR</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button onclick="closeStatusFilter()" style="padding: 8px 16px; border: 1px solid #ddd; background: #f8f9fa; border-radius: 4px; cursor: pointer;">Cancelar</button>
+                    <button onclick="applyStatusFilter()" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Aplicar Filtro</button>
+                </div>
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Cerrar modal al hacer clic fuera de él
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeStatusFilter();
+                }
+            });
+        }
+        
+        // Función para cerrar el filtro de estatus
+        function closeStatusFilter() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // Función para aplicar el filtro de estatus
+        function applyStatusFilter() {
+            const select = document.getElementById('status-filter-select');
+            const newStatusFilter = select.value;
+            
+            // Actualizar URL con el nuevo filtro
+            const url = new URL(window.location);
+            if (newStatusFilter) {
+                url.searchParams.set('status', newStatusFilter);
+            } else {
+                url.searchParams.delete('status');
+            }
+            url.searchParams.set('page', '1'); // Resetear a la primera página al filtrar
+            window.history.pushState({}, '', url);
+            
+            // Actualizar variable global
+            currentStatusFilter = newStatusFilter;
+            
+            // Cerrar modal y recargar la tabla
+            closeStatusFilter();
+            loadFacturasList();
+        }
+        
+        // Funciones para los botones
+        function downloadFacturas() {
+            alert('Función de descarga de facturas en desarrollo');
+        }
+        
+        function nuevaFactura() {
+            alert('Función de nueva factura en desarrollo');
+        }
+        
+        function generarReporte() {
+            alert('Función de reportes en desarrollo');
+        }
+
+        // Función para cambiar de página
+        function changePage(direction) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentPage = parseInt(urlParams.get('page')) || 1;
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1) {
+                const url = new URL(window.location);
+                url.searchParams.set('page', newPage);
+                window.history.pushState({}, '', url);
+                loadFacturasList();
+            }
+        }
+        
+        // Función para ir a una página específica
+        function goToPage(page) {
+            const url = new URL(window.location);
+            url.searchParams.set('page', page);
+            window.history.pushState({}, '', url);
+            loadFacturasList();
+        }
+        
+        // Mostrar paginación
+        function displayPagination(pagination) {
+            const paginationInfo = document.getElementById('pagination-info');
+            const pageNumbers = document.getElementById('page-numbers');
+            const prevPage = document.getElementById('prev-page');
+            const nextPage = document.getElementById('next-page');
+            
+            // Actualizar información de paginación
+            if (paginationInfo) {
+                paginationInfo.textContent = `Mostrando ${pagination.start} a ${pagination.end} de ${pagination.total} facturas`;
+            }
+            
+            // Actualizar botones de navegación
+            if (prevPage) {
+                prevPage.disabled = !pagination.has_prev;
+                prevPage.classList.toggle('disabled', !pagination.has_prev);
+            }
+            
+            if (nextPage) {
+                nextPage.disabled = !pagination.has_next;
+                nextPage.classList.toggle('disabled', !pagination.has_next);
+            }
+            
+            // Generar números de página
+            if (pageNumbers) {
+                let html = '';
+                const maxPages = 5;
+                let startPage = Math.max(1, pagination.page - Math.floor(maxPages / 2));
+                let endPage = Math.min(pagination.pages, startPage + maxPages - 1);
+                
+                if (endPage - startPage + 1 < maxPages) {
+                    startPage = Math.max(1, endPage - maxPages + 1);
+                }
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    const activeClass = i === pagination.page ? 'active' : '';
+                    html += `<span class="page-number ${activeClass}" onclick="goToPage(${i})">${i}</span>`;
+                }
+                
+                pageNumbers.innerHTML = html;
+            }
+        }
+        
+        // =====================================================
+        // FUNCIONES PARA ANULACIÓN DE FACTURAS
+        // =====================================================
+        
+        // Variable global para almacenar la factura encontrada
+        let facturaEncontrada = null;
+        
+        // Mostrar modal de anulación
+        function showAnularForm() {
+            // Referencias a elementos
+            const modal = document.getElementById('anular-modal');
+            const form = document.getElementById('anular-form');
+            const result = document.getElementById('anular-result');
+            const searchBtn = document.getElementById('anular-search-btn');
+            const confirmBtn = document.getElementById('anular-confirm-btn');
+
+            // Reiniciar la visibilidad
+            if(form) form.style.display = 'block';
+            if(result) result.style.display = 'none';
+            if(searchBtn) searchBtn.style.display = 'inline-block';
+            if(confirmBtn) confirmBtn.style.display = 'none';
+
+            // Limpiar formulario
+            const estabInput = document.getElementById('anular-estab');
+            const ptoEmiInput = document.getElementById('anular-pto-emi');
+            const secuencialInput = document.getElementById('anular-secuencial');
+            if(estabInput) estabInput.value = '';
+            if(ptoEmiInput) ptoEmiInput.value = '';
+            if(secuencialInput) secuencialInput.value = '';
+            
+            // Mostrar el modal
+            if (modal) {
+                modal.classList.add('show-modal-urgente');
+            }
+        }
+        
+        // Cerrar modal de anulación
+        function closeAnularModal() {
+            const modal = document.getElementById('anular-modal');
+            const modalContent = document.getElementById('anular-modal-content');
+            const form = document.getElementById('anular-form');
+            const result = document.getElementById('anular-result');
+            const searchBtn = document.getElementById('anular-search-btn');
+            const confirmBtn = document.getElementById('anular-confirm-btn');
+            
+            // Reiniciar completamente el modal
+            form.style.display = 'block';
+            result.style.display = 'none';
+            searchBtn.style.display = 'inline-block';
+            confirmBtn.style.display = 'none';
+            
+            // Limpiar formulario
+            document.getElementById('anular-estab').value = '';
+            document.getElementById('anular-pto-emi').value = '';
+            document.getElementById('anular-secuencial').value = '';
+            
+            // Limpiar contenido del resultado
+            result.innerHTML = '';
+            
+            // Limpiar variable global
+            facturaEncontrada = null;
+            
+            // Ocultar el modal
+            if (modal) {
+                modal.classList.remove('show-modal-urgente');
+            }
+        }
+        
+        // Buscar factura para anular
+        function buscarFacturaParaAnular() {
+            const estab = document.getElementById('anular-estab').value.trim();
+            const ptoEmi = document.getElementById('anular-pto-emi').value.trim();
+            const secuencial = document.getElementById('anular-secuencial').value.trim();
+            
+            // Validar campos requeridos
+            if (!estab || !ptoEmi || !secuencial) {
+                alert('Por favor completa todos los campos requeridos.');
+                return;
+            }
+            
+            // Mostrar indicador de carga
+            const modalContent = document.getElementById('anular-modal-content');
+            const form = document.getElementById('anular-form');
+            const result = document.getElementById('anular-result');
+            const searchBtn = document.getElementById('anular-search-btn');
+            const confirmBtn = document.getElementById('anular-confirm-btn');
+            
+            // Ocultar formulario y mostrar carga
+            form.style.display = 'none';
+            result.style.display = 'block';
+            searchBtn.style.display = 'none';
+            confirmBtn.style.display = 'none';
+            
+            modalContent.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 15px;"></i>
+                    <p>Buscando factura...</p>
+                    <small style="color: #666;">Esto puede tomar unos segundos</small>
+                </div>
+            `;
+            
+            // Crear un timeout para evitar bucle infinito
+            const timeoutId = setTimeout(() => {
+                mostrarErrorAnulacion('La búsqueda está tomando más tiempo del esperado. Verifica tu conexión a internet.');
+            }, 30000); // 30 segundos de timeout
+            
+            // Realizar búsqueda
+            fetch(`api/buscar_factura.php?estab=${encodeURIComponent(estab)}&pto_emi=${encodeURIComponent(ptoEmi)}&secuencial=${encodeURIComponent(secuencial)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                clearTimeout(timeoutId); // Limpiar timeout si la respuesta llega
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                clearTimeout(timeoutId); // Limpiar timeout si la respuesta llega
+                
+                if (data.success) {
+                    facturaEncontrada = data.data;
+                    mostrarResultadoAnulacion(facturaEncontrada);
+                } else {
+                    mostrarErrorAnulacion(data.message || 'No se pudo encontrar la factura');
+                }
+            })
+            .catch(error => {
+                clearTimeout(timeoutId); // Limpiar timeout en caso de error
+                
+                console.error('Error buscando factura:', error);
+                let errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+                
+                if (error.message.includes('HTTP error')) {
+                    errorMessage = 'Error en el servidor. Intenta nuevamente.';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
+                }
+                
+                mostrarErrorAnulacion(errorMessage);
+            });
+        }
+        
+        // Mostrar resultado de búsqueda para anulación
+        function mostrarResultadoAnulacion(factura) {
+            console.log('mostrarResultadoAnulacion() llamada con:', factura);
+            
+            const modalContent = document.getElementById('anular-modal-content');
+            const form = document.getElementById('anular-form');
+            const result = document.getElementById('anular-result');
+            const searchBtn = document.getElementById('anular-search-btn');
+            const confirmBtn = document.getElementById('anular-confirm-btn');
+            
+            console.log('Elementos del modal:', { form, result, searchBtn, confirmBtn });
+            
+            // Ocultar formulario y mostrar resultado
+            form.style.display = 'none';
+            result.style.display = 'block';
+            searchBtn.style.display = 'none';
+            
+            // Verificar si la factura puede ser anulada
+            if (factura.estatus !== 'REGISTRADO') {
+                console.log('Factura no puede ser anulada, estatus:', factura.estatus);
+                confirmBtn.style.display = 'none';
+                result.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ffc107; margin-bottom: 15px;"></i>
+                        <h3 style="color: #ffc107;">Factura No Puede Ser Anulada</h3>
+                        <p>La factura encontrada tiene estatus "${factura.estatus}" y solo se pueden anular facturas con estatus "REGISTRADO".</p>
+                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                            <strong>Información de la Factura:</strong><br>
+                            • Establecimiento: ${factura.estab}<br>
+                            • Punto de Emisión: ${factura.pto_emi}<br>
+                            • Secuencial: ${factura.secuencial}<br>
+                            • Cliente: ${factura.cliente}<br>
+                            • Total: $${factura.total}<br>
+                            • Estatus: ${factura.estatus}
+                        </div>
+                        <button onclick="resetAnularForm()" style="margin-top: 15px; padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-arrow-left"></i> Volver al Formulario
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            console.log('Factura puede ser anulada, mostrando información y botón');
+            
+            // Mostrar información de la factura para anulación
+            result.innerHTML = `
+                <div style="background: #f8d7da; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+                    <h4 style="margin: 0 0 10px 0; color: #721c24;">
+                        <i class="fas fa-exclamation-triangle"></i> Confirmar Anulación de Factura
+                    </h4>
+                    <p style="margin: 0; color: #721c24; font-size: 0.9rem;">
+                        Estás a punto de anular la siguiente factura. Esta acción no se puede deshacer.
+                    </p>
+                </div>
+                
+                <div class="factura-info">
+                    <div class="info-item">
+                        <div class="info-label">Establecimiento</div>
+                        <div class="info-value">${factura.estab}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Punto de Emisión</div>
+                        <div class="info-value">${factura.pto_emi}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Secuencial</div>
+                        <div class="info-value">${factura.secuencial}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Fecha de Emisión</div>
+                        <div class="info-value">${factura.fecha_emision}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Cliente</div>
+                        <div class="info-value">${factura.cliente}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Dirección</div>
+                        <div class="info-value">${factura.direccion || 'N/A'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Total</div>
+                        <div class="info-value">$${factura.total}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Estatus Actual</div>
+                        <div class="info-value" style="color: #28a745; font-weight: bold;">${factura.estatus}</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="confirmarAnulacionConDatos('${factura.estab}', '${factura.pto_emi}', '${factura.secuencial}')" style="background: #dc3545; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;">
+                        <i class="fas fa-ban"></i> Sí, Anular Factura
+                    </button>
+                </div>
+            `;
+            
+            // Ocultar el botón original y usar el nuevo botón integrado
+            if (confirmBtn) {
+                confirmBtn.style.display = 'none';
+            }
+            
+            console.log('Información de factura mostrada con botón integrado');
+        }
+        
+        // Mostrar error en búsqueda de anulación
+        function mostrarErrorAnulacion(mensaje) {
+            const modalContent = document.getElementById('anular-modal-content');
+            const form = document.getElementById('anular-form');
+            const result = document.getElementById('anular-result');
+            const searchBtn = document.getElementById('anular-search-btn');
+            const confirmBtn = document.getElementById('anular-confirm-btn');
+            
+            // Mostrar formulario y resultado de error
+            form.style.display = 'block';
+            result.style.display = 'block';
+            searchBtn.style.display = 'inline-block';
+            confirmBtn.style.display = 'none';
+            
+            result.innerHTML = `
+                <div style="text-align: center; padding: 20px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px; margin-top: 15px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #dc3545; margin-bottom: 10px;"></i>
+                    <h4 style="color: #721c24; margin: 0 0 10px 0;">Error en la Búsqueda</h4>
+                    <p style="color: #721c24; margin: 0;">${mensaje}</p>
+                    <button onclick="resetAnularForm()" style="margin-top: 10px; padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        <i class="fas fa-arrow-left"></i> Volver al Formulario
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Función para resetear el formulario de anulación
+        function resetAnularForm() {
+            const form = document.getElementById('anular-form');
+            const result = document.getElementById('anular-result');
+            const searchBtn = document.getElementById('anular-search-btn');
+            const confirmBtn = document.getElementById('anular-confirm-btn');
+            
+            // Limpiar formulario
+            document.getElementById('anular-estab').value = '';
+            document.getElementById('anular-pto-emi').value = '';
+            document.getElementById('anular-secuencial').value = '';
+            
+            // Reiniciar modal
+            form.style.display = 'block';
+            result.style.display = 'none';
+            searchBtn.style.display = 'inline-block';
+            confirmBtn.style.display = 'none';
+            
+            // Limpiar contenido del resultado
+            result.innerHTML = '';
+            
+            // Limpiar variable global
+            facturaEncontrada = null;
+        }
+        
+        // Confirmar anulación de factura con datos específicos
+        function confirmarAnulacionConDatos(estab, ptoEmi, secuencial) {
+            console.log('=== confirmarAnulacionConDatos() INICIADA ===');
+            console.log('Parámetros recibidos:', { estab, ptoEmi, secuencial });
+            
+            if (!estab || !ptoEmi || !secuencial) {
+                console.error('Error: Datos incompletos');
+                alert('Datos incompletos para anular la factura.');
+                return;
+            }
+            
+            console.log('Datos válidos, mostrando modal de confirmación...');
+            
+            // Mostrar modal de confirmación antes de proceder
+            showConfirmationModal(estab, ptoEmi, secuencial);
+        }
+        
+        // Confirmar anulación de factura
+        function confirmarAnulacion() {
+            console.log('confirmarAnulacion() llamada');
+            console.log('facturaEncontrada:', facturaEncontrada);
+            
+            if (!facturaEncontrada) {
+                alert('No hay factura seleccionada para anular.');
+                return;
+            }
+            
+            // Mostrar indicador de carga
+            const modalContent = document.getElementById('anular-modal-content');
+            modalContent.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 15px;"></i>
+                    <p>Anulando factura...</p>
+                </div>
+            `;
+            
+            // Preparar datos para la anulación
+            const datosAnulacion = {
+                estab: facturaEncontrada.estab,
+                pto_emi: facturaEncontrada.pto_emi,
+                secuencial: facturaEncontrada.secuencial
+            };
+            
+            console.log('Datos para anulación:', datosAnulacion);
+            
+            // Realizar anulación
+            fetch('api/anular_factura.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datosAnulacion)
+            })
+            .then(response => {
+                console.log('Respuesta del servidor:', response);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Datos de respuesta:', data);
+                
+                if (data.success) {
+                    modalContent.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-check-circle" style="font-size: 3rem; color: #28a745; margin-bottom: 15px;"></i>
+                            <h3 style="color: #28a745;">¡Factura Anulada Exitosamente!</h3>
+                            <p>La factura ha sido anulada en el sistema.</p>
+                            <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                                <strong>Información de la Factura Anulada:</strong><br>
+                                • Establecimiento: ${facturaEncontrada.estab}<br>
+                                • Punto de Emisión: ${facturaEncontrada.pto_emi}<br>
+                                • Secuencial: ${facturaEncontrada.secuencial}<br>
+                                • Cliente: ${facturaEncontrada.cliente}<br>
+                                • Total: $${facturaEncontrada.total}
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Recargar la tabla de facturas después de 3 segundos
+                    setTimeout(() => {
+                        closeAnularModal();
+                        loadFacturasList();
+                    }, 3000);
+                } else {
+                    modalContent.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 15px;"></i>
+                            <h3 style="color: #dc3545;">Error al Anular Factura</h3>
+                            <p>${data.message}</p>
+                            <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                                <strong>Detalles del error:</strong><br>
+                                ${data.message}
+                            </div>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error anulando factura:', error);
+                modalContent.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 15px;"></i>
+                        <h3 style="color: #dc3545;">Error de Conexión</h3>
+                        <p>Error al conectar con el servidor. Verifica tu conexión a internet.</p>
+                        <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                            <strong>Detalles del error:</strong><br>
+                            ${error.message || 'Error desconocido'}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Variables globales para almacenar datos de confirmación
+        let pendingAnulacionData = null;
+
+        // Mostrar modal de confirmación
+        function showConfirmationModal(estab, ptoEmi, secuencial) {
+            try {
+                console.log('📋 showConfirmationModal iniciada con:', { estab, ptoEmi, secuencial });
+                
+                // Almacenar los datos para usar después de la confirmación
+                pendingAnulacionData = { estab, ptoEmi, secuencial };
+                console.log('✅ Datos almacenados en pendingAnulacionData');
+                
+                // Mostrar el modal de confirmación
+                const confirmationModal = document.getElementById('confirmation-modal');
+                if (!confirmationModal) {
+                    console.error('❌ Error: No se encontró confirmation-modal');
+                    alert('❌ Error: Modal no encontrado en showConfirmationModal');
+                    return;
+                }
+                
+                console.log('✅ Modal encontrado, mostrando...');
+                confirmationModal.style.display = 'block';
+                console.log('✅ Modal display cambiado a block');
+                
+                // Verificar que el botón de confirmar existe
+                const confirmBtn = document.getElementById('confirm-anular-btn');
+                if (!confirmBtn) {
+                    console.error('❌ Error: No se encontró confirm-anular-btn');
+                    alert('❌ Error: Botón de confirmar no encontrado');
+                    return;
+                }
+                
+                // Asignar la función al botón de confirmar
+                confirmBtn.onclick = function() {
+                    console.log('👆 Botón de confirmar clickeado');
+                    executeAnulacion();
+                };
+                console.log('✅ Evento click asignado al botón');
+                
+                // Agregar evento para cerrar con Escape
+                document.addEventListener('keydown', escapeHandler);
+                console.log('✅ Event listener de Escape agregado');
+                
+                console.log('✅ showConfirmationModal completada exitosamente');
+                
+            } catch (error) {
+                console.error('❌ Error en showConfirmationModal:', error);
+                alert('❌ Error en showConfirmationModal: ' + error.message);
+            }
+        }
+        
+        // Handler separado para el evento Escape
+        function escapeHandler(event) {
+            if (event.key === 'Escape') {
+                console.log('⌨️ Tecla Escape presionada');
+                closeConfirmationModal();
+            }
+        }
+
+        // Cerrar modal de confirmación
+        function closeConfirmationModal() {
+            try {
+                console.log('🔒 Cerrando modal de confirmación...');
+                
+                const confirmationModal = document.getElementById('confirmation-modal');
+                if (confirmationModal) {
+                    confirmationModal.style.display = 'none';
+                    console.log('✅ Modal ocultado');
+                } else {
+                    console.error('❌ Error: Modal no encontrado al cerrar');
+                }
+                
+                pendingAnulacionData = null;
+                console.log('✅ Datos pendientes limpiados');
+                
+                // Remover el event listener de Escape
+                document.removeEventListener('keydown', escapeHandler);
+                console.log('✅ Event listener de Escape removido');
+                
+            } catch (error) {
+                console.error('❌ Error en closeConfirmationModal:', error);
+                alert('❌ Error al cerrar modal: ' + error.message);
+            }
+        }
+
+        // Ejecutar la anulación después de la confirmación
+        function executeAnulacion() {
+            if (!pendingAnulacionData) {
+                alert('Error: No hay datos de anulación pendientes.');
+                return;
+            }
+
+            const { estab, ptoEmi, secuencial } = pendingAnulacionData;
+            
+            // Cerrar modal de confirmación
+            closeConfirmationModal();
+            
+            console.log('=== executeAnulacion() INICIADA ===');
+            console.log('Datos de anulación:', { estab, ptoEmi, secuencial });
+            
+            // Mostrar indicador de carga en el modal principal
+            const modalContent = document.getElementById('anular-modal-content');
+            if (!modalContent) {
+                console.error('Error: No se encontró el modal content');
+                alert('Error: No se pudo encontrar el modal.');
+                return;
+            }
+            
+            modalContent.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 15px;"></i>
+                    <p>Anulando factura...</p>
+                    <small style="color: #666;">Esto puede tomar unos segundos</small>
+                </div>
+            `;
+            
+            console.log('Enviando solicitud de anulación...');
+            
+            // Realizar anulación
+            fetch('./api/anular_factura.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    estab: estab,
+                    pto_emi: ptoEmi,
+                    secuencial: secuencial
+                })
+            })
+            .then(response => {
+                console.log('Respuesta recibida:', response);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Datos de respuesta:', data);
+                
+                if (data.success) {
+                    console.log('Anulación exitosa');
+                    modalContent.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-check-circle" style="font-size: 3rem; color: #28a745; margin-bottom: 15px;"></i>
+                            <h3 style="color: #28a745;">¡Factura Anulada Exitosamente!</h3>
+                            <p>La factura ha sido anulada en el sistema.</p>
+                            <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                                <strong>Información de la Factura Anulada:</strong><br>
+                                • Establecimiento: ${estab}<br>
+                                • Punto de Emisión: ${ptoEmi}<br>
+                                • Secuencial: ${secuencial}
+                            </div>
+                            <button onclick="closeAnularModal(); loadFacturasList();" style="margin-top: 15px; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                <i class="fas fa-check"></i> Continuar
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    console.log('Error en la anulación:', data.message);
+                    modalContent.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 15px;"></i>
+                            <h3 style="color: #dc3545;">Error al Anular Factura</h3>
+                            <p>${data.message || 'Error desconocido'}</p>
+                            <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                                <strong>Detalles del error:</strong><br>
+                                ${data.message || 'Error desconocido en el servidor'}
+                            </div>
+                            <button onclick="resetAnularForm()" style="margin-top: 15px; padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                <i class="fas fa-arrow-left"></i> Volver
+                            </button>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error anulando factura:', error);
+                
+                let errorMessage = 'Error desconocido';
+                let troubleshooting = '';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'No se pudo conectar con la API del servidor';
+                    troubleshooting = `
+                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                            <strong>Posibles soluciones:</strong><br>
+                            • Verifica que la carpeta 'api' esté en el hosting<br>
+                            • Revisa que el archivo 'config.php' esté configurado<br>
+                            • Comprueba los permisos de los archivos PHP<br>
+                            • Verifica la conexión a la base de datos
+                        </div>
+                    `;
+                } else {
+                    errorMessage = error.message || 'Error desconocido';
+                }
+                
+                modalContent.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 15px;"></i>
+                        <h3 style="color: #dc3545;">Error de Conexión</h3>
+                        <p>${errorMessage}</p>
+                        <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                            <strong>Detalles del error:</strong><br>
+                            ${error.message || 'Error desconocido'}
+                        </div>
+                        ${troubleshooting}
+                        <button onclick="resetAnularForm()" style="margin-top: 15px; padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </button>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
