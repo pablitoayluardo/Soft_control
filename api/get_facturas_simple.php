@@ -139,6 +139,7 @@ try {
     // Consulta principal para obtener facturas con los campos específicos solicitados
     // Usando los nombres detectados de columnas
     $sql = "SELECT 
+        it.id_info_tributaria as id,
         it.estab,
         it.pto_emi,
         it.secuencial,
@@ -194,6 +195,7 @@ try {
         $valorPagado = $factura['estatus'] === 'REGISTRADO' ? 0.00 : ($factura['valor_pagado'] ?: 0.00);
         
         $formattedFacturas[] = [
+            'id' => $factura['id'],
             'estab' => $factura['estab'] ?: 'N/A',
             'pto_emi' => $factura['pto_emi'] ?: 'N/A',
             'secuencial' => $factura['secuencial'] ?: 'N/A',

@@ -419,6 +419,7 @@
         .facturas-table th:nth-child(9), .facturas-table td:nth-child(9) { width: 8%; } /* RETENCIÓN */
         .facturas-table th:nth-child(10), .facturas-table td:nth-child(10) { width: 8%; } /* VALOR PAGADO */
         .facturas-table th:nth-child(11), .facturas-table td:nth-child(11) { width: 8%; } /* OBSERVACIÓN */
+        .facturas-table th:nth-child(12), .facturas-table td:nth-child(12) { width: 10%; } /* ACCIONES */
         
         .file-input-hidden {
             display: none;
@@ -910,9 +911,58 @@
         </div>
     </div>
 
+    <!-- Modal para confirmar anulación de factura -->
+    <div id="anular-factura-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i> Confirmar Anulación
+                </h3>
+                <button class="modal-close" onclick="closeAnularModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="anular-modal-content">
+                <p>¿Estás seguro de que deseas anular la factura <strong id="anular-factura-numero"></strong>?</p>
+                <p>Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeAnularModal()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-confirm-anular" onclick="confirmAnularFactura()">
+                    <i class="fas fa-check"></i> Sí, Anular Factura
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para visualizar detalles de la factura -->
+    <div id="ver-factura-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-file-invoice-dollar"></i> Detalles de la Factura
+                </h3>
+                <button class="modal-close" onclick="closeVerModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="ver-modal-content">
+                <!-- El contenido se cargará dinámicamente -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeVerModal()">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let selectedFile = null;
         let facturaData = null;
+        let facturaIdParaAnular = null;
         
         // Variables globales para ordenamiento
         let currentSort = 'fecha_emision';
@@ -1576,12 +1626,14 @@
                             <th>RETENCIÓN</th>
                             <th>VALOR PAGADO</th>
                             <th>OBSERVACIÓN</th>
+                            <th>ACCIONES</th> 
                         </tr>
                     </thead>
                     <tbody>
             `;
             
             facturas.forEach(factura => {
+                const numeroFactura = `${factura.estab || ''}-${factura.pto_emi || ''}-${factura.secuencial || ''}`;
                 html += `
                     <tr>
                         <td>${factura.estab || 'N/A'}</td>
@@ -1595,6 +1647,17 @@
                         <td>$${factura.retencion || '0.00'}</td>
                         <td>$${factura.valor_pagado || '0.00'}</td>
                         <td>${factura.observacion || 'N/A'}</td>
+                        <td class="actions-cell">
+                            <button class="btn-ver" onclick="showVerFactura(${factura.id})" title="Ver Detalles">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                            ${factura.estatus !== 'ANULADO' ?
+                                `<button class="btn-anular" onclick="showAnularConfirm(${factura.id}, '${numeroFactura}')" title="Anular Factura">
+                                    <i class="fas fa-ban"></i> Anular
+                                </button>` :
+                                '<span class="status-anulado">Anulada</span>'
+                            }
+                        </td>
                     </tr>
                 `;
             });
@@ -1809,34 +1872,161 @@
                 pageNumbers.innerHTML = html;
             }
         }
+
+        // --- FUNCIONES DE ANULACIÓN ---
+
+        function showAnularConfirm(facturaId, numeroFactura) {
+            facturaIdParaAnular = facturaId;
+            document.getElementById('anular-factura-numero').textContent = numeroFactura;
+            document.getElementById('anular-factura-modal').classList.add('active');
+        }
+
+        function closeAnularModal() {
+            document.getElementById('anular-factura-modal').classList.remove('active');
+            facturaIdParaAnular = null;
+            
+            // Restaurar el contenido original del modal para la próxima anulación
+            const modalContent = document.getElementById('anular-modal-content');
+            if (modalContent) {
+                modalContent.innerHTML = `
+                    <p>¿Estás seguro de que deseas anular la factura <strong id="anular-factura-numero"></strong>?</p>
+                    <p>Esta acción no se puede deshacer.</p>
+                `;
+            }
+        }
+
+        function confirmAnularFactura() {
+            if (!facturaIdParaAnular) return;
+
+            const modalContent = document.getElementById('anular-modal-content');
+            modalContent.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-color);"></i>
+                    <p>Anulando factura...</p>
+                </div>
+            `;
+
+            fetch('api/anular_factura.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: facturaIdParaAnular })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    modalContent.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-check-circle" style="font-size: 3rem; color: #28a745;"></i>
+                            <h4 style="color: #28a745;">¡Factura Anulada!</h4>
+                            <p>${data.message}</p>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        closeAnularModal();
+                        loadFacturasList();
+                    }, 2000);
+                } else {
+                    modalContent.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545;"></i>
+                            <h4 style="color: #dc3545;">Error al Anular</h4>
+                            <p>${data.message}</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error al anular factura:', error);
+                modalContent.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545;"></i>
+                        <h4 style="color: #dc3545;">Error de Conexión</h4>
+                        <p>No se pudo comunicar con el servidor.</p>
+                    </div>
+                `;
+            });
+        }
+
+        // --- FUNCIONES PARA VER FACTURA ---
+        
+        function showVerFactura(facturaId) {
+            const modal = document.getElementById('ver-factura-modal');
+            const modalContent = document.getElementById('ver-modal-content');
+            modalContent.innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Cargando detalles...</p></div>';
+            modal.classList.add('active');
+
+            fetch(`api/get_factura_details.php?id=${facturaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayFacturaDetalles(data.data);
+                    } else {
+                        modalContent.innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al obtener detalles:', error);
+                    modalContent.innerHTML = `<p style="color: red;">Error de conexión al obtener los detalles.</p>`;
+                });
+        }
+
+        function closeVerModal() {
+            document.getElementById('ver-factura-modal').classList.remove('active');
+        }
+
+        function displayFacturaDetalles(factura) {
+            const modalContent = document.getElementById('ver-modal-content');
+            
+            let detallesHtml = '<p>No se encontraron detalles para esta factura.</p>';
+            if (factura.detalles && factura.detalles.length > 0) {
+                detallesHtml = `
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 15px;">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Código</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Descripción</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Cant.</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">P. Unit.</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Desc.</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                factura.detalles.forEach(d => {
+                    detallesHtml += `
+                        <tr>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${d.codigo_principal}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${d.descripcion}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${parseFloat(d.cantidad).toFixed(2)}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">$${parseFloat(d.precio_unitario).toFixed(2)}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">$${parseFloat(d.descuento).toFixed(2)}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: bold;">$${parseFloat(d.precio_total_sin_impuesto).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+                detallesHtml += '</tbody></table>';
+            }
+
+            const html = `
+                <div class="factura-info">
+                    <div class="info-item"><strong>Cliente:</strong> ${factura.razon_social_comprador}</div>
+                    <div class="info-item"><strong>Identificación:</strong> ${factura.identificacion_comprador}</div>
+                    <div class="info-item"><strong>Factura No:</strong> ${factura.estab}-${factura.pto_emi}-${factura.secuencial}</div>
+                    <div class="info-item"><strong>Fecha Emisión:</strong> ${new Date(factura.fecha_emision).toLocaleDateString()}</div>
+                    <div class="info-item"><strong>Total:</strong> $${parseFloat(factura.importe_total).toFixed(2)}</div>
+                    <div class="info-item"><strong>Estado:</strong> <span class="${getStatusClass(factura.estatus)}">${factura.estatus}</span></div>
+                    <div class="info-item" style="grid-column: 1 / -1;"><strong>Dirección:</strong> ${factura.direccion_comprador}</div>
+                    <div class="info-item" style="grid-column: 1 / -1;"><strong>Clave de Acceso:</strong> ${factura.clave_acceso}</div>
+                </div>
+                <h4 style="margin-top: 20px;">Detalles</h4>
+                ${detallesHtml}
+            `;
+            modalContent.innerHTML = html;
+        }
     </script>
-    
-    <!-- Modal para preview de facturas -->
-    <div id="factura-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-file-invoice"></i> Preview de Factura
-                </h3>
-                <button class="modal-close" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div id="modal-content">
-                <!-- El contenido se cargará dinámicamente -->
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-                <button class="btn-confirm" onclick="confirmarRegistro()">
-                    <i class="fas fa-check"></i> Sí, Registrar Factura
-                </button>
-            </div>
-        </div>
-    </div>
     
     <style>
         /* Modal styles */
@@ -1981,6 +2171,65 @@
         
         .file-input-hidden {
             display: none;
+        }
+
+        /* Estilos para el botón de anular */
+        .actions-cell {
+            text-align: center;
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-ver {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-ver:hover {
+            background: #138496;
+        }
+
+        .btn-anular {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-anular:hover {
+            background: #c82333;
+        }
+
+        .btn-confirm-anular {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-confirm-anular:hover {
+            background: #c82333;
         }
     </style>
 </body>
