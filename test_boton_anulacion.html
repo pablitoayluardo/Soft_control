@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Botón Anulación</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #c82333;
+        }
+        .success {
+            color: #28a745;
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .info {
+            color: #0c5460;
+            background: #d1ecf1;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Botón Anulación</h1>
+        <p>Este archivo prueba la funcionalidad del botón de anulación de facturas.</p>
+    </div>
+
+    <div class="container">
+        <h2>1. Test Función confirmarAnulacionConDatos</h2>
+        <button class="btn" onclick="testConfirmarAnulacion()">Probar Función confirmarAnulacionConDatos</button>
+        <div id="test-result-1"></div>
+    </div>
+
+    <div class="container">
+        <h2>2. Test Función showAnularForm</h2>
+        <button class="btn" onclick="testShowAnularForm()">Probar Función showAnularForm</button>
+        <div id="test-result-2"></div>
+    </div>
+
+    <div class="container">
+        <h2>3. Test Variable facturaEncontrada</h2>
+        <button class="btn" onclick="testVariableFactura()">Probar Variable facturaEncontrada</button>
+        <div id="test-result-3"></div>
+    </div>
+
+    <div class="container">
+        <h2>4. Test Botón Dinámico</h2>
+        <button class="btn" onclick="testBotonDinamico()">Probar Botón Dinámico</button>
+        <div id="test-result-4"></div>
+    </div>
+
+    <script>
+        // Simular variable facturaEncontrada
+        let facturaEncontrada = {
+            estab: '001',
+            pto_emi: '001',
+            secuencial: '000000001',
+            cliente: 'Cliente Test',
+            total: '100.00',
+            estatus: 'REGISTRADO'
+        };
+
+        // Test 1: Función confirmarAnulacionConDatos
+        function testConfirmarAnulacion() {
+            const resultDiv = document.getElementById('test-result-1');
+            
+            try {
+                // Verificar si la función existe
+                if (typeof confirmarAnulacionConDatos === 'function') {
+                    resultDiv.innerHTML = '<div class="success">✅ Función confirmarAnulacionConDatos existe</div>';
+                    
+                    // Probar la función con datos de prueba
+                    confirmarAnulacionConDatos('001', '001', '000000001');
+                    resultDiv.innerHTML += '<div class="info">✅ Función ejecutada con datos de prueba</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="error">❌ Función confirmarAnulacionConDatos no existe</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Error al ejecutar la función: ' + error.message + '</div>';
+            }
+        }
+
+        // Test 2: Función showAnularForm
+        function testShowAnularForm() {
+            const resultDiv = document.getElementById('test-result-2');
+            
+            try {
+                if (typeof showAnularForm === 'function') {
+                    resultDiv.innerHTML = '<div class="success">✅ Función showAnularForm existe</div>';
+                    showAnularForm();
+                    resultDiv.innerHTML += '<div class="info">✅ Modal de anulación abierto</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="error">❌ Función showAnularForm no existe</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Error al ejecutar showAnularForm: ' + error.message + '</div>';
+            }
+        }
+
+        // Test 3: Variable facturaEncontrada
+        function testVariableFactura() {
+            const resultDiv = document.getElementById('test-result-3');
+            
+            if (facturaEncontrada) {
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        ✅ Variable facturaEncontrada existe<br>
+                        <strong>Datos de prueba:</strong><br>
+                        • Estab: ${facturaEncontrada.estab}<br>
+                        • Pto Emi: ${facturaEncontrada.pto_emi}<br>
+                        • Secuencial: ${facturaEncontrada.secuencial}<br>
+                        • Cliente: ${facturaEncontrada.cliente}<br>
+                        • Total: $${facturaEncontrada.total}<br>
+                        • Estatus: ${facturaEncontrada.estatus}
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = '<div class="error">❌ Variable facturaEncontrada no existe</div>';
+            }
+        }
+
+        // Test 4: Botón Dinámico
+        function testBotonDinamico() {
+            const resultDiv = document.getElementById('test-result-4');
+            
+            try {
+                // Crear un botón dinámico similar al que se crea en mostrarResultadoAnulacion
+                const botonHTML = `
+                    <button onclick="testBotonClick('001', '001', '000000001')" style="background: #dc3545; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;">
+                        <i class="fas fa-ban"></i> Sí, Anular Factura (Test)
+                    </button>
+                `;
+                
+                resultDiv.innerHTML = `
+                    <div class="info">Botón dinámico creado:</div>
+                    ${botonHTML}
+                `;
+                
+                // Agregar el botón al DOM
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = botonHTML;
+                resultDiv.appendChild(tempDiv.firstElementChild);
+                
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Error al crear botón dinámico: ' + error.message + '</div>';
+            }
+        }
+
+        // Función para probar el click del botón
+        function testBotonClick(estab, ptoEmi, secuencial) {
+            alert(`Botón clickeado con datos: Estab=${estab}, PtoEmi=${ptoEmi}, Secuencial=${secuencial}`);
+        }
+
+        // Simular las funciones que pueden no existir en este contexto
+        if (typeof confirmarAnulacionConDatos === 'undefined') {
+            window.confirmarAnulacionConDatos = function(estab, ptoEmi, secuencial) {
+                console.log('confirmarAnulacionConDatos llamada con:', { estab, ptoEmi, secuencial });
+                alert(`Función confirmarAnulacionConDatos ejecutada con: Estab=${estab}, PtoEmi=${ptoEmi}, Secuencial=${secuencial}`);
+            };
+        }
+
+        if (typeof showAnularForm === 'undefined') {
+            window.showAnularForm = function() {
+                console.log('showAnularForm llamada');
+                alert('Función showAnularForm ejecutada');
+            };
+        }
+    </script>
+</body>
+</html> 
