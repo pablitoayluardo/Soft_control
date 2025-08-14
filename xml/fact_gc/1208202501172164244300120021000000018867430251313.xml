@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?><factura id="comprobante" version="1.1.0">
+    <infoTributaria>
+        <ambiente>2</ambiente>
+        <tipoEmision>1</tipoEmision>
+        <razonSocial>AYLUARDO GARCIA JOSELYN NICKOLL</razonSocial>
+        <nombreComercial>GLOBO CITY</nombreComercial>
+        <ruc>1721642443001</ruc>
+        <claveAcceso>1208202501172164244300120021000000018867430251313</claveAcceso>
+        <codDoc>01</codDoc>
+        <estab>002</estab>
+        <ptoEmi>100</ptoEmi>
+        <secuencial>000001886</secuencial>
+        <dirMatriz>Ciudadela: ALBORADA Numero: SOLAR 04 Manzana: A1 </dirMatriz>
+    </infoTributaria>
+    <infoFactura>
+        <fechaEmision>12/08/2025</fechaEmision>
+        <dirEstablecimiento>Ciudadela: ALBORADA Numero: SOLAR 04 Manzana: A1 </dirEstablecimiento>
+        <obligadoContabilidad>NO</obligadoContabilidad>
+        <tipoIdentificacionComprador>04</tipoIdentificacionComprador>
+        <razonSocialComprador>ATIMASA S.A.</razonSocialComprador>
+        <identificacionComprador>0991331859001</identificacionComprador>
+        <direccionComprador>La Joya</direccionComprador>
+        <totalSinImpuestos>139.88</totalSinImpuestos>
+        <totalDescuento>0.00</totalDescuento>
+        <totalConImpuestos>
+            <totalImpuesto>
+                <codigo>2</codigo>
+                <codigoPorcentaje>4</codigoPorcentaje>
+                <baseImponible>139.88</baseImponible>
+                <valor>20.98</valor>
+            </totalImpuesto>
+        </totalConImpuestos>
+        <propina>0</propina>
+        <importeTotal>160.86</importeTotal>
+        <moneda>DOLAR</moneda>
+        <pagos>
+            <pago>
+                <formaPago>20</formaPago>
+                <total>160.86</total>
+            </pago>
+        </pagos>
+    </infoFactura>
+    <detalles>
+        <detalle>
+            <codigoPrincipal>ATI01</codigoPrincipal>
+            <descripcion>ATIMASA GLOBOS DE ALUMINIO # 9</descripcion>
+            <cantidad>20.0</cantidad>
+            <precioUnitario>0.66</precioUnitario>
+            <descuento>0.00</descuento>
+            <precioTotalSinImpuesto>13.20</precioTotalSinImpuesto>
+            <detallesAdicionales>
+                <detAdicional nombre="informacionAdicional" valor="Para Atimasa"/>
+            </detallesAdicionales>
+            <impuestos>
+                <impuesto>
+                    <codigo>2</codigo>
+                    <codigoPorcentaje>4</codigoPorcentaje>
+                    <tarifa>15.0</tarifa>
+                    <baseImponible>13.20</baseImponible>
+                    <valor>1.98</valor>
+                </impuesto>
+            </impuestos>
+        </detalle>
+        <detalle>
+            <codigoPrincipal>ATI02</codigoPrincipal>
+            <descripcion>ATIMASA GLOBO DE ALUMINIO #14</descripcion>
+            <cantidad>40.0</cantidad>
+            <precioUnitario>1.31</precioUnitario>
+            <descuento>0.00</descuento>
+            <precioTotalSinImpuesto>52.40</precioTotalSinImpuesto>
+            <impuestos>
+                <impuesto>
+                    <codigo>2</codigo>
+                    <codigoPorcentaje>4</codigoPorcentaje>
+                    <tarifa>15.0</tarifa>
+                    <baseImponible>52.40</baseImponible>
+                    <valor>7.86</valor>
+                </impuesto>
+            </impuestos>
+        </detalle>
+        <detalle>
+            <codigoPrincipal>ATI03</codigoPrincipal>
+            <descripcion>ATIMASA GLOBO DE ALUMINIO #18</descripcion>
+            <cantidad>8.0</cantidad>
+            <precioUnitario>1.59</precioUnitario>
+            <descuento>0.00</descuento>
+            <precioTotalSinImpuesto>12.72</precioTotalSinImpuesto>
+            <impuestos>
+                <impuesto>
+                    <codigo>2</codigo>
+                    <codigoPorcentaje>4</codigoPorcentaje>
+                    <tarifa>15.0</tarifa>
+                    <baseImponible>12.72</baseImponible>
+                    <valor>1.91</valor>
+                </impuesto>
+            </impuestos>
+        </detalle>
+        <detalle>
+            <codigoPrincipal>ATI08</codigoPrincipal>
+            <descripcion>ATIMASA PLATOS MEDIANOS X 10 UNIDADES</descripcion>
+            <cantidad>12.0</cantidad>
+            <precioUnitario>1.13</precioUnitario>
+            <descuento>0.00</descuento>
+            <precioTotalSinImpuesto>13.56</precioTotalSinImpuesto>
+            <impuestos>
+                <impuesto>
+                    <codigo>2</codigo>
+                    <codigoPorcentaje>4</codigoPorcentaje>
+                    <tarifa>15.0</tarifa>
+                    <baseImponible>13.56</baseImponible>
+                    <valor>2.03</valor>
+                </impuesto>
+            </impuestos>
+        </detalle>
+        <detalle>
+            <codigoPrincipal>ATI12</codigoPrincipal>
+            <descripcion>ATIMASA VASOS VARIADOS X 10 UNIDADES</descripcion>
+            <cantidad>12.0</cantidad>
+            <precioUnitario>1.10</precioUnitario>
+            <descuento>0.00</descuento>
+            <precioTotalSinImpuesto>13.20</precioTotalSinImpuesto>
+            <impuestos>
+                <impuesto>
+                    <codigo>2</codigo>
+                    <codigoPorcentaje>4</codigoPorcentaje>
+                    <tarifa>15.0</tarifa>
+                    <baseImponible>13.20</baseImponible>
+                    <valor>1.98</valor>
+                </impuesto>
+            </impuestos>
+        </detalle>
+        <detalle>
+            <codigoPrincipal>ATI13</codigoPrincipal>
+            <descripcion>ATIMASA VELAS SURTIDAS</descripcion>
+            <cantidad>8.0</cantidad>
+            <precioUnitario>0.63</precioUnitario>
+            <descuento>0.00</descuento>
+            <precioTotalSinImpuesto>5.04</precioTotalSinImpuesto>
+            <impuestos>
+                <impuesto>
+                    <codigo>2</codigo>
+                    <codigoPorcentaje>4</codigoPorcentaje>
+                    <tarifa>15.0</tarifa>
+                    <baseImponible>5.04</baseImponible>
+                    <valor>0.76</valor>
+                </impuesto>
+            </impuestos>
+        </detalle>
+        <detalle>
+            <codigoPrincipal>ATI14</codigoPrincipal>
+            <descripcion>VELA EXPLOSIVA X 3 UNIDADES MEDIUM</descripcion>
+            <cantidad>8.0</cantidad>
+            <precioUnitario>0.60</precioUnitario>
+            <descuento>0.00</descuento>
+            <precioTotalSinImpuesto>4.80</precioTotalSinImpuesto>
+            <impuestos>
+                <impuesto>
+                    <codigo>2</codigo>
+                    <codigoPorcentaje>4</codigoPorcentaje>
+                    <tarifa>15.0</tarifa>
+                    <baseImponible>4.80</baseImponible>
+                    <valor>0.72</valor>
+                </impuesto>
+            </impuestos>
+        </detalle>
+        <detalle>
+            <codigoPrincipal>ATI06</codigoPrincipal>
+            <descripcion>ATIMASA FUNDA BOTELLA MEDIANA</descripcion>
+            <cantidad>12.0</cantidad>
+            <precioUnitario>0.74</precioUnitario>
+            <descuento>0.00</descuento>
+            <precioTotalSinImpuesto>8.88</precioTotalSinImpuesto>
+            <impuestos>
+                <impuesto>
+                    <codigo>2</codigo>
+                    <codigoPorcentaje>4</codigoPorcentaje>
+                    <tarifa>15.0</tarifa>
+                    <baseImponible>8.88</baseImponible>
+                    <valor>1.33</valor>
+                </impuesto>
+            </impuestos>
+        </detalle>
+        <detalle>
+            <codigoPrincipal>ATI05</codigoPrincipal>
+            <descripcion>ATIMASA FUNDA REGALO MEDIANA</descripcion>
+            <cantidad>12.0</cantidad>
+            <precioUnitario>0.74</precioUnitario>
+            <descuento>0.00</descuento>
+            <precioTotalSinImpuesto>8.88</precioTotalSinImpuesto>
+            <impuestos>
+                <impuesto>
+                    <codigo>2</codigo>
+                    <codigoPorcentaje>4</codigoPorcentaje>
+                    <tarifa>15.0</tarifa>
+                    <baseImponible>8.88</baseImponible>
+                    <valor>1.33</valor>
+                </impuesto>
+            </impuestos>
+        </detalle>
+        <detalle>
+            <codigoPrincipal>ATI04</codigoPrincipal>
+            <descripcion>ATIMASA BANDERINES</descripcion>
+            <cantidad>6.0</cantidad>
+            <precioUnitario>1.20</precioUnitario>
+            <descuento>0.00</descuento>
+            <precioTotalSinImpuesto>7.20</precioTotalSinImpuesto>
+            <impuestos>
+                <impuesto>
+                    <codigo>2</codigo>
+                    <codigoPorcentaje>4</codigoPorcentaje>
+                    <tarifa>15.0</tarifa>
+                    <baseImponible>7.20</baseImponible>
+                    <valor>1.08</valor>
+                </impuesto>
+            </impuestos>
+        </detalle>
+    </detalles>
+    <infoAdicional>
+        <campoAdicional nombre="Telefono">042584481</campoAdicional>
+        <campoAdicional nombre="Email">felectronicas@atimasa.com.ec</campoAdicional>
+    </infoAdicional>
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="xmldsig-f25a9bed-b2cd-4e0a-8bd7-0e79d1400baf"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><ds:Reference Id="xmldsig-f25a9bed-b2cd-4e0a-8bd7-0e79d1400baf-ref0" URI="#comprobante"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>hj7JdiEbRktExjMU/vOmSNC91fsNiC572G7vvikjvls=</ds:DigestValue></ds:Reference><ds:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#xmldsig-f25a9bed-b2cd-4e0a-8bd7-0e79d1400baf-signedprops"><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>4xz16BOe95myBGTuNN4fQAVWOBIiXw2wpuj11o1k/rU=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue Id="xmldsig-f25a9bed-b2cd-4e0a-8bd7-0e79d1400baf-sigvalue">30AzDi5J8g2LbnNjX3g8IC72fKFsCxnOaKfiU/+htWIyM3Hl5VM+LET/YH93/Lp52EvHvxQITEa5d6zBkb4loaONgboK0ccBJiYgI+hBMY5q/j4YIPhWfFXfy3yLf8p/oV9QJkoCDbRgEq5WuRZfNA55BUrgLoAjqw02GgHA9g+QGTk+7ZOBv51f49kLVl2mmIZWhxt9tUvpcNddwti7u6qm53oqzyDI5nk4LrH28G7vj8ILXxbAOnmxj5cJfT4yJOIaBUUSY6L7g3JQlJWY+P5EzAKNUzU5zxOcGm4qdMiqwP98xtfuwIc1l9oGFKaAzZERstdMW0UYFupoLNmZlw==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIJuzCCB6OgAwIBAgIEZeSXiDANBgkqhkiG9w0BAQsFADCBoTELMAkGA1UEBhMCRUMxIjAgBgNVBAoTGUJBTkNPIENFTlRSQUwgREVMIEVDVUFET1IxNzA1BgNVBAsTLkVOVElEQUQgREUgQ0VSVElGSUNBQ0lPTiBERSBJTkZPUk1BQ0lPTi1FQ0lCQ0UxDjAMBgNVBAcTBVFVSVRPMSUwIwYDVQQDExxBQyBCQU5DTyBDRU5UUkFMIERFTCBFQ1VBRE9SMB4XDTI0MDkxODAyMjAzM1oXDTI2MDkxODAyNTAzM1owgbcxCzAJBgNVBAYTAkVDMSIwIAYDVQQKExlCQU5DTyBDRU5UUkFMIERFTCBFQ1VBRE9SMTcwNQYDVQQLEy5FTlRJREFEIERFIENFUlRJRklDQUNJT04gREUgSU5GT1JNQUNJT04tRUNJQkNFMQ4wDAYDVQQHEwVRVUlUTzE7MBEGA1UEBRMKMDAwMDc0MTE0MDAmBgNVBAMTH0pPU0VMWU4gTklDS09MTCBBWUxVQVJETyBHQVJDSUEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDmFIGNoHaCeAFQ0f92pj86iRbx2PAnjH9tM2rHgN1LgoeZcMmYK0n0zXPOPc+oS9aO24gnYfWoXk19lFcIYqTrg7kozUgDaDfReLhn2pYXlKj6YGCU/OIaiLN/uLzWQoWm/SiderEgyr9O1yOxWPEunDHXXAU3+VQ9+DpNUc9ontPsn03cu0U+xCIWfKJFSbiaJ04GsiCTTQxz1JuOOU1kJZiLGJ5Klv/N8gQqbcPIMqGfmpddmELi9f8EtMK9pqK4oPMIcfZ6CiAdyHc8Ys6KAaoSMteJM9X+QYZxc25Xbe8mIzOgMLS8BXEbDyFJbsh4v9E0PBua5Yu5rYxDbgkxAgMBAAGjggThMIIE3TALBgNVHQ8EBAMCB4AwZgYDVR0gBF8wXTBbBgsrBgEEAYKoOwIBATBMMEoGCCsGAQUFBwIBFj5odHRwOi8vd3d3LmVjaS5iY2UuZWMvcG9saXRpY2EtY2VydGlmaWNhZG8vcGVyc29uYS1uYXR1cmFsLnBkZjCBkQYIKwYBBQUHAQEEgYQwgYEwPgYIKwYBBQUHMAGGMmh0dHA6Ly9vY3NwLmVjaS5iY2UuZWMvZWpiY2EvcHVibGljd2ViL3N0YXR1cy9vY3NwMD8GCCsGAQUFBzABhjNodHRwOi8vb2NzcDEuZWNpLmJjZS5lYy9lamJjYS9wdWJsaWN3ZWIvc3RhdHVzL29jc3AwGgYKKwYBBAGCqDsDAQQMEwoxNzIxNjQyNDQzMB8GCisGAQQBgqg7AwIEERMPSk9TRUxZTiBOSUNLT0xMMBgGCisGAQQBgqg7AwMEChMIQVlMVUFSRE8wFgYKKwYBBAGCqDsDBAQIEwZHQVJDSUEwLgYKKwYBBAGCqDsDBwQgEx5BbGJvcmFkYSAyZGEsIEd1YXlhcXVpbCwgRWN1YWQwGgYKKwYBBAGCqDsDCAQMEwowOTg3Njc5MzA2MBkGCisGAQQBgqg7AwkECxMJR3VheWFxdWlsMBcGCisGAQQBgqg7AwwECRMHRUNVQURPUjAdBgorBgEEAYKoOwMLBA8TDTE3MjE2NDI0NDMwMDEwIAYKKwYBBAGCqDsDMwQSExBTT0ZUV0FSRS1BUkNISVZPMCoGA1UdEQQjMCGBH3BhYmxvLmF5bHVhcmRvQGdsb2JvY2l0eS5jb20uZWMwggHhBgNVHR8EggHYMIIB1DCCAdCgggHMoIIByIaB1mxkYXA6Ly9iY2VxbGRhcHN1YnAxLmJjZS5lYy9jbj1DUkwyMDgwLGNuPUFDJTIwQkFOQ08lMjBDRU5UUkFMJTIwREVMJTIwRUNVQURPUixsPVFVSVRPLG91PUVOVElEQUQlMjBERSUyMENFUlRJRklDQUNJT04lMjBERSUyMElORk9STUFDSU9OLUVDSUJDRSxvPUJBTkNPJTIwQ0VOVFJBTCUyMERFTCUyMEVDVUFET1IsYz1FQz9jZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2WGNGh0dHA6Ly93d3cuZWNpLmJjZS5lYy9DUkwvZWNpX2JjZV9lY19jcmxmaWxlY29tYi5jcmykgbYwgbMxCzAJBgNVBAYTAkVDMSIwIAYDVQQKExlCQU5DTyBDRU5UUkFMIERFTCBFQ1VBRE9SMTcwNQYDVQQLEy5FTlRJREFEIERFIENFUlRJRklDQUNJT04gREUgSU5GT1JNQUNJT04tRUNJQkNFMQ4wDAYDVQQHEwVRVUlUTzElMCMGA1UEAxMcQUMgQkFOQ08gQ0VOVFJBTCBERUwgRUNVQURPUjEQMA4GA1UEAxMHQ1JMMjA4MDArBgNVHRAEJDAigA8yMDI0MDkxODAyMjAzM1qBDzIwMjYwOTE4MDI1MDMzWjAfBgNVHSMEGDAWgBRIot8jHx34LFF6jAPNSTKlCcGUqzAdBgNVHQ4EFgQUD0+Br+jixFDWuML5Og9X/hLhHxwwCQYDVR0TBAIwADAZBgkqhkiG9n0HQQAEDDAKGwRWOC4zAwIEsDANBgkqhkiG9w0BAQsFAAOCAgEAt/29u/KpgTZr/v32zOCLuuolcbubYxq1gF+gS2CBu29J8pyuVdL53SlRAVOwSsom32ruY+K1KJNYMWmNKKIy0RB6sunrEbD5PuJjDiEvSsXCUja8AECTK4C+1VLEz96m1HnUHmJtn3WrWiHD9sISjIb4rWpgWb8372LtL21zfhuoqz0rgmT9pypPiikUqnau1SP6nKlIotKkp0Z8qHUusn3PbEoL9q6IwLD+nCq+zo3Hvmqx+Q13ZK+nGQVpDKoFXaAoPAENRTOcSHUuFYAHBeidOFoXAjDrJmjSeZyZcPuyWN3Sn5Jox6SdoPz2Xb5VksktM9HvdiWcXpgq6rShwAlye1atR4HCICJ9TSTlfAP0FrJ9ngZ541zOp2SKwBr7eMuwBr9kCq+ADeTbnrk5XNM3eKEXNGX8vCtn5jk4Tq/33g4iz0++9mJjzc4gVx+1td7rb7wBRQW/f6K9b5DGq21u8g1KBjOdFAFq1CibnWuCdbwPCiUtBNprnCut85LMDkrAT3/UX1EegrEQ3q8/Pc/A/YFNSch8FhM6K2gBK8Vlv5X9oOrc3NjzEJ0FxXrYBAi7sQIhe8toKZWeq7UXkJjyCMeUE3sgHLTLZPOdZvi1ZpfDIsIlUikM56m6+tyeK44U+xqAb+OUcULpUZ0UuBOJa0ySCSL1MSFNum60eJY=</ds:X509Certificate></ds:X509Data></ds:KeyInfo><ds:Object><xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:xades141="http://uri.etsi.org/01903/v1.4.1#" Target="#xmldsig-f25a9bed-b2cd-4e0a-8bd7-0e79d1400baf"><xades:SignedProperties Id="xmldsig-f25a9bed-b2cd-4e0a-8bd7-0e79d1400baf-signedprops"><xades:SignedSignatureProperties><xades:SigningTime>2025-08-12T11:32:55.216-05:00</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>tOVO0YP7Q6ia8BmrPcXcNiKjWYc4E3f3Im3dQyIkSDE=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>CN=AC BANCO CENTRAL DEL ECUADOR,L=QUITO,OU=ENTIDAD DE CERTIFICACION DE INFORMACION-ECIBCE,O=BANCO CENTRAL DEL ECUADOR,C=EC</ds:X509IssuerName><ds:X509SerialNumber>1709479816</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate></xades:SignedSignatureProperties><xades:SignedDataObjectProperties><xades:DataObjectFormat ObjectReference="#xmldsig-f25a9bed-b2cd-4e0a-8bd7-0e79d1400baf-ref0"><xades:Description>FIRMA DIGITAL SRI</xades:Description><xades:MimeType>text/xml</xades:MimeType><xades:Encoding>UTF-8</xades:Encoding></xades:DataObjectFormat></xades:SignedDataObjectProperties></xades:SignedProperties></xades:QualifyingProperties></ds:Object></ds:Signature></factura>

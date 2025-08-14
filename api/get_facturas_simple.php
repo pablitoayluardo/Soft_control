@@ -65,85 +65,21 @@ try {
     
     $sortField = $sortFieldMap[$sort];
     
-    // Verificar si las tablas existen
-    $sql = "SHOW TABLES LIKE 'info_factura'";
-    $stmt = $pdo->query($sql);
-    $infoFacturaExists = $stmt->fetch();
+    // Detectar nombres correctos de columnas para el JOIN
+    $tributaria_cols = array_column($pdo->query("DESCRIBE info_tributaria")->fetchAll(), 'Field');
+    $factura_cols = array_column($pdo->query("DESCRIBE info_factura")->fetchAll(), 'Field');
     
-    if (!$infoFacturaExists) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'La tabla info_factura no existe',
-            'debug' => [
-                'info_factura_exists' => false,
-                'db_host' => DB_HOST,
-                'db_name' => DB_NAME,
-                'db_user' => DB_USER
-            ]
-        ]);
-        exit;
-    }
-    
-    // Detectar nombres correctos de columnas
-    $sql = "DESCRIBE info_tributaria";
-    $stmt = $pdo->query($sql);
-    $tributaria_columns = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'Field');
-    
-    $sql = "DESCRIBE info_factura";
-    $stmt = $pdo->query($sql);
-    $factura_columns = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'Field');
-    
-    // Determinar nombres correctos de columnas
-    $tributaria_id_column = 'id_info_tributaria';
-    if (!in_array('id_info_tributaria', $tributaria_columns)) {
-        if (in_array('id', $tributaria_columns)) {
-            $tributaria_id_column = 'id';
-        }
-    }
-    
-    $factura_tributaria_id_column = 'id_info_tributaria';
-    if (!in_array('id_info_tributaria', $factura_columns)) {
-        if (in_array('info_tributaria_id', $factura_columns)) {
-            $factura_tributaria_id_column = 'info_tributaria_id';
-        }
-    }
-    
-    // Contar registros en la tabla info_factura
-    $sql = "SELECT COUNT(*) as total FROM info_factura";
-    $stmt = $pdo->query($sql);
-    $totalFacturas = $stmt->fetch()['total'];
-    
-    if ($totalFacturas == 0) {
-        echo json_encode([
-            'success' => true,
-            'data' => [],
-            'pagination' => [
-                'page' => $page,
-                'limit' => $limit,
-                'total' => 0,
-                'pages' => 0,
-                'has_prev' => false,
-                'has_next' => false
-            ],
-            'debug' => [
-                'info_factura_count' => $totalFacturas,
-                'message' => 'No hay facturas registradas',
-                'tributaria_id_column' => $tributaria_id_column,
-                'factura_tributaria_id_column' => $factura_tributaria_id_column
-            ],
-            'timestamp' => date('Y-m-d H:i:s')
-        ]);
-        exit;
-    }
-    
-    // Consulta principal para obtener facturas con los campos específicos solicitados
-    // Usando los nombres detectados de columnas
+    $tributaria_id_col = in_array('id_info_tributaria', $tributaria_cols) ? 'id_info_tributaria' : 'id';
+    $factura_tributaria_id_col = in_array('info_tributaria_id', $factura_cols) ? 'info_tributaria_id' : 'id_info_tributaria';
+
+    // Construir la consulta principal
     $sql = "SELECT 
-        it.id_info_tributaria as id,
+        it.$tributaria_id_col as id,
         it.estab,
         it.pto_emi,
         it.secuencial,
-        f.fecha_emision as fecha_emision,
+        it.clave_acceso,
+        f.fecha_emision,
         f.razon_social_comprador as cliente,
         f.direccion_comprador as direccion,
         f.importe_total as total,
@@ -152,61 +88,52 @@ try {
         f.valor_pagado,
         f.observacion
     FROM info_factura f 
-    JOIN info_tributaria it ON f.$factura_tributaria_id_column = it.$tributaria_id_column";
+    JOIN info_tributaria it ON f.$factura_tributaria_id_col = it.$tributaria_id_col";
     
-    // Agregar filtro de estatus si se especifica
+    // Construir WHERE y PARAMS para la consulta principal y la de conteo
+    $whereClause = '';
     $params = [];
     if (!empty($statusFilter)) {
-        $sql .= " WHERE f.estatus = ?";
+        $whereClause = " WHERE f.estatus = ?";
         $params[] = $statusFilter;
     }
+
+    // Obtener el total de registros con el filtro aplicado
+    $sqlCount = "SELECT COUNT(*) as total FROM info_factura f" . $whereClause;
+    $stmtCount = $pdo->prepare($sqlCount);
+    $stmtCount->execute($params);
+    $total = $stmtCount->fetchColumn();
     
-    $sql .= " ORDER BY $sortField $order LIMIT ? OFFSET ?";
+    // Añadir ordenamiento y paginación a la consulta principal
+    $sql .= $whereClause . " ORDER BY $sortField $order LIMIT ? OFFSET ?";
     $params[] = $limit;
     $params[] = $offset;
 
+    // Ejecutar la consulta principal
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-    $facturas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Contar total de facturas (considerando filtros)
-    $sqlCount = "SELECT COUNT(*) as total FROM info_factura f";
-    $countParams = [];
-    
-    if (!empty($statusFilter)) {
-        $sqlCount .= " WHERE f.estatus = ?";
-        $countParams[] = $statusFilter;
-    }
-    
-    $stmtCount = $pdo->prepare($sqlCount);
-    $stmtCount->execute($countParams);
-    $total = $stmtCount->fetch()['total'];
+    $facturas = $stmt->fetchAll();
     
     // Calcular información de paginación
     $totalPages = ceil($total / $limit);
-    $hasPrev = $page > 1;
-    $hasNext = $page < $totalPages;
     
-    // Formatear datos para la respuesta con los campos específicos solicitados
+    // Formatear datos para la respuesta
     $formattedFacturas = [];
     foreach ($facturas as $factura) {
-        // Validación: Facturas con estatus REGISTRADO deben tener 0 en retención y valor pagado
-        $retencion = $factura['estatus'] === 'REGISTRADO' ? 0.00 : ($factura['retencion'] ?: 0.00);
-        $valorPagado = $factura['estatus'] === 'REGISTRADO' ? 0.00 : ($factura['valor_pagado'] ?: 0.00);
-        
         $formattedFacturas[] = [
             'id' => $factura['id'],
-            'estab' => $factura['estab'] ?: 'N/A',
-            'pto_emi' => $factura['pto_emi'] ?: 'N/A',
-            'secuencial' => $factura['secuencial'] ?: 'N/A',
+            'clave_acceso' => $factura['clave_acceso'],
+            'estab' => $factura['estab'] ?? 'N/A',
+            'pto_emi' => $factura['pto_emi'] ?? 'N/A',
+            'secuencial' => $factura['secuencial'] ?? 'N/A',
             'fecha_emision' => $factura['fecha_emision'] ? date('d/m/Y', strtotime($factura['fecha_emision'])) : 'N/A',
-            'cliente' => $factura['cliente'] ?: 'N/A',
-            'direccion' => $factura['direccion'] ?: 'N/A',
-            'total' => number_format($factura['total'] ?: 0, 2),
-            'estatus' => $factura['estatus'] ?: 'REGISTRADO',
-            'retencion' => number_format($retencion, 2),
-            'valor_pagado' => number_format($valorPagado, 2),
-            'observacion' => $factura['observacion'] ?: 'Factura registrada desde XML'
+            'cliente' => $factura['cliente'] ?? 'N/A',
+            'direccion' => $factura['direccion'] ?? 'N/A',
+            'total' => number_format($factura['total'] ?? 0, 2),
+            'estatus' => $factura['estatus'] ?? 'REGISTRADO',
+            'retencion' => number_format($factura['retencion'] ?? 0, 2),
+            'valor_pagado' => number_format($factura['valor_pagado'] ?? 0, 2),
+            'observacion' => $factura['observacion'] ?? 'Factura registrada desde XML'
         ];
     }
     
@@ -218,9 +145,9 @@ try {
             'limit' => $limit,
             'total' => $total,
             'pages' => $totalPages,
-            'has_prev' => $hasPrev,
-            'has_next' => $hasNext,
-            'start' => $offset + 1,
+            'has_prev' => $page > 1,
+            'has_next' => $page < $totalPages,
+            'start' => min($offset + 1, $total),
             'end' => min($offset + $limit, $total)
         ],
         'sorting' => [
@@ -229,20 +156,7 @@ try {
         ],
         'filtering' => [
             'status' => $statusFilter
-        ],
-        'debug' => [
-            'info_factura_count' => $totalFacturas,
-            'query_limit' => $limit,
-            'query_offset' => $offset,
-            'results_count' => count($facturas),
-            'tributaria_id_column' => $tributaria_id_column,
-            'factura_tributaria_id_column' => $factura_tributaria_id_column,
-            'sort_field' => $sortField,
-            'sort_order' => $order,
-            'status_filter' => $statusFilter,
-            'message' => 'Consulta exitosa usando nombres detectados de columnas'
-        ],
-        'timestamp' => date('Y-m-d H:i:s')
+        ]
     ]);
     
 } catch (Exception $e) {

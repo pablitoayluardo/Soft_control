@@ -412,14 +412,13 @@
         .facturas-table th:nth-child(2), .facturas-table td:nth-child(2) { width: 6%; } /* PTO EMI */
         .facturas-table th:nth-child(3), .facturas-table td:nth-child(3) { width: 8%; } /* SECUENCIAL */
         .facturas-table th:nth-child(4), .facturas-table td:nth-child(4) { width: 10%; } /* FECHA EMISIÓN */
-        .facturas-table th:nth-child(5), .facturas-table td:nth-child(5) { width: 15%; } /* CLIENTE */
-        .facturas-table th:nth-child(6), .facturas-table td:nth-child(6) { width: 15%; } /* DIRECCIÓN */
+        .facturas-table th:nth-child(5), .facturas-table td:nth-child(5) { width: 19%; } /* CLIENTE */
+        .facturas-table th:nth-child(6), .facturas-table td:nth-child(6) { width: 19%; } /* DIRECCIÓN */
         .facturas-table th:nth-child(7), .facturas-table td:nth-child(7) { width: 8%; } /* TOTAL */
         .facturas-table th:nth-child(8), .facturas-table td:nth-child(8) { width: 8%; } /* ESTATUS */
         .facturas-table th:nth-child(9), .facturas-table td:nth-child(9) { width: 8%; } /* RETENCIÓN */
         .facturas-table th:nth-child(10), .facturas-table td:nth-child(10) { width: 8%; } /* VALOR PAGADO */
-        .facturas-table th:nth-child(11), .facturas-table td:nth-child(11) { width: 8%; } /* OBSERVACIÓN */
-        .facturas-table th:nth-child(12), .facturas-table td:nth-child(12) { width: 10%; } /* ACCIONES */
+        .facturas-table th:nth-child(11), .facturas-table td:nth-child(11) { width: 10%; } /* ACCIONES */
         
         .file-input-hidden {
             display: none;
@@ -953,7 +952,10 @@
             </div>
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeVerModal()">
-                    <i class="fas fa-times"></i> Cerrar
+                    <i class="fas fa-times"></i> Salir
+                </button>
+                <button class="btn-confirm" onclick="generarRide()">
+                    <i class="fas fa-file-pdf"></i> Generar RIDE o PDF
                 </button>
             </div>
         </div>
@@ -963,6 +965,7 @@
         let selectedFile = null;
         let facturaData = null;
         let facturaIdParaAnular = null;
+        let facturaIdParaVer = null;
         
         // Variables globales para ordenamiento
         let currentSort = 'fecha_emision';
@@ -1625,7 +1628,6 @@
                             <th class="filterable-header ${getStatusFilterClass()}" onclick="showStatusFilter()">ESTATUS ${currentStatusFilter ? `(${currentStatusFilter})` : ''}</th>
                             <th>RETENCIÓN</th>
                             <th>VALOR PAGADO</th>
-                            <th>OBSERVACIÓN</th>
                             <th>ACCIONES</th> 
                         </tr>
                     </thead>
@@ -1634,6 +1636,32 @@
             
             facturas.forEach(factura => {
                 const numeroFactura = `${factura.estab || ''}-${factura.pto_emi || ''}-${factura.secuencial || ''}`;
+                
+                let dropdownItems = `
+                    <a href="#" onclick="event.preventDefault(); showVerFactura('${factura.clave_acceso}');">
+                        <i class="fas fa-eye"></i> Ver Factura
+                    </a>
+                `;
+
+                if (factura.estatus === 'REGISTRADO') {
+                    dropdownItems += `
+                        <a href="#" onclick="event.preventDefault(); showAnularConfirm(${factura.id}, '${numeroFactura}');">
+                            <i class="fas fa-ban"></i> Anular Factura
+                        </a>
+                    `;
+                }
+
+                const actionsHtml = `
+                    <div class="dropdown">
+                        <button class="btn-actions" onclick="toggleDropdown(event)">
+                            Acciones <i class="fas fa-caret-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            ${dropdownItems}
+                        </div>
+                    </div>
+                `;
+
                 html += `
                     <tr>
                         <td>${factura.estab || 'N/A'}</td>
@@ -1646,17 +1674,8 @@
                         <td class="${getStatusClass(factura.estatus)}">${factura.estatus || 'REGISTRADO'}</td>
                         <td>$${factura.retencion || '0.00'}</td>
                         <td>$${factura.valor_pagado || '0.00'}</td>
-                        <td>${factura.observacion || 'N/A'}</td>
                         <td class="actions-cell">
-                            <button class="btn-ver" onclick="showVerFactura(${factura.id})" title="Ver Detalles">
-                                <i class="fas fa-eye"></i> Ver
-                            </button>
-                            ${factura.estatus !== 'ANULADO' ?
-                                `<button class="btn-anular" onclick="showAnularConfirm(${factura.id}, '${numeroFactura}')" title="Anular Factura">
-                                    <i class="fas fa-ban"></i> Anular
-                                </button>` :
-                                '<span class="status-anulado">Anulada</span>'
-                            }
+                            ${actionsHtml}
                         </td>
                     </tr>
                 `;
@@ -1808,6 +1827,16 @@
             alert('Función de reportes en desarrollo');
         }
 
+        function generarRide() {
+            if (!facturaIdParaVer) {
+                alert('No hay factura seleccionada para generar RIDE.');
+                return;
+            }
+            // Abre el script del PDF en una nueva pestaña, pasando la clave de acceso
+            const url = `api/generar_pdf.php?clave_acceso=${facturaIdParaVer}`;
+            window.open(url, '_blank');
+        }
+
         // Función para cambiar de página
         function changePage(direction) {
             const urlParams = new URLSearchParams(window.location.search);
@@ -1951,13 +1980,18 @@
 
         // --- FUNCIONES PARA VER FACTURA ---
         
-        function showVerFactura(facturaId) {
+        function showVerFactura(claveAcceso) {
+            if (!claveAcceso) {
+                alert('No se pudo obtener la clave de acceso de la factura.');
+                return;
+            }
+            facturaIdParaVer = claveAcceso; // Reutilizamos la variable para la clave
             const modal = document.getElementById('ver-factura-modal');
             const modalContent = document.getElementById('ver-modal-content');
             modalContent.innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Cargando detalles...</p></div>';
             modal.classList.add('active');
 
-            fetch(`api/get_factura_details.php?id=${facturaId}`)
+            fetch(`api/get_factura_details.php?clave_acceso=${claveAcceso}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1974,6 +2008,7 @@
 
         function closeVerModal() {
             document.getElementById('ver-factura-modal').classList.remove('active');
+            facturaIdParaVer = null;
         }
 
         function displayFacturaDetalles(factura) {
@@ -2026,6 +2061,31 @@
             `;
             modalContent.innerHTML = html;
         }
+
+        // --- FUNCIONES PARA DROPDOWN DE ACCIONES ---
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const button = event.currentTarget;
+            const dropdownContent = button.nextElementSibling;
+
+            // Cerrar todos los demás dropdowns abiertos antes de mostrar/ocultar el actual
+            document.querySelectorAll('.dropdown-content.show').forEach(dd => {
+                if (dd !== dropdownContent) {
+                    dd.classList.remove('show');
+                }
+            });
+
+            dropdownContent.classList.toggle('show');
+        }
+
+        // Cerrar todos los dropdowns si se hace clic fuera de ellos
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-content.show').forEach(dd => {
+                    dd.classList.remove('show');
+                });
+            }
+        });
     </script>
     
     <style>
@@ -2175,11 +2235,9 @@
 
         /* Estilos para el botón de anular */
         .actions-cell {
-            text-align: center;
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-            align-items: center;
+            text-align: right;
+            padding-right: 10px; /* Añade un poco de espacio al borde */
+            overflow: visible !important; /* Para que el dropdown no se corte */
         }
 
         .btn-ver {
@@ -2230,6 +2288,65 @@
 
         .btn-confirm-anular:hover {
             background: #c82333;
+        }
+
+        /* Estilos para el dropdown de acciones */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .btn-actions {
+            background: #007bff;
+            color: white;
+            padding: 5px 10px;
+            font-size: 11px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-actions:hover {
+            background: #0056b3;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 180px; /* Un ancho mínimo razonable */
+            width: auto; /* Permitir que el ancho se ajuste al contenido */
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 101; /* Encima de la fila de la tabla */
+            border-radius: 5px;
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            right: 0;
+            left: auto;
+        }
+
+        .dropdown-content a {
+            color: var(--text-primary);
+            padding: 12px 20px; /* Aumentar padding para más espacio */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Aumentar gap */
+            font-size: 13px; /* Aumentar tamaño de fuente */
+            transition: background-color 0.2s;
+            white-space: nowrap; /* Forzar que el texto no se divida en líneas */
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(74, 222, 128, 0.1);
+        }
+        
+        .dropdown-content.show {
+            display: block;
         }
     </style>
 </body>

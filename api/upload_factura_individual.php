@@ -79,8 +79,17 @@ try {
     // Extraer información de impuestos por detalle
     $impuestosDetalle = extraerImpuestosDetalle($xml);
     
-    // Conectar a la base de datos
-    $pdo = getDBConnection();
+    // Conectar a la base de datos (método directo que funciona en el hosting)
+    if (!defined('DB_HOST') || !defined('DB_NAME') || !defined('DB_USER') || !defined('DB_PASS')) {
+        throw new Exception('Configuración de base de datos incompleta en el servidor.');
+    }
+    
+    $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
+    $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false
+    ]);
     
     if (!$pdo) {
         returnJsonResponse(false, 'Error de conexión a la base de datos');
@@ -155,8 +164,8 @@ try {
                 obligado_contabilidad, tipo_identificacion_comprador,
                 razon_social_comprador, identificacion_comprador,
                 direccion_comprador, total_sin_impuestos, total_descuento,
-                importe_total, moneda, forma_pago, estatus, retencion,
-                valor_pagado, observacion
+                importe_total, moneda, forma_pago, estatus, 
+                retencion, valor_pagado, observacion
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
@@ -192,27 +201,20 @@ try {
                 INSERT INTO detalle_factura_sri (
                     id_info_factura, codigo_principal, descripcion,
                     cantidad, precio_unitario, descuento,
-                    precio_total_sin_impuesto, codigo_impuesto,
-                    codigo_porcentaje, tarifa, base_imponible,
-                    valor_impuesto, informacion_adicional
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    precio_total_sin_impuesto, informacion_adicional
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
             foreach ($detallesFactura as $detalle) {
                 $stmt->execute([
                     $infoFacturaId,
-                    $detalle['codigo_principal'],
-                    $detalle['descripcion'],
-                    $detalle['cantidad'],
-                    $detalle['precio_unitario'],
-                    $detalle['descuento'],
-                    $detalle['precio_total_sin_impuesto'],
-                    $detalle['codigo_impuesto'] ?: '2',
-                    $detalle['codigo_porcentaje'] ?: '4',
-                    $detalle['tarifa'] ?: 15.00,
-                    $detalle['base_imponible'] ?: $detalle['precio_total_sin_impuesto'],
-                    $detalle['valor_impuesto'] ?: ($detalle['precio_total_sin_impuesto'] * 0.15),
-                    $detalle['informacion_adicional'] ?: ''
+                    $detalle['codigo_principal'] ?? 'N/A',
+                    $detalle['descripcion'] ?? 'N/A',
+                    $detalle['cantidad'] ?? 0,
+                    $detalle['precio_unitario'] ?? 0,
+                    $detalle['descuento'] ?? 0,
+                    $detalle['precio_total_sin_impuesto'] ?? 0,
+                    $detalle['informacion_adicional'] ?? null
                 ]);
             }
         }
@@ -251,56 +253,7 @@ try {
             }
         }
         
-        // PASO 6: Insertar impuestos totales
-        if (!empty($totalImpuestos)) {
-            $stmt = $pdo->prepare("
-                INSERT INTO total_con_impuestos (
-                    id_info_factura, codigo, codigoPorcentaje, baseImponible, valor
-                ) VALUES (?, ?, ?, ?, ?)
-            ");
-            
-            foreach ($totalImpuestos as $impuesto) {
-                $stmt->execute([
-                    $infoFacturaId,
-                    $impuesto['codigo'],
-                    $impuesto['codigoPorcentaje'],
-                    $impuesto['baseImponible'],
-                    $impuesto['valor']
-                ]);
-            }
-        }
-        
-        // PASO 7: Insertar impuestos por detalle
-        if (!empty($impuestosDetalle)) {
-            $stmt = $pdo->prepare("
-                INSERT INTO impuestos_detalle (
-                    id_detalle, codigo, codigoPorcentaje, tarifa, baseImponible, valor
-                ) VALUES (?, ?, ?, ?, ?, ?)
-            ");
-            
-            // Obtener los IDs de los detalles insertados
-            $detallesIds = [];
-            if (!empty($detallesFactura)) {
-                $sql = "SELECT id_detalle FROM detalle_factura_sri WHERE id_info_factura = ? ORDER BY id_detalle ASC";
-                $stmtIds = $pdo->prepare($sql);
-                $stmtIds->execute([$infoFacturaId]);
-                $detallesIds = $stmtIds->fetchAll(PDO::FETCH_COLUMN);
-            }
-            
-            foreach ($impuestosDetalle as $impuesto) {
-                $detalleIndex = $impuesto['detalle_index'];
-                if (isset($detallesIds[$detalleIndex])) {
-                    $stmt->execute([
-                        $detallesIds[$detalleIndex],
-                        $impuesto['codigo'],
-                        $impuesto['codigoPorcentaje'],
-                        $impuesto['tarifa'],
-                        $impuesto['baseImponible'],
-                        $impuesto['valor']
-                    ]);
-                }
-            }
-        }
+        // PASO 6 y 7 han sido eliminados porque su lógica es incorrecta o se maneja en otra parte.
         
         // Confirmar transacción
         $pdo->commit();
@@ -379,6 +332,17 @@ function extraerInformacionFactura($xml) {
     $info['importe_total'] = (float)($xml->importeTotal ?? $xml->infoFactura->importeTotal ?? 0);
     $info['total_sin_impuestos'] = (float)($xml->totalSinImpuestos ?? $xml->infoFactura->totalSinImpuestos ?? $info['importe_total']);
     $info['total_descuento'] = (float)($xml->totalDescuento ?? $xml->infoFactura->totalDescuento ?? 0);
+    
+    // Extraer y sumar todos los valores de impuestos
+    $totalImpuestosSuma = 0;
+    if (isset($xml->infoFactura->totalConImpuestos->totalImpuesto)) {
+        foreach ($xml->infoFactura->totalConImpuestos->totalImpuesto as $impuesto) {
+            $totalImpuestosSuma += (float)($impuesto->valor ?? 0);
+        }
+    }
+    // Ya no asignamos a $info['total_impuestos'] porque la columna no existe
+    // $info['total_impuestos'] = $totalImpuestosSuma;
+
     $info['moneda'] = (string)($xml->moneda ?? $xml->infoFactura->moneda ?? 'USD');
     $info['forma_pago'] = (string)($xml->formaPago ?? $xml->infoFactura->formaPago ?? '01');
     
@@ -446,44 +410,29 @@ function convertirFecha($fecha) {
 function extraerDetallesFactura($xml) {
     $detalles = [];
     
-    // Buscar elementos de detalle - intentar diferentes estructuras
-    $detallesFactura = null;
-    
-    // Estructura 1: detallesFactura -> detalleFactura
-    if (isset($xml->detallesFactura) && isset($xml->detallesFactura->detalleFactura)) {
-        $detallesFactura = $xml->detallesFactura->detalleFactura;
+    // Buscar el nodo <detalles> que es el contenedor estándar
+    if (!isset($xml->detalles)) {
+        return [];
     }
-    // Estructura 2: detalle directamente
-    elseif (isset($xml->detalle)) {
-        $detallesFactura = $xml->detalle;
-    }
-    // Estructura 3: detallesFactura directamente
-    elseif (isset($xml->detallesFactura)) {
-        $detallesFactura = $xml->detallesFactura;
-    }
-    
-    if ($detallesFactura) {
-        // Convertir a array si es un solo elemento
-        if (!is_array($detallesFactura)) {
-            $detallesFactura = [$detallesFactura];
+
+    // Iterar sobre cada nodo <detalle> dentro de <detalles>
+    foreach ($xml->detalles->detalle as $detalle) {
+        $infoAdicional = '';
+        if (isset($detalle->detallesAdicionales)) {
+            foreach ($detalle->detallesAdicionales->detAdicional as $adicional) {
+                $infoAdicional .= (string)$adicional['nombre'] . ': ' . (string)$adicional['valor'] . '; ';
+            }
         }
-        
-        foreach ($detallesFactura as $detalle) {
-            $det = [];
-            $det['codigo_principal'] = (string)($detalle->codigoPrincipal ?? $detalle->codigo ?? 'N/A');
-            $det['descripcion'] = (string)($detalle->descripcion ?? 'N/A');
-            $det['cantidad'] = (float)($detalle->cantidad ?? 0);
-            $det['precio_unitario'] = (float)($detalle->precioUnitario ?? $detalle->precio ?? 0);
-            $det['descuento'] = (float)($detalle->descuento ?? 0);
-            $det['precio_total_sin_impuesto'] = (float)($detalle->precioTotalSinImpuesto ?? $detalle->precioTotal ?? 0);
-            $det['codigo_impuesto'] = (string)($detalle->codigoImpuesto ?? '2');
-            $det['codigo_porcentaje'] = (string)($detalle->codigoPorcentaje ?? '4');
-            $det['tarifa'] = (float)($detalle->tarifa ?? 15.00);
-            $det['base_imponible'] = (float)($detalle->baseImponible ?? $det['precio_total_sin_impuesto']);
-            $det['valor_impuesto'] = (float)($detalle->valorImpuesto ?? ($det['precio_total_sin_impuesto'] * 0.15));
-            $det['informacion_adicional'] = (string)($detalle->informacionAdicional ?? '');
-            $detalles[] = $det;
-        }
+
+        $detalles[] = [
+            'codigo_principal' => (string)($detalle->codigoPrincipal ?? 'N/A'),
+            'descripcion' => (string)($detalle->descripcion ?? 'N/A'),
+            'cantidad' => (float)($detalle->cantidad ?? 0),
+            'precio_unitario' => (float)($detalle->precioUnitario ?? 0),
+            'descuento' => (float)($detalle->descuento ?? 0),
+            'precio_total_sin_impuesto' => (float)($detalle->precioTotalSinImpuesto ?? 0),
+            'informacion_adicional' => trim($infoAdicional)
+        ];
     }
     
     return $detalles;
@@ -495,23 +444,12 @@ function extraerDetallesFactura($xml) {
 function extraerInfoAdicional($xml) {
     $infoAdicional = [];
     
-    $infoAdicionalElement = $xml->infoAdicional ?? $xml->informacionAdicional ?? null;
-    
-    if ($infoAdicionalElement) {
-        $campoAdicional = $infoAdicionalElement->campoAdicional ?? [];
-        
-        if (is_array($campoAdicional)) {
-            foreach ($campoAdicional as $campo) {
-                $nombre = (string)($campo['nombre'] ?? 'campo_' . count($infoAdicional));
-                $valor = (string)($campo ?? '');
-                
-                if (!empty($valor)) {
-                    $infoAdicional[] = [
-                        'nombre' => $nombre,
-                        'valor' => $valor
-                    ];
-                }
-            }
+    if (isset($xml->infoAdicional->campoAdicional)) {
+        foreach ($xml->infoAdicional->campoAdicional as $campo) {
+            $infoAdicional[] = [
+                'nombre' => (string)$campo['nombre'],
+                'valor' => (string)$campo
+            ];
         }
     }
     
