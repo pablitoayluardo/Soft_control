@@ -110,7 +110,10 @@ try {
     }
     
     // Obtener el total de registros con el filtro aplicado
-    $sqlCount = "SELECT COUNT(*) as total FROM info_factura f" . $whereClause;
+    $sqlCount = "SELECT COUNT(*) as total 
+                 FROM info_factura f 
+                 JOIN info_tributaria it ON f.$factura_tributaria_id_col = it.$tributaria_id_col" 
+                 . $whereClause;
     $stmtCount = $pdo->prepare($sqlCount);
     $stmtCount->execute($params);
     $total = $stmtCount->fetchColumn();
