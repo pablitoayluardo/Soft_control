@@ -37,6 +37,7 @@ try {
     
     // Obtener parámetros de filtrado
     $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
+    $paraPagoFilter = isset($_GET['para_pago']) && $_GET['para_pago'] === 'true';
     
     // Validar parámetros de ordenamiento
     $allowedSortFields = ['secuencial', 'fecha_emision', 'cliente'];
@@ -75,6 +76,7 @@ try {
     // Construir la consulta principal
     $sql = "SELECT 
         it.$tributaria_id_col as id,
+        f.id_info_factura,
         it.estab,
         it.pto_emi,
         it.secuencial,
@@ -85,19 +87,28 @@ try {
         f.importe_total as total,
         f.estatus,
         f.retencion,
-        f.valor_pagado,
+        COALESCE(f.valor_pagado, 0) as valor_pagado,
         f.observacion
     FROM info_factura f 
     JOIN info_tributaria it ON f.$factura_tributaria_id_col = it.$tributaria_id_col";
     
     // Construir WHERE y PARAMS para la consulta principal y la de conteo
-    $whereClause = '';
+    $whereClauses = [];
     $params = [];
-    if (!empty($statusFilter)) {
-        $whereClause = " WHERE f.estatus = ?";
+    
+    if ($paraPagoFilter) {
+        $whereClauses[] = "f.estatus = 'REGISTRADO'";
+        $whereClauses[] = "f.importe_total > f.valor_pagado";
+    } elseif (!empty($statusFilter)) {
+        $whereClauses[] = "f.estatus = ?";
         $params[] = $statusFilter;
     }
 
+    $whereClause = '';
+    if (!empty($whereClauses)) {
+        $whereClause = " WHERE " . implode(' AND ', $whereClauses);
+    }
+    
     // Obtener el total de registros con el filtro aplicado
     $sqlCount = "SELECT COUNT(*) as total FROM info_factura f" . $whereClause;
     $stmtCount = $pdo->prepare($sqlCount);
@@ -122,6 +133,7 @@ try {
     foreach ($facturas as $factura) {
         $formattedFacturas[] = [
             'id' => $factura['id'],
+            'id_info_factura' => $factura['id_info_factura'],
             'clave_acceso' => $factura['clave_acceso'],
             'estab' => $factura['estab'] ?? 'N/A',
             'pto_emi' => $factura['pto_emi'] ?? 'N/A',
@@ -155,7 +167,8 @@ try {
             'order' => $order
         ],
         'filtering' => [
-            'status' => $statusFilter
+            'status' => $statusFilter,
+            'para_pago' => $paraPagoFilter
         ]
     ]);
     

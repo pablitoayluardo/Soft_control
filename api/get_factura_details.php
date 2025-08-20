@@ -12,42 +12,45 @@ if (!$claveAcceso) {
 }
 
 try {
-    // Conexión directa a la base de datos, igual que en el script de listado que funciona
-    if (!defined('DB_HOST') || !defined('DB_NAME') || !defined('DB_USER') || !defined('DB_PASS')) {
-        throw new Exception('Configuración de base de datos incompleta en el servidor.');
+    $conn = getDBConnection();
+
+    // 1. Encontrar el id_info_tributaria y id_info_factura usando la clave de acceso
+    $sql_ids = "SELECT it.id_info_tributaria, f.id_info_factura 
+                FROM info_tributaria it
+                JOIN info_factura f ON it.id_info_tributaria = f.id_info_tributaria
+                WHERE it.clave_acceso = ?";
+    $stmt_ids = $conn->prepare($sql_ids);
+    $stmt_ids->execute([$claveAcceso]);
+    $ids = $stmt_ids->fetch(PDO::FETCH_ASSOC);
+
+    if (!$ids) {
+        echo json_encode(['success' => false, 'message' => 'Factura no encontrada.']);
+        exit;
     }
     
-    $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
-    $conn = new PDO($dsn, DB_USER, DB_PASS, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false
-    ]);
+    $infoTributariaId = $ids['id_info_tributaria'];
+    $infoFacturaId = $ids['id_info_factura'];
 
-    // 1. Encontrar la factura usando la clave de acceso
-    $sql = "SELECT 
-                it.id_info_tributaria,
-                it.estab, it.pto_emi, it.secuencial, it.clave_acceso,
-                f.id_info_factura AS info_factura_id,
-                f.fecha_emision, f.razon_social_comprador, f.identificacion_comprador, 
-                f.direccion_comprador, f.importe_total, f.estatus
-            FROM info_tributaria it
-            JOIN info_factura f ON it.id_info_tributaria = f.id_info_tributaria
-            WHERE it.clave_acceso = ?";
+    // 2. Obtener los datos generales de la factura
+    $sql_factura = "SELECT 
+                       it.estab, it.pto_emi, it.secuencial, it.clave_acceso,
+                       f.fecha_emision, f.razon_social_comprador, f.identificacion_comprador, 
+                       f.direccion_comprador, f.importe_total, f.estatus
+                    FROM info_tributaria it
+                    JOIN info_factura f ON it.id_info_tributaria = f.id_info_tributaria
+                    WHERE it.id_info_tributaria = ?";
     
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([$claveAcceso]);
-    $factura = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt_factura = $conn->prepare($sql_factura);
+    $stmt_factura->execute([$infoTributariaId]);
+    $factura = $stmt_factura->fetch(PDO::FETCH_ASSOC);
 
     if (!$factura) {
-        echo json_encode(['success' => false, 'message' => 'Factura no encontrada con la clave de acceso proporcionada.']);
+        // Esto sería raro si la consulta anterior tuvo éxito, pero es una buena verificación
+        echo json_encode(['success' => false, 'message' => 'No se encontraron datos de la factura.']);
         exit;
     }
 
-    // Usar el ID de info_factura que acabamos de obtener para buscar los detalles
-    $infoFacturaId = $factura['info_factura_id'];
-
-    // Obtener detalles de la factura (productos/items)
+    // 3. Obtener los detalles de la factura
     $sql_detalles = "SELECT 
                         codigo_principal, descripcion, cantidad, precio_unitario, 
                         descuento, precio_total_sin_impuesto
@@ -59,7 +62,7 @@ try {
     $detalles = $stmt_detalles->fetchAll(PDO::FETCH_ASSOC);
     
     $factura['detalles'] = $detalles;
-
+    
     echo json_encode(['success' => true, 'data' => $factura]);
 
 } catch (Exception $e) {

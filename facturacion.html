@@ -681,8 +681,8 @@
                     <i class="fas fa-list"></i> Ver Facturas
                 </button>
                 
-                <button class="nav-button" onclick="showSection('bajar-facturas')">
-                    <i class="fas fa-download"></i> Bajar Facturas
+                <button class="nav-button" onclick="showSection('pago-factura')">
+                    <i class="fas fa-money-bill-wave"></i> Pago Factura
                 </button>
                 
                 <button class="nav-button" onclick="showSection('nueva-factura')">
@@ -809,27 +809,29 @@
                 </div>
             </div>
             
-            <!-- Bajar Facturas -->
-            <div id="bajar-facturas" class="content-section">
+            <!-- Pago Factura -->
+            <div id="pago-factura" class="content-section">
                 <div class="content-header">
-                    <h1><i class="fas fa-download"></i> Bajar Facturas</h1>
-                    <p>Descargar facturas en formato PDF</p>
+                    <h1><i class="fas fa-money-bill-wave"></i> Pago Factura</h1>
+                    <p>Listado de facturas registradas con saldo pendiente de pago</p>
                 </div>
                 
                 <div class="table-container">
                     <div class="table-header">
-                        <h3><i class="fas fa-file-pdf"></i> Descargas Disponibles</h3>
+                        <h3><i class="fas fa-file-invoice-dollar"></i> Facturas por Pagar</h3>
                     </div>
                     <div class="table-content">
-                        <div style="text-align: center; padding: 40px;">
-                            <i class="fas fa-file-pdf" style="font-size: 4rem; color: #dc3545; margin-bottom: 20px;"></i>
-                            <h3>Descarga de Facturas</h3>
-                            <p>Selecciona las facturas que deseas descargar en formato PDF</p>
-                            <button class="btn btn-primary" onclick="downloadFacturas()">
-                                <i class="fas fa-download"></i> Descargar Seleccionadas
-                            </button>
+                        <div id="pagos-table-container">
+                            <div class="loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Cargando facturas por pagar...</p>
+                            </div>
                         </div>
                     </div>
+                </div>
+                
+                <div class="pagination-container" id="pagos-pagination-container" style="display: none;">
+                    <!-- La paginación para esta tabla se puede implementar aquí si es necesario -->
                 </div>
             </div>
             
@@ -961,6 +963,124 @@
         </div>
     </div>
 
+    <!-- Modal para registrar pago -->
+    <div id="pago-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-hand-holding-usd"></i> Registrar Pago de Factura
+                </h3>
+                <button class="modal-close" onclick="closePagoModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="pago-form-container">
+                <form id="pago-form" onsubmit="showPagoConfirmation(event)">
+                    <input type="hidden" id="pago-factura-id" name="factura_id">
+                    
+                    <div class="pago-info">
+                        <div class="pago-info-grid">
+                            <div><strong>Factura:</strong> <span id="pago-factura-numero"></span></div>
+                            <div><strong>Cliente:</strong> <span id="pago-factura-cliente"></span></div>
+                            <div><strong>Dirección:</strong> <span id="pago-factura-direccion"></span></div>
+                            <div><strong>Retención:</strong> <span id="pago-factura-retencion"></span></div>
+                            <div class="saldo"><strong>Saldo Actual:</strong> <span id="pago-factura-saldo"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-3-col">
+                        <div class="form-group">
+                            <label for="pago-monto">Monto a Pagar (*):</label>
+                            <input type="number" id="pago-monto" name="monto" class="form-control" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pago-fecha">Fecha del Pago (*):</label>
+                            <input type="date" id="pago-fecha" name="fecha_pago" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pago-forma">Forma de Pago (*):</label>
+                            <select id="pago-forma" name="forma_pago" class="form-control" required>
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Transferencia">Transferencia</option>
+                                <option value="Tarjeta">Tarjeta</option>
+                                <option value="Canje">Canje</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pago-banco">Nombre del Banco:</label>
+                            <input type="text" id="pago-banco" name="nombre_banco" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="pago-documento"># de Documento:</label>
+                            <input type="text" id="pago-documento" name="numero_documento" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="pago-descripcion">Descripción:</label>
+                            <input type="text" id="pago-descripcion" name="descripcion" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-cancel" onclick="closePagoModal()">Cancelar</button>
+                        <button type="submit" class="btn-confirm">Revisar Pago</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="pago-confirmation-container" style="display: none;">
+                <h4 style="text-align: center; margin-bottom: 20px;">Confirmar Registro de Pago</h4>
+                <div id="pago-summary" class="pago-info"></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="editPago()">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button type="button" class="btn-confirm" onclick="submitPago()">
+                        <i class="fas fa-check"></i> Confirmar Pago
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal para ver pagos de factura -->
+    <div id="ver-pagos-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-history"></i> Historial de Pagos de Factura
+                </h3>
+                <button class="modal-close" onclick="closeVerPagosModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="ver-pagos-modal-content">
+                <h4 id="ver-pagos-factura-numero" style="margin-bottom: 15px;"></h4>
+                <div class="table-container-modal">
+                    <table class="table-modal">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Forma de Pago</th>
+                                <th>Banco</th>
+                                <th># Documento</th>
+                                <th>Descripción</th>
+                                <th>Registrado por</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ver-pagos-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeVerPagosModal()">Salir</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let selectedFile = null;
         let facturaData = null;
@@ -1015,6 +1135,8 @@
             // Cargar datos específicos según la sección
             if (sectionId === 'ver-facturas') {
                 loadFacturasList();
+            } else if (sectionId === 'pago-factura') {
+                loadFacturasParaPagoList();
             }
         }
         
@@ -1641,15 +1763,15 @@
                     <a href="#" onclick="event.preventDefault(); showVerFactura('${factura.clave_acceso}');">
                         <i class="fas fa-eye"></i> Ver Factura
                     </a>
+                    <a href="#" onclick="event.preventDefault(); showVerPagos(${factura.id_info_factura}, '${numeroFactura}');">
+                        <i class="fas fa-money-check-alt"></i> Ver Pagos
+                    </a>
+                    ${(factura.estatus === 'REGISTRADO' && parseFloat(factura.valor_pagado) === 0) ? `
+                    <a href="#" onclick="event.preventDefault(); showAnularConfirm('${factura.clave_acceso}');" class="anular-link">
+                        <i class="fas fa-ban"></i> Anular Factura
+                    </a>
+                    ` : ''}
                 `;
-
-                if (factura.estatus === 'REGISTRADO') {
-                    dropdownItems += `
-                        <a href="#" onclick="event.preventDefault(); showAnularConfirm(${factura.id}, '${numeroFactura}');">
-                            <i class="fas fa-ban"></i> Anular Factura
-                        </a>
-                    `;
-                }
 
                 const actionsHtml = `
                     <div class="dropdown">
@@ -2086,6 +2208,573 @@
                 });
             }
         });
+
+        // --- FUNCIONES PARA LA SECCIÓN DE PAGOS ---
+
+        function loadFacturasParaPagoList() {
+            const container = document.getElementById('pagos-table-container');
+            const paginationContainer = document.getElementById('pagos-pagination-container');
+            
+            if (!container) {
+                console.error('No se encontró el contenedor pagos-table-container');
+                return;
+            }
+            
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i><p>Cargando facturas por pagar...</p></div>';
+            paginationContainer.style.display = 'none';
+
+            // Llamamos a la API con un parámetro especial para obtener solo las facturas para pago
+            const apiUrl = `api/get_facturas_simple.php?para_pago=true`;
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayFacturasParaPagoTable(data.data);
+                        // Aquí se podría implementar la lógica de paginación si es necesaria
+                    } else {
+                        container.innerHTML = `<div style="text-align: center; padding: 40px;"><h3>Error al cargar facturas</h3><p>${data.message || 'Error desconocido'}</p></div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cargando facturas por pagar:', error);
+                    container.innerHTML = `<div style="text-align: center; padding: 40px;"><h3>Error de Conexión</h3><p>No se pudo conectar con el servidor.</p></div>`;
+                });
+        }
+
+        function displayFacturasParaPagoTable(facturas) {
+            const container = document.getElementById('pagos-table-container');
+
+            if (!Array.isArray(facturas) || facturas.length === 0) {
+                container.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 15px;"></i>
+                    <h4 style="color: var(--text-primary);">No hay facturas pendientes de pago</h4>
+                    <p>Todas las facturas registradas han sido pagadas o anuladas.</p>
+                </div>`;
+                return;
+            }
+
+            let html = `
+                <table class="facturas-table">
+                    <thead>
+                        <tr>
+                            <th>SECUENCIAL</th>
+                            <th>FECHA EMISIÓN</th>
+                            <th>CLIENTE</th>
+                            <th>DIRECCIÓN</th>
+                            <th style="text-align: right;">TOTAL</th>
+                            <th style="text-align: right;">RETENCIÓN</th>
+                            <th style="text-align: right;">PAGADO</th>
+                            <th style="text-align: right;">SALDO</th>
+                            <th style="text-align: center;">ACCIONES</th> 
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            facturas.forEach(factura => {
+                const total = parseFloat(factura.total.toString().replace(/,/g, ''));
+                const pagado = parseFloat(factura.valor_pagado.toString().replace(/,/g, ''));
+                const retencion = parseFloat(factura.retencion.toString().replace(/,/g, ''));
+                const saldo = total - retencion - pagado;
+                const numeroFactura = `${factura.estab}-${factura.pto_emi}-${factura.secuencial}`;
+
+                html += `
+                    <tr>
+                        <td>${numeroFactura}</td>
+                        <td>${factura.fecha_emision}</td>
+                        <td>${factura.cliente}</td>
+                        <td>${factura.direccion}</td>
+                        <td style="text-align: right;">$${total.toFixed(2)}</td>
+                        <td style="text-align: right;">$${retencion.toFixed(2)}</td>
+                        <td style="text-align: right;">$${pagado.toFixed(2)}</td>
+                        <td style="text-align: right; font-weight: bold; color: #c82333;">$${saldo.toFixed(2)}</td>
+                        <td class="actions-cell">
+                            <div class="dropdown">
+                                <button class="btn-actions" onclick="toggleDropdown(event)">
+                                    Acciones <i class="fas fa-caret-down"></i>
+                                </button>
+                                <div class="dropdown-content">
+                                    <a href="#" onclick="event.preventDefault(); imprimirPagos(${factura.id});">
+                                        <i class="fas fa-print"></i> Imprimir Pagos
+                                    </a>
+                                    <a href="#" onclick="event.preventDefault(); generarRetencion(${factura.id_info_factura});">
+                                        <i class="fas fa-file-invoice-dollar"></i> Generar Retención
+                                    </a>
+                                    <a href="#" onclick="event.preventDefault(); generarPago(${factura.id_info_factura}, '${numeroFactura}', ${saldo.toFixed(2)}, '${factura.cliente}', '${factura.direccion}', ${retencion.toFixed(2)});">
+                                        <i class="fas fa-hand-holding-usd"></i> Generar Pago
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        // Funciones placeholder para las nuevas acciones de pago
+        function imprimirPagos(facturaId) {
+            alert('Función "Imprimir Pagos" para la factura ID ' + facturaId + ' en desarrollo.');
+        }
+
+        function generarRetencion(facturaId) {
+            alert('Función "Generar Retención" para la factura ID ' + facturaId + ' en desarrollo.');
+        }
+
+        function generarPago(facturaId, numeroFactura, saldo, cliente, direccion, retencion) {
+            // Llenar la información de la cabecera del modal
+            document.getElementById('pago-factura-id').value = facturaId;
+            document.getElementById('pago-factura-numero').textContent = numeroFactura;
+            document.getElementById('pago-factura-cliente').textContent = cliente;
+            document.getElementById('pago-factura-direccion').textContent = direccion;
+            document.getElementById('pago-factura-retencion').textContent = `$${retencion}`;
+            document.getElementById('pago-factura-saldo').textContent = `$${saldo.toFixed(2)}`;
+            
+            // Llenar valores por defecto en el formulario
+            document.getElementById('pago-monto').value = saldo.toFixed(2);
+            document.getElementById('pago-monto').max = saldo.toFixed(2);
+            document.getElementById('pago-fecha').value = new Date().toISOString().slice(0, 10);
+            
+            // Asegurarse que la vista de formulario esté visible y la de confirmación oculta
+            document.getElementById('pago-form-container').style.display = 'block';
+            document.getElementById('pago-confirmation-container').style.display = 'none';
+
+            // Mostrar el modal
+            document.getElementById('pago-modal').classList.add('active');
+        }
+
+        function closePagoModal() {
+            document.getElementById('pago-modal').classList.remove('active');
+            document.getElementById('pago-form').reset();
+        }
+
+        function showPagoConfirmation(event) {
+            event.preventDefault(); // Evita el envío real del formulario
+            const form = document.getElementById('pago-form');
+
+            // Validar formulario antes de continuar
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Capturar datos del formulario
+            const monto = document.getElementById('pago-monto').value;
+            const fecha = document.getElementById('pago-fecha').value;
+            const forma = document.getElementById('pago-forma').value;
+            const banco = document.getElementById('pago-banco').value || 'N/A';
+            const documento = document.getElementById('pago-documento').value || 'N/A';
+            const descripcion = document.getElementById('pago-descripcion').value || 'N/A';
+
+            // Crear el resumen
+            const summaryHTML = `
+                <div class="pago-info-grid">
+                    <div><strong>Monto a Pagar:</strong> $${monto}</div>
+                    <div><strong>Fecha:</strong> ${fecha}</div>
+                    <div><strong>Forma de Pago:</strong> ${forma}</div>
+                    <div><strong>Banco:</strong> ${banco}</div>
+                    <div><strong># Documento:</strong> ${documento}</div>
+                    <div><strong>Descripción:</strong> ${descripcion}</div>
+                </div>
+            `;
+            document.getElementById('pago-summary').innerHTML = summaryHTML;
+
+            // Ocultar formulario y mostrar confirmación
+            document.getElementById('pago-form-container').style.display = 'none';
+            document.getElementById('pago-confirmation-container').style.display = 'block';
+        }
+
+        function editPago() {
+            // Ocultar confirmación y mostrar formulario
+            document.getElementById('pago-confirmation-container').style.display = 'none';
+            document.getElementById('pago-form-container').style.display = 'block';
+        }
+
+        function submitPago() {
+            const form = document.getElementById('pago-form');
+            const formData = new FormData(form);
+            formData.append('usuario_registro', sessionStorage.getItem('username') || 'sistema');
+
+            // Mostrar feedback de carga en el botón de confirmación
+            const confirmButton = document.querySelector('#pago-confirmation-container .btn-confirm');
+            confirmButton.disabled = true;
+            confirmButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirmando...';
+
+            fetch('api/registrar_pago.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('¡Pago registrado exitosamente!');
+                    closePagoModal();
+                    loadFacturasParaPagoList(); // Recargar la lista
+                } else {
+                    alert('Error al registrar el pago: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un error de conexión al intentar registrar el pago.');
+            })
+            .finally(() => {
+                // Restaurar botón
+                confirmButton.disabled = false;
+                confirmButton.innerHTML = '<i class="fas fa-check"></i> Confirmar Pago';
+            });
+        }
+
+        // --- FIN DE FUNCIONES PARA LA SECCIÓN DE PAGOS ---
+
+        function showVerPagos(facturaId, numeroFactura) {
+            const modal = document.getElementById('ver-pagos-modal');
+            const tableBody = document.getElementById('ver-pagos-table-body');
+            const numeroFacturaEl = document.getElementById('ver-pagos-factura-numero');
+
+            numeroFacturaEl.textContent = `Factura: ${numeroFactura}`;
+            tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Cargando historial de pagos...</td></tr>';
+            modal.classList.add('active');
+
+            fetch(`api/get_pagos_factura.php?id_info_factura=${facturaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    let html = '';
+                    if (data.success && data.data.length > 0) {
+                        let totalPagado = 0;
+                        data.data.forEach(pago => {
+                            const monto = parseFloat(pago.monto);
+                            totalPagado += monto;
+                            html += `
+                                <tr>
+                                    <td>${pago.fecha_pago}</td>
+                                    <td style="text-align: right;">$${monto.toFixed(2)}</td>
+                                    <td>${pago.forma_pago || ''}</td>
+                                    <td>${pago.nombre_banco || ''}</td>
+                                    <td>${pago.numero_documento || ''}</td>
+                                    <td>${pago.descripcion || ''}</td>
+                                    <td>${pago.usuario_registro || ''}</td>
+                                </tr>
+                            `;
+                        });
+                        // Fila de total
+                        html += `
+                            <tr style="font-weight: bold; background-color: #f2f2f2;">
+                                <td>Total Pagado</td>
+                                <td style="text-align: right;">$${totalPagado.toFixed(2)}</td>
+                                <td colspan="5"></td>
+                            </tr>
+                        `;
+                    } else if (data.success) {
+                        html = '<tr><td colspan="7" style="text-align:center;">No se han registrado pagos para esta factura.</td></tr>';
+                    } else {
+                        html = `<tr><td colspan="7" style="text-align:center;">Error al cargar pagos: ${data.message}</td></tr>`;
+                    }
+                    tableBody.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Error de conexión al cargar el historial de pagos.</td></tr>`;
+                });
+        }
+
+        function closeVerPagosModal() {
+            document.getElementById('ver-pagos-modal').classList.remove('active');
+        }
+
+        function displayFacturaDetalles(factura) {
+            const detallesContainer = document.getElementById('modal-detalles-factura');
+            detallesContainer.innerHTML = `
+                <div class="factura-info">
+                    <div class="info-item"><strong>Cliente:</strong> ${factura.razon_social_comprador}</div>
+                    <div class="info-item"><strong>Identificación:</strong> ${factura.identificacion_comprador}</div>
+                    <div class="info-item"><strong>Factura No:</strong> ${factura.estab}-${factura.pto_emi}-${factura.secuencial}</div>
+                    <div class="info-item"><strong>Fecha Emisión:</strong> ${new Date(factura.fecha_emision).toLocaleDateString()}</div>
+                    <div class="info-item"><strong>Total:</strong> $${parseFloat(factura.importe_total).toFixed(2)}</div>
+                    <div class="info-item"><strong>Estado:</strong> <span class="${getStatusClass(factura.estatus)}">${factura.estatus}</span></div>
+                    <div class="info-item" style="grid-column: 1 / -1;"><strong>Dirección:</strong> ${factura.direccion_comprador}</div>
+                    <div class="info-item" style="grid-column: 1 / -1;"><strong>Clave de Acceso:</strong> ${factura.clave_acceso}</div>
+                </div>
+                <h4 style="margin-top: 20px;">Detalles</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Código</th>
+                            <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Descripción</th>
+                            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Cant.</th>
+                            <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">P. Unit.</th>
+                            <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Desc.</th>
+                            <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            factura.detalles.forEach(d => {
+                detallesContainer.innerHTML += `
+                    <tr>
+                        <td style="padding: 6px; border: 1px solid #ddd;">${d.codigo_principal}</td>
+                        <td style="padding: 6px; border: 1px solid #ddd;">${d.descripcion}</td>
+                        <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${parseFloat(d.cantidad).toFixed(2)}</td>
+                        <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">$${parseFloat(d.precio_unitario).toFixed(2)}</td>
+                        <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">$${parseFloat(d.descuento).toFixed(2)}</td>
+                        <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: bold;">$${parseFloat(d.precio_total_sin_impuesto).toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            detallesContainer.innerHTML += `
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // --- FUNCIONES PARA DROPDOWN DE ACCIONES ---
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const button = event.currentTarget;
+            const dropdownContent = button.nextElementSibling;
+
+            // Cerrar todos los demás dropdowns abiertos antes de mostrar/ocultar el actual
+            document.querySelectorAll('.dropdown-content.show').forEach(dd => {
+                if (dd !== dropdownContent) {
+                    dd.classList.remove('show');
+                }
+            });
+
+            dropdownContent.classList.toggle('show');
+        }
+
+        // Cerrar todos los dropdowns si se hace clic fuera de ellos
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-content.show').forEach(dd => {
+                    dd.classList.remove('show');
+                });
+            }
+        });
+
+        // --- FUNCIONES PARA LA SECCIÓN DE PAGOS ---
+
+        function loadFacturasParaPagoList() {
+            const container = document.getElementById('pagos-table-container');
+            const paginationContainer = document.getElementById('pagos-pagination-container');
+            
+            if (!container) {
+                console.error('No se encontró el contenedor pagos-table-container');
+                return;
+            }
+            
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i><p>Cargando facturas por pagar...</p></div>';
+            paginationContainer.style.display = 'none';
+
+            // Llamamos a la API con un parámetro especial para obtener solo las facturas para pago
+            const apiUrl = `api/get_facturas_simple.php?para_pago=true`;
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayFacturasParaPagoTable(data.data);
+                        // Aquí se podría implementar la lógica de paginación si es necesaria
+                    } else {
+                        container.innerHTML = `<div style="text-align: center; padding: 40px;"><h3>Error al cargar facturas</h3><p>${data.message || 'Error desconocido'}</p></div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cargando facturas por pagar:', error);
+                    container.innerHTML = `<div style="text-align: center; padding: 40px;"><h3>Error de Conexión</h3><p>No se pudo conectar con el servidor.</p></div>`;
+                });
+        }
+
+        function displayFacturasParaPagoTable(facturas) {
+            const container = document.getElementById('pagos-table-container');
+
+            if (!Array.isArray(facturas) || facturas.length === 0) {
+                container.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 15px;"></i>
+                    <h4 style="color: var(--text-primary);">No hay facturas pendientes de pago</h4>
+                    <p>Todas las facturas registradas han sido pagadas o anuladas.</p>
+                </div>`;
+                return;
+            }
+
+            let html = `
+                <table class="facturas-table">
+                    <thead>
+                        <tr>
+                            <th>SECUENCIAL</th>
+                            <th>FECHA EMISIÓN</th>
+                            <th>CLIENTE</th>
+                            <th>DIRECCIÓN</th>
+                            <th style="text-align: right;">TOTAL</th>
+                            <th style="text-align: right;">RETENCIÓN</th>
+                            <th style="text-align: right;">PAGADO</th>
+                            <th style="text-align: right;">SALDO</th>
+                            <th style="text-align: center;">ACCIONES</th> 
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            facturas.forEach(factura => {
+                const total = parseFloat(factura.total.toString().replace(/,/g, ''));
+                const pagado = parseFloat(factura.valor_pagado.toString().replace(/,/g, ''));
+                const retencion = parseFloat(factura.retencion.toString().replace(/,/g, ''));
+                const saldo = total - retencion - pagado;
+                const numeroFactura = `${factura.estab}-${factura.pto_emi}-${factura.secuencial}`;
+
+                html += `
+                    <tr>
+                        <td>${numeroFactura}</td>
+                        <td>${factura.fecha_emision}</td>
+                        <td>${factura.cliente}</td>
+                        <td>${factura.direccion}</td>
+                        <td style="text-align: right;">$${total.toFixed(2)}</td>
+                        <td style="text-align: right;">$${retencion.toFixed(2)}</td>
+                        <td style="text-align: right;">$${pagado.toFixed(2)}</td>
+                        <td style="text-align: right; font-weight: bold; color: #c82333;">$${saldo.toFixed(2)}</td>
+                        <td class="actions-cell">
+                            <div class="dropdown">
+                                <button class="btn-actions" onclick="toggleDropdown(event)">
+                                    Acciones <i class="fas fa-caret-down"></i>
+                                </button>
+                                <div class="dropdown-content">
+                                    <a href="#" onclick="event.preventDefault(); imprimirPagos(${factura.id});">
+                                        <i class="fas fa-print"></i> Imprimir Pagos
+                                    </a>
+                                    <a href="#" onclick="event.preventDefault(); generarRetencion(${factura.id_info_factura});">
+                                        <i class="fas fa-file-invoice-dollar"></i> Generar Retención
+                                    </a>
+                                    <a href="#" onclick="event.preventDefault(); generarPago(${factura.id_info_factura}, '${numeroFactura}', ${saldo.toFixed(2)}, '${factura.cliente}', '${factura.direccion}', ${retencion.toFixed(2)});">
+                                        <i class="fas fa-hand-holding-usd"></i> Generar Pago
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        // Funciones placeholder para las nuevas acciones de pago
+        function imprimirPagos(facturaId) {
+            alert('Función "Imprimir Pagos" para la factura ID ' + facturaId + ' en desarrollo.');
+        }
+
+        function generarRetencion(facturaId) {
+            alert('Función "Generar Retención" para la factura ID ' + facturaId + ' en desarrollo.');
+        }
+
+        function generarPago(facturaId, numeroFactura, saldo, cliente, direccion, retencion) {
+            // Llenar la información de la cabecera del modal
+            document.getElementById('pago-factura-id').value = facturaId;
+            document.getElementById('pago-factura-numero').textContent = numeroFactura;
+            document.getElementById('pago-factura-cliente').textContent = cliente;
+            document.getElementById('pago-factura-direccion').textContent = direccion;
+            document.getElementById('pago-factura-retencion').textContent = `$${retencion}`;
+            document.getElementById('pago-factura-saldo').textContent = `$${saldo.toFixed(2)}`;
+            
+            // Llenar valores por defecto en el formulario
+            document.getElementById('pago-monto').value = saldo.toFixed(2);
+            document.getElementById('pago-monto').max = saldo.toFixed(2);
+            document.getElementById('pago-fecha').value = new Date().toISOString().slice(0, 10);
+            
+            // Asegurarse que la vista de formulario esté visible y la de confirmación oculta
+            document.getElementById('pago-form-container').style.display = 'block';
+            document.getElementById('pago-confirmation-container').style.display = 'none';
+
+            // Mostrar el modal
+            document.getElementById('pago-modal').classList.add('active');
+        }
+
+        function closePagoModal() {
+            document.getElementById('pago-modal').classList.remove('active');
+            document.getElementById('pago-form').reset();
+        }
+
+        function showPagoConfirmation(event) {
+            event.preventDefault(); // Evita el envío real del formulario
+            const form = document.getElementById('pago-form');
+
+            // Validar formulario antes de continuar
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Capturar datos del formulario
+            const monto = document.getElementById('pago-monto').value;
+            const fecha = document.getElementById('pago-fecha').value;
+            const forma = document.getElementById('pago-forma').value;
+            const banco = document.getElementById('pago-banco').value || 'N/A';
+            const documento = document.getElementById('pago-documento').value || 'N/A';
+            const descripcion = document.getElementById('pago-descripcion').value || 'N/A';
+
+            // Crear el resumen
+            const summaryHTML = `
+                <div class="pago-info-grid">
+                    <div><strong>Monto a Pagar:</strong> $${monto}</div>
+                    <div><strong>Fecha:</strong> ${fecha}</div>
+                    <div><strong>Forma de Pago:</strong> ${forma}</div>
+                    <div><strong>Banco:</strong> ${banco}</div>
+                    <div><strong># Documento:</strong> ${documento}</div>
+                    <div><strong>Descripción:</strong> ${descripcion}</div>
+                </div>
+            `;
+            document.getElementById('pago-summary').innerHTML = summaryHTML;
+
+            // Ocultar formulario y mostrar confirmación
+            document.getElementById('pago-form-container').style.display = 'none';
+            document.getElementById('pago-confirmation-container').style.display = 'block';
+        }
+
+        function editPago() {
+            // Ocultar confirmación y mostrar formulario
+            document.getElementById('pago-confirmation-container').style.display = 'none';
+            document.getElementById('pago-form-container').style.display = 'block';
+        }
+
+        function submitPago() {
+            const form = document.getElementById('pago-form');
+            const formData = new FormData(form);
+            formData.append('usuario_registro', sessionStorage.getItem('username') || 'sistema');
+
+            // Mostrar feedback de carga en el botón de confirmación
+            const confirmButton = document.querySelector('#pago-confirmation-container .btn-confirm');
+            confirmButton.disabled = true;
+            confirmButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirmando...';
+
+            fetch('api/registrar_pago.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('¡Pago registrado exitosamente!');
+                    closePagoModal();
+                    loadFacturasParaPagoList(); // Recargar la lista
+                } else {
+                    alert('Error al registrar el pago: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un error de conexión al intentar registrar el pago.');
+            })
+            .finally(() => {
+                // Restaurar botón
+                confirmButton.disabled = false;
+                confirmButton.innerHTML = '<i class="fas fa-check"></i> Confirmar Pago';
+            });
+        }
+
+        // --- FIN DE FUNCIONES PARA LA SECCIÓN DE PAGOS ---
     </script>
     
     <style>
@@ -2347,6 +3036,78 @@
         
         .dropdown-content.show {
             display: block;
+        }
+
+        /* Estilos para el formulario de pago */
+        .pago-info {
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+        .pago-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 5px 15px;
+        }
+        .pago-info .saldo {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .form-grid-3-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-grid-3-col .form-group {
+            margin-bottom: 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .table-detalles td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+        }
+
+        .table-container-modal {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .table-modal {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table-modal th, .table-modal td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .table-modal th {
+            background-color: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 1;
         }
     </style>
 </body>
