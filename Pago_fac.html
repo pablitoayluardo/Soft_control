@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo de Pagos - Sistema de Control GloboCity</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+        /* Estilos base para evitar scroll innecesario */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .payment-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-height: 100vh;
+            margin: 0;
+            padding: 12px;
+            box-sizing: border-box;
+        }
+        
+        .top-navigation {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-filter);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        
+        .back-button {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 6px 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .back-button:hover {
+            background: rgba(74, 222, 128, 0.1);
+            transform: translateX(-5px);
+        }
+        
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+        
+        .content-header {
+            margin-bottom: 2px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .content-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1px;
+        }
+        
+        .content-header p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 6px;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+        
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 6px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-card .stat-icon {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-bottom: 2px;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1px;
+        }
+        
+        .stat-card .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            margin: 0;
+        }
+        
+        .filters-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 8px;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .filter-group label {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .filter-group input, .filter-group select {
+            padding: 4px 8px;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            font-size: 0.8rem;
+        }
+        
+        .btn-filter {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        
+        .btn-filter:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+        
+        .table-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            overflow: visible;
+            margin-top: 2px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .table-header {
+            background: rgba(74, 222, 128, 0.1);
+            padding: 4px 10px;
+            border-bottom: 1px solid var(--glass-border);
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .btn-refresh {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        
+        .btn-refresh:hover {
+            background: var(--primary-hover);
+        }
+        
+        .table-content {
+            padding: 4px;
+            overflow: auto;
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            max-height: 600px;
+            position: relative;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 10px;
+            color: var(--text-secondary);
+        }
+        
+        .loading i {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            color: var(--primary-color);
+        }
+        
+        /* Estilos para la tabla responsiva */
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            table-layout: fixed;
+            position: relative;
+            margin: 0;
+        }
+        
+        .payment-table thead {
+            position: sticky;
+            top: -4px;
+            z-index: 100;
+            background: #007bff;
+        }
+        
+        .payment-table th {
+            background: #007bff;
+            color: white;
+            padding: 8px 4px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+            position: sticky;
+            top: -4px;
+            z-index: 100;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .payment-table td {
+            padding: 6px 4px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .payment-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .payment-table tr:hover {
+            background: #e3f2fd;
+        }
+        
+        /* Estilos para mejorar la experiencia de scroll */
+        .table-content::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .table-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .table-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        .table-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        .status-registered {
+            background: #d4edda;
+            color: #155724;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .btn-pay {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: var(--transition);
+        }
+        
+        .btn-pay:hover {
+            background: #0056b3;
+        }
+        
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-right: 3px;
+            transition: var(--transition);
+        }
+        
+        .btn-view:hover {
+            background: #138496;
+        }
+        
+        /* Estilos para la lista desplegable de acciones */
+        .actions-select {
+            padding: 4px 6px;
+            border: 1px solid var(--glass-border);
+            border-radius: 3px;
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .actions-select:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .actions-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: var(--glass-bg);
+            border-top: 1px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+        
+        .pagination button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        
+        .pagination button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+        
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        
+        /* Modal de Pago */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+        
+        .close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        
+        .close:hover {
+            color: var(--text-primary);
+        }
+        
+        .modal-body {
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            background: var(--glass-bg);
+            color: var(--text-primary);
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
+        
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+        
+        .btn-confirm {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
+        
+        .btn-confirm:hover {
+            background: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <!-- Navegación superior -->
+        <div class="top-navigation">
+            <a href="dashboard.html" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Volver al Dashboard
+            </a>
+            <h2>Módulo de Pagos</h2>
+        </div>
+
+        <div class="content-area">
+            <!-- Encabezado del contenido -->
+            <div class="content-header">
+                <h1>Gestión de Pagos</h1>
+                <p>Administra los pagos de facturas pendientes</p>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <div class="stat-value" id="total-facturas">0</div>
+                    <div class="stat-label">Total Facturas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-value" id="total-saldo">$0.00</div>
+                    <div class="stat-label">Saldo Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value" id="facturas-pagadas">0</div>
+                    <div class="stat-label">Facturas Pagadas</div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filters-section">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="cliente-filter">Cliente:</label>
+                        <input type="text" id="cliente-filter" placeholder="Buscar por cliente...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="secuencial-filter">Secuencial:</label>
+                        <input type="text" id="secuencial-filter" placeholder="Buscar por secuencial...">
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn-filter" onclick="aplicarFiltros()">
+                            <i class="fas fa-search"></i> Filtrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de facturas -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Facturas Pendientes de Pago</h3>
+                    <button class="btn-refresh" onclick="cargarFacturas()">
+                        <i class="fas fa-sync-alt"></i> Actualizar
+                    </button>
+                </div>
+                <div class="table-content">
+                    <table class="payment-table">
+                        <thead>
+                            <tr>
+                                <th>ESTAB</th>
+                                <th>PTO EMI</th>
+                                <th>SECUENCIAL</th>
+                                <th>FECHA EMISIÓN</th>
+                                <th>CLIENTE</th>
+                                <th>DIRECCIÓN</th>
+                                <th>TOTAL</th>
+                                <th>ESTATUS</th>
+                                <th>RETENCIÓN</th>
+                                <th>VALOR PAGADO</th>
+                                <th>SALDO</th>
+                                <th>ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="facturas-tbody">
+                            <tr>
+                                <td colspan="12" class="loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <br>Cargando facturas...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Paginación -->
+            <div class="pagination">
+                <button onclick="cambiarPagina(-1)" id="btn-prev">Anterior</button>
+                <span class="pagination-info" id="pagination-info">Página 1 de 1</span>
+                <button onclick="cambiarPagina(1)" id="btn-next">Siguiente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Pago -->
+    <div id="modal-pago" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Registrar Pago</h3>
+                <button class="close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="factura-info">Factura:</label>
+                    <input type="text" id="factura-info" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="saldo-actual">Saldo Actual:</label>
+                    <input type="text" id="saldo-actual" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="monto-pago">Monto a Pagar:</label>
+                    <input type="number" id="monto-pago" step="0.01" min="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="observacion">Observación:</label>
+                    <input type="text" id="observacion" placeholder="Observación del pago">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-confirm" onclick="confirmarPago()">Confirmar Pago</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let facturas = [];
+        let paginaActual = 1;
+        let facturasPorPagina = 20;
+        let facturaSeleccionada = null;
+
+        // Cargar facturas al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarFacturas();
+        });
+
+        function cargarFacturas() {
+            const tbody = document.getElementById('facturas-tbody');
+            tbody.innerHTML = '<tr><td colspan="12" class="loading"><i class="fas fa-spinner fa-spin"></i><br>Cargando facturas...</td></tr>';
+
+            fetch('api/get_fact_pago.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        facturas = data.facturas;
+                        actualizarEstadisticas();
+                        mostrarFacturas();
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: red;">Error: ' + data.message + '</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: red;">Error de conexión</td></tr>';
+                });
+        }
+
+        function actualizarEstadisticas() {
+            const totalFacturas = facturas.length;
+            const totalSaldo = facturas.reduce((sum, factura) => sum + parseFloat(factura.saldo), 0);
+            const facturasPagadas = facturas.filter(f => parseFloat(f.valor_pagado) > 0).length;
+
+            document.getElementById('total-facturas').textContent = totalFacturas;
+            document.getElementById('total-saldo').textContent = '$' + totalSaldo.toFixed(2);
+            document.getElementById('facturas-pagadas').textContent = facturasPagadas;
+        }
+
+        function mostrarFacturas() {
+            const tbody = document.getElementById('facturas-tbody');
+            const inicio = (paginaActual - 1) * facturasPorPagina;
+            const fin = inicio + facturasPorPagina;
+            const facturasPagina = facturas.slice(inicio, fin);
+
+            if (facturasPagina.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: #666;">No hay facturas pendientes de pago</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = facturasPagina.map(factura => `
+                <tr>
+                    <td>${factura.estab}</td>
+                    <td>${factura.pto_emi}</td>
+                    <td>${factura.secuencial}</td>
+                    <td>${formatearFecha(factura.fecha_emision)}</td>
+                    <td>${factura.razon_social_comprador}</td>
+                    <td>${factura.direccion_comprador || '-'}</td>
+                    <td>$${parseFloat(factura.importe_total).toFixed(2)}</td>
+                    <td><span class="status-registered">${factura.estatus}</span></td>
+                    <td>$${parseFloat(factura.retencion || 0).toFixed(2)}</td>
+                    <td>$${parseFloat(factura.valor_pagado || 0).toFixed(2)}</td>
+                    <td>$${parseFloat(factura.saldo).toFixed(2)}</td>
+                    <td>
+                        <select class="actions-select" onchange="ejecutarAccion(this.value, '${factura.clave_acceso}')">
+                            <option value="">Seleccionar...</option>
+                            <option value="ver">Ver Factura</option>
+                            <option value="pagar">Pagar Factura</option>
+                        </select>
+                    </td>
+                </tr>
+            `).join('');
+
+            actualizarPaginacion();
+        }
+
+        function actualizarPaginacion() {
+            const totalPaginas = Math.ceil(facturas.length / facturasPorPagina);
+            document.getElementById('pagination-info').textContent = `Página ${paginaActual} de ${totalPaginas}`;
+            document.getElementById('btn-prev').disabled = paginaActual <= 1;
+            document.getElementById('btn-next').disabled = paginaActual >= totalPaginas;
+        }
+
+        function cambiarPagina(direccion) {
+            const nuevaPagina = paginaActual + direccion;
+            const totalPaginas = Math.ceil(facturas.length / facturasPorPagina);
+            
+            if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+                paginaActual = nuevaPagina;
+                mostrarFacturas();
+            }
+        }
+
+        function aplicarFiltros() {
+            const clienteFilter = document.getElementById('cliente-filter').value.toLowerCase();
+            const secuencialFilter = document.getElementById('secuencial-filter').value.toLowerCase();
+
+            const facturasFiltradas = facturas.filter(factura => {
+                const clienteMatch = factura.razon_social_comprador.toLowerCase().includes(clienteFilter);
+                const secuencialMatch = factura.secuencial.toLowerCase().includes(secuencialFilter);
+                return clienteMatch && secuencialMatch;
+            });
+
+            // Mostrar facturas filtradas
+            const tbody = document.getElementById('facturas-tbody');
+            if (facturasFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: #666;">No se encontraron facturas con los filtros aplicados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = facturasFiltradas.map(factura => `
+                <tr>
+                    <td>${factura.estab}</td>
+                    <td>${factura.pto_emi}</td>
+                    <td>${factura.secuencial}</td>
+                    <td>${formatearFecha(factura.fecha_emision)}</td>
+                    <td>${factura.razon_social_comprador}</td>
+                    <td>${factura.direccion_comprador || '-'}</td>
+                    <td>$${parseFloat(factura.importe_total).toFixed(2)}</td>
+                    <td><span class="status-registered">${factura.estatus}</span></td>
+                    <td>$${parseFloat(factura.retencion || 0).toFixed(2)}</td>
+                    <td>$${parseFloat(factura.valor_pagado || 0).toFixed(2)}</td>
+                    <td>$${parseFloat(factura.saldo).toFixed(2)}</td>
+                    <td>
+                        <select class="actions-select" onchange="ejecutarAccion(this.value, '${factura.clave_acceso}')">
+                            <option value="">Seleccionar...</option>
+                            <option value="ver">Ver Factura</option>
+                            <option value="pagar">Pagar Factura</option>
+                        </select>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function formatearFecha(fecha) {
+            if (!fecha) return '-';
+            const fechaObj = new Date(fecha);
+            return fechaObj.toLocaleDateString('es-ES');
+        }
+
+        function ejecutarAccion(accion, claveAcceso) {
+            if (!accion) return; // Si no hay acción seleccionada, no hacer nada
+            
+            switch(accion) {
+                case 'ver':
+                    verFactura(claveAcceso);
+                    break;
+                case 'pagar':
+                    abrirModalPago(claveAcceso);
+                    break;
+            }
+            
+            // Resetear el select después de ejecutar la acción
+            setTimeout(() => {
+                const select = event.target;
+                if (select) select.value = '';
+            }, 100);
+        }
+
+        function verFactura(claveAcceso) {
+            // Redirigir a la página de ver factura
+            window.open(`facturacion.html?clave=${claveAcceso}`, '_blank');
+        }
+
+        function abrirModalPago(claveAcceso) {
+            const factura = facturas.find(f => f.clave_acceso === claveAcceso);
+            if (!factura) return;
+
+            facturaSeleccionada = factura;
+            document.getElementById('factura-info').value = `${factura.estab}-${factura.pto_emi}-${factura.secuencial}`;
+            document.getElementById('saldo-actual').value = '$' + parseFloat(factura.saldo).toFixed(2);
+            document.getElementById('monto-pago').value = '';
+            document.getElementById('observacion').value = '';
+
+            document.getElementById('modal-pago').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-pago').classList.remove('active');
+            facturaSeleccionada = null;
+        }
+
+        function confirmarPago() {
+            if (!facturaSeleccionada) return;
+
+            const montoPago = parseFloat(document.getElementById('monto-pago').value);
+            const observacion = document.getElementById('observacion').value;
+
+            if (!montoPago || montoPago <= 0) {
+                alert('Por favor ingrese un monto válido');
+                return;
+            }
+
+            if (montoPago > parseFloat(facturaSeleccionada.saldo)) {
+                alert('El monto no puede ser mayor al saldo pendiente');
+                return;
+            }
+
+            // Aquí se implementaría la lógica para registrar el pago
+            // Por ahora solo cerramos el modal
+            alert('Pago registrado exitosamente');
+            cerrarModal();
+            cargarFacturas(); // Recargar para actualizar datos
+        }
+
+        // Cerrar modal al hacer clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal-pago');
+            if (event.target === modal) {
+                cerrarModal();
+            }
+        }
+    </script>
+</body>
+</html>

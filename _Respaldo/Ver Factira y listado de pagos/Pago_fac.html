@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo de Pagos - Sistema de Control</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .payment-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .payment-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .payment-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .payment-filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .filter-group input, .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .btn-filter {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-filter:hover {
+            background: #5a6fd8;
+        }
+        
+        .payment-table {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-refresh {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-refresh:hover {
+            background: #218838;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .payment-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .payment-table th,
+        .payment-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .payment-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .payment-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-registered {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .btn-pay {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .btn-pay:hover {
+            background: #0056b3;
+        }
+        
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .btn-view:hover {
+            background: #138496;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .pagination button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .pagination button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: #5a6fd8;
+        }
+        
+        .pagination-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .loading i {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        /* Modal de Pago */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .payment-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .summary-row:last-child {
+            margin-bottom: 0;
+            font-weight: bold;
+            border-top: 1px solid #dee2e6;
+            padding-top: 8px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+        
+        .btn-save {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-save:hover {
+            background: #218838;
+        }
+        
+        .btn-save:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <!-- Header -->
+        <div class="payment-header">
+            <h1><i class="fas fa-credit-card"></i> Módulo de Pagos</h1>
+            <p>Gestiona los pagos de facturas pendientes</p>
+        </div>
+        
+        <!-- Estadísticas -->
+        <div class="payment-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-facturas">0</div>
+                <div class="stat-label">Facturas Pendientes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="total-saldo">$0.00</div>
+                <div class="stat-label">Saldo Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="promedio-saldo">$0.00</div>
+                <div class="stat-label">Promedio por Factura</div>
+            </div>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="payment-filters">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="search-cliente">Cliente:</label>
+                    <input type="text" id="search-cliente" placeholder="Buscar por cliente...">
+                </div>
+                <div class="filter-group">
+                    <label for="search-secuencial">Secuencial:</label>
+                    <input type="text" id="search-secuencial" placeholder="Buscar por secuencial...">
+                </div>
+                <div class="filter-group">
+                    <label for="sort-by">Ordenar por:</label>
+                    <select id="sort-by">
+                        <option value="fecha_emision">Fecha de Emisión</option>
+                        <option value="cliente">Cliente</option>
+                        <option value="secuencial">Secuencial</option>
+                        <option value="saldo">Saldo Pendiente</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sort-order">Orden:</label>
+                    <select id="sort-order">
+                        <option value="DESC">Descendente</option>
+                        <option value="ASC">Ascendente</option>
+                    </select>
+                </div>
+                <button class="btn-filter" onclick="applyFilters()">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </div>
+        
+        <!-- Tabla de Facturas -->
+        <div class="payment-table">
+            <div class="table-header">
+                <div class="table-title">Facturas con Saldo Pendiente</div>
+                <div class="table-actions">
+                    <button class="btn-refresh" onclick="loadFacturas()">
+                        <i class="fas fa-sync-alt"></i> Actualizar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ESTAB</th>
+                            <th>PTO EMI</th>
+                            <th>SECUENCIAL</th>
+                            <th>FECHA EMISIÓN</th>
+                            <th>CLIENTE</th>
+                            <th>DIRECCIÓN</th>
+                            <th>TOTAL</th>
+                            <th>ESTATUS</th>
+                            <th>RETENCIÓN</th>
+                            <th>VALOR PAGADO</th>
+                            <th>SALDO</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="facturas-tbody">
+                        <tr>
+                            <td colspan="12" class="loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Cargando facturas...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination">
+                <button id="prev-page" onclick="changePage(-1)">Anterior</button>
+                <span class="pagination-info" id="page-info">Página 1 de 1</span>
+                <button id="next-page" onclick="changePage(1)">Siguiente</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Pago -->
+    <div id="pago-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Registrar Pago</h2>
+                <button class="close" onclick="closePagoModal()">&times;</button>
+            </div>
+            
+            <div class="payment-summary">
+                <div class="summary-row">
+                    <span>Factura:</span>
+                    <span id="modal-factura-info">-</span>
+                </div>
+                <div class="summary-row">
+                    <span>Cliente:</span>
+                    <span id="modal-cliente">-</span>
+                </div>
+                <div class="summary-row">
+                    <span>Total Factura:</span>
+                    <span id="modal-total">$0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Ya Pagado:</span>
+                    <span id="modal-pagado">$0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Saldo Pendiente:</span>
+                    <span id="modal-saldo">$0.00</span>
+                </div>
+            </div>
+            
+            <form id="pago-form">
+                <div class="form-group">
+                    <label for="monto-pago">Monto del Pago:</label>
+                    <input type="number" id="monto-pago" step="0.01" min="0.01" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fecha-pago">Fecha del Pago:</label>
+                        <input type="date" id="fecha-pago" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="forma-pago">Forma de Pago:</label>
+                        <select id="forma-pago" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="EFECTIVO">Efectivo</option>
+                            <option value="TRANSFERENCIA">Transferencia</option>
+                            <option value="CHEQUE">Cheque</option>
+                            <option value="TARJETA">Tarjeta de Crédito/Débito</option>
+                            <option value="DEPOSITO">Depósito Bancario</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="referencia-pago">Referencia/Número de Transacción:</label>
+                    <input type="text" id="referencia-pago" placeholder="Número de cheque, transferencia, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="observacion-pago">Observaciones:</label>
+                    <textarea id="observacion-pago" placeholder="Observaciones adicionales sobre el pago..."></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closePagoModal()">Cancelar</button>
+                    <button type="submit" class="btn-save" id="btn-save-pago">
+                        <i class="fas fa-save"></i> Registrar Pago
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Variables globales
+        let currentPage = 1;
+        let currentLimit = 20;
+        let currentSort = 'fecha_emision';
+        let currentOrder = 'DESC';
+        let currentFilters = {};
+        let selectedFactura = null;
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFacturas();
+            setCurrentDate();
+        });
+        
+        // Establecer fecha actual
+        function setCurrentDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fecha-pago').value = today;
+        }
+        
+        // Cargar facturas
+        function loadFacturas() {
+            const tbody = document.getElementById('facturas-tbody');
+            tbody.innerHTML = '<tr><td colspan="12" class="loading"><i class="fas fa-spinner fa-spin"></i><p>Cargando facturas...</p></td></tr>';
+            
+            const params = new URLSearchParams({
+                page: currentPage,
+                limit: currentLimit,
+                sort: currentSort,
+                order: currentOrder,
+                para_pago: 'true'
+            });
+            
+            // Agregar filtros
+            if (currentFilters.cliente) params.append('cliente', currentFilters.cliente);
+            if (currentFilters.secuencial) params.append('secuencial', currentFilters.secuencial);
+            
+            fetch(`api/get_fact_pago.php?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayFacturas(data.data);
+                        updatePagination(data.pagination);
+                        updateStats(data.data);
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; color: red;">Error: ${data.message}</td></tr>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: red;">Error de conexión al cargar las facturas.</td></tr>';
+                });
+        }
+        
+        // Mostrar facturas en la tabla
+        function displayFacturas(facturas) {
+            const tbody = document.getElementById('facturas-tbody');
+            
+            if (facturas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: #666;">No se encontraron facturas con saldo pendiente.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = facturas.map(factura => `
+                <tr>
+                    <td>${factura.estab}</td>
+                    <td>${factura.pto_emi}</td>
+                    <td>${factura.secuencial}</td>
+                    <td>${factura.fecha_emision}</td>
+                    <td>${factura.cliente}</td>
+                    <td>${factura.direccion}</td>
+                    <td>$${factura.total}</td>
+                    <td><span class="status-registered">${factura.estatus}</span></td>
+                    <td>$${factura.retencion}</td>
+                    <td>$${factura.valor_pagado}</td>
+                    <td><strong>$${factura.saldo_pendiente}</strong></td>
+                    <td>
+                        <button class="btn-view" onclick="viewFactura('${factura.clave_acceso}')">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                        <button class="btn-pay" onclick="openPagoModal(${JSON.stringify(factura).replace(/"/g, '&quot;')})">
+                            <i class="fas fa-credit-card"></i> Pagar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Actualizar paginación
+        function updatePagination(pagination) {
+            document.getElementById('page-info').textContent = `Página ${pagination.page} de ${pagination.pages}`;
+            document.getElementById('prev-page').disabled = !pagination.has_prev;
+            document.getElementById('next-page').disabled = !pagination.has_next;
+        }
+        
+        // Actualizar estadísticas
+        function updateStats(facturas) {
+            const totalFacturas = facturas.length;
+            const totalSaldo = facturas.reduce((sum, f) => sum + parseFloat(f.saldo_pendiente.replace(/[$,]/g, '')), 0);
+            const promedioSaldo = totalFacturas > 0 ? totalSaldo / totalFacturas : 0;
+            
+            document.getElementById('total-facturas').textContent = totalFacturas;
+            document.getElementById('total-saldo').textContent = `$${totalSaldo.toFixed(2)}`;
+            document.getElementById('promedio-saldo').textContent = `$${promedioSaldo.toFixed(2)}`;
+        }
+        
+        // Cambiar página
+        function changePage(delta) {
+            currentPage += delta;
+            if (currentPage < 1) currentPage = 1;
+            loadFacturas();
+        }
+        
+        // Aplicar filtros
+        function applyFilters() {
+            currentFilters = {
+                cliente: document.getElementById('search-cliente').value.trim(),
+                secuencial: document.getElementById('search-secuencial').value.trim()
+            };
+            currentSort = document.getElementById('sort-by').value;
+            currentOrder = document.getElementById('sort-order').value;
+            currentPage = 1;
+            loadFacturas();
+        }
+        
+        // Ver factura
+        function viewFactura(claveAcceso) {
+            // Aquí puedes implementar la lógica para ver los detalles de la factura
+            // Por ahora, abriremos en una nueva pestaña
+            window.open(`api/get_factura_details.php?clave_acceso=${claveAcceso}`, '_blank');
+        }
+        
+        // Abrir modal de pago
+        function openPagoModal(factura) {
+            selectedFactura = factura;
+            
+            // Llenar información del modal
+            document.getElementById('modal-factura-info').textContent = `${factura.secuencial}`;
+            document.getElementById('modal-cliente').textContent = factura.cliente;
+            document.getElementById('modal-total').textContent = `$${factura.total}`;
+            document.getElementById('modal-pagado').textContent = `$${factura.valor_pagado}`;
+            document.getElementById('modal-saldo').textContent = `$${factura.saldo_pendiente}`;
+            
+            // Establecer monto máximo
+            const saldoPendiente = parseFloat(factura.saldo_pendiente.replace(/[$,]/g, ''));
+            document.getElementById('monto-pago').max = saldoPendiente;
+            document.getElementById('monto-pago').value = saldoPendiente;
+            
+            // Mostrar modal
+            document.getElementById('pago-modal').classList.add('active');
+        }
+        
+        // Cerrar modal de pago
+        function closePagoModal() {
+            document.getElementById('pago-modal').classList.remove('active');
+            document.getElementById('pago-form').reset();
+            selectedFactura = null;
+        }
+        
+        // Manejar envío del formulario de pago
+        document.getElementById('pago-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!selectedFactura) {
+                alert('Error: No se ha seleccionado una factura.');
+                return;
+            }
+            
+            const btnSave = document.getElementById('btn-save-pago');
+            btnSave.disabled = true;
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+            
+            const pagoData = {
+                factura_id: selectedFactura.id,
+                monto: parseFloat(document.getElementById('monto-pago').value),
+                fecha_pago: document.getElementById('fecha-pago').value,
+                forma_pago: document.getElementById('forma-pago').value,
+                referencia: document.getElementById('referencia-pago').value,
+                observacion: document.getElementById('observacion-pago').value
+            };
+            
+            fetch('api/registrar_pago.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(pagoData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Pago registrado exitosamente.');
+                    closePagoModal();
+                    loadFacturas(); // Recargar la lista
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error de conexión al registrar el pago.');
+            })
+            .finally(() => {
+                btnSave.disabled = false;
+                btnSave.innerHTML = '<i class="fas fa-save"></i> Registrar Pago';
+            });
+        });
+        
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('pago-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePagoModal();
+            }
+        });
+    </script>
+</body>
+</html>
