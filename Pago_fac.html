@@ -321,6 +321,15 @@
             font-weight: bold;
         }
         
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
         .btn-pay {
             background: #007bff;
             color: white;
@@ -428,17 +437,17 @@
             align-items: center;
         }
         
-        .modal-content {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--border-radius-lg);
-            padding: 20px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-        }
+                 .modal-content {
+             background: var(--glass-bg);
+             border: 1px solid var(--glass-border);
+             border-radius: var(--border-radius-lg);
+             padding: 20px;
+             max-width: 800px;
+             width: 95%;
+             max-height: 85vh;
+             overflow-y: auto;
+             box-shadow: var(--shadow-lg);
+         }
         
         .modal-header {
             display: flex;
@@ -471,25 +480,53 @@
             margin-bottom: 15px;
         }
         
-        .form-group {
-            margin-bottom: 10px;
+                 .form-group {
+             margin-bottom: 8px;
+         }
+        
+                 .form-group label {
+             display: block;
+             margin-bottom: 4px;
+             color: var(--text-primary);
+             font-weight: 600;
+             font-size: 0.8rem;
+         }
+        
+                 .form-group input, .form-group select, .form-group textarea {
+             width: 100%;
+             padding: 8px;
+             border: 1px solid var(--glass-border);
+             border-radius: var(--border-radius);
+             background: var(--glass-bg);
+             color: var(--text-primary);
+             font-size: 0.85rem;
+             box-sizing: border-box;
+         }
+        
+                 .form-group textarea {
+             resize: vertical;
+             min-height: 50px;
+         }
+        
+                 .form-row {
+             display: flex;
+             gap: 8px;
+             margin-bottom: 8px;
+         }
+        
+        .form-row .form-group {
+            flex: 1;
         }
         
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--text-primary);
-            font-weight: 600;
-        }
+                 .factura-info-section, .pago-form-section {
+             margin-bottom: 12px;
+         }
         
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid var(--glass-border);
-            border-radius: var(--border-radius);
-            background: var(--glass-bg);
-            color: var(--text-primary);
-        }
+                 .form-group small {
+             display: block;
+             margin-top: 2px;
+             font-size: 0.7rem;
+         }
         
         .modal-footer {
             display: flex;
@@ -641,22 +678,91 @@
                 <button class="close" onclick="cerrarModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="factura-info">Factura:</label>
-                    <input type="text" id="factura-info" readonly>
+                <!-- Información de la factura (solo lectura) -->
+                <div class="factura-info-section">
+                    <h4 style="margin-bottom: 10px; color: var(--text-primary); border-bottom: 1px solid var(--glass-border); padding-bottom: 5px;">
+                        <i class="fas fa-file-invoice"></i> Información de la Factura
+                    </h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="factura-info">Número de Factura:</label>
+                            <input type="text" id="factura-info" readonly style="background-color: #f8f9fa;">
+                        </div>
+                        <div class="form-group">
+                            <label for="cliente-info">Cliente:</label>
+                            <input type="text" id="cliente-info" readonly style="background-color: #f8f9fa;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="direccion-info">Dirección:</label>
+                        <input type="text" id="direccion-info" readonly style="background-color: #f8f9fa;">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="total-factura">Total Factura:</label>
+                            <input type="text" id="total-factura" readonly style="background-color: #f8f9fa;">
+                        </div>
+                        <div class="form-group">
+                            <label for="saldo-actual">Saldo Pendiente:</label>
+                            <input type="text" id="saldo-actual" readonly style="background-color: #f8f9fa; color: #dc3545; font-weight: bold;">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="saldo-actual">Saldo Actual:</label>
-                    <input type="text" id="saldo-actual" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="monto-pago">Monto a Pagar:</label>
-                    <input type="number" id="monto-pago" step="0.01" min="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="observacion">Observación:</label>
-                    <input type="text" id="observacion" placeholder="Observación del pago">
-                </div>
+
+                                 <!-- Formulario de pago -->
+                 <div class="pago-form-section">
+                     <h4 style="margin: 20px 0 10px 0; color: var(--text-primary); border-bottom: 1px solid var(--glass-border); padding-bottom: 5px;">
+                         <i class="fas fa-credit-card"></i> Datos del Pago
+                     </h4>
+                     <div class="form-row">
+                         <div class="form-group">
+                             <label for="monto-pago">Monto a Pagar: <span style="color: #dc3545;">*</span></label>
+                             <input type="number" id="monto-pago" step="0.01" min="0.01" required>
+                             <small style="color: var(--text-secondary);">El monto no puede superar el saldo pendiente</small>
+                         </div>
+                         <div class="form-group">
+                             <label for="metodo-pago">Método de Pago: <span style="color: #dc3545;">*</span></label>
+                             <select id="metodo-pago" required>
+                                 <option value="">Seleccionar método de pago...</option>
+                                 <option value="efectivo">Efectivo</option>
+                                 <option value="tarjeta">Tarjeta</option>
+                                 <option value="transferencia">Transferencia</option>
+                                 <option value="cheque">Cheque</option>
+                                 <option value="deposito">Depósito</option>
+                                 <option value="pago_movil">Pago Móvil</option>
+                                 <option value="otro">Otro</option>
+                             </select>
+                         </div>
+                         <div class="form-group">
+                             <label for="fecha-pago">Fecha de Pago: <span style="color: #dc3545;">*</span></label>
+                             <input type="date" id="fecha-pago" required>
+                         </div>
+                     </div>
+                     <div class="form-row">
+                         <div class="form-group">
+                             <label for="institucion">Institución:</label>
+                             <input type="text" id="institucion" placeholder="Banco, cooperativa, etc.">
+                         </div>
+                         <div class="form-group">
+                             <label for="documento">Documento:</label>
+                             <input type="text" id="documento" placeholder="Número de documento">
+                         </div>
+                         <div class="form-group">
+                             <label for="referencia">Referencia:</label>
+                             <input type="text" id="referencia" placeholder="Número de referencia">
+                         </div>
+                     </div>
+                     <div class="form-row">
+                         <div class="form-group">
+                             <label for="usuario-pago">Usuario:</label>
+                             <input type="text" id="usuario-pago" readonly style="background-color: #f8f9fa;">
+                         </div>
+                         <div class="form-group" style="flex: 2;">
+                             <label for="observacion">Observaciones:</label>
+                             <textarea id="observacion" placeholder="Observaciones adicionales..." rows="2"></textarea>
+                         </div>
+                     </div>
+                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
@@ -707,6 +813,17 @@
             document.getElementById('facturas-pagadas').textContent = facturasPagadas;
         }
 
+        function getStatusClass(estatus) {
+            switch(estatus) {
+                case 'REGISTRADO':
+                    return 'status-registered';
+                case 'PENDIENTE':
+                    return 'status-pending';
+                default:
+                    return 'status-registered';
+            }
+        }
+
         function mostrarFacturas() {
             const tbody = document.getElementById('facturas-tbody');
             const inicio = (paginaActual - 1) * facturasPorPagina;
@@ -727,7 +844,7 @@
                     <td>${factura.razon_social_comprador}</td>
                     <td>${factura.direccion_comprador || '-'}</td>
                     <td>$${parseFloat(factura.importe_total).toFixed(2)}</td>
-                    <td><span class="status-registered">${factura.estatus}</span></td>
+                    <td><span class="${getStatusClass(factura.estatus)}">${factura.estatus}</span></td>
                     <td>$${parseFloat(factura.retencion || 0).toFixed(2)}</td>
                     <td>$${parseFloat(factura.valor_pagado || 0).toFixed(2)}</td>
                     <td>$${parseFloat(factura.saldo).toFixed(2)}</td>
@@ -787,7 +904,7 @@
                     <td>${factura.razon_social_comprador}</td>
                     <td>${factura.direccion_comprador || '-'}</td>
                     <td>$${parseFloat(factura.importe_total).toFixed(2)}</td>
-                    <td><span class="status-registered">${factura.estatus}</span></td>
+                    <td><span class="${getStatusClass(factura.estatus)}">${factura.estatus}</span></td>
                     <td>$${parseFloat(factura.retencion || 0).toFixed(2)}</td>
                     <td>$${parseFloat(factura.valor_pagado || 0).toFixed(2)}</td>
                     <td>$${parseFloat(factura.saldo).toFixed(2)}</td>
@@ -838,9 +955,18 @@
 
             facturaSeleccionada = factura;
             document.getElementById('factura-info').value = `${factura.estab}-${factura.pto_emi}-${factura.secuencial}`;
+            document.getElementById('cliente-info').value = factura.razon_social_comprador;
+            document.getElementById('direccion-info').value = factura.direccion_comprador || '-';
+            document.getElementById('total-factura').value = '$' + parseFloat(factura.importe_total).toFixed(2);
             document.getElementById('saldo-actual').value = '$' + parseFloat(factura.saldo).toFixed(2);
-            document.getElementById('monto-pago').value = '';
-            document.getElementById('observacion').value = '';
+                         document.getElementById('monto-pago').value = '';
+             document.getElementById('metodo-pago').value = '';
+             document.getElementById('institucion').value = '';
+             document.getElementById('documento').value = '';
+             document.getElementById('referencia').value = '';
+             document.getElementById('fecha-pago').value = new Date().toISOString().split('T')[0];
+             document.getElementById('usuario-pago').value = 'Administrador'; // Por defecto, se puede cambiar
+             document.getElementById('observacion').value = '';
 
             document.getElementById('modal-pago').classList.add('active');
         }
@@ -853,24 +979,94 @@
         function confirmarPago() {
             if (!facturaSeleccionada) return;
 
-            const montoPago = parseFloat(document.getElementById('monto-pago').value);
-            const observacion = document.getElementById('observacion').value;
+                         // Obtener todos los valores del formulario
+             const montoPago = parseFloat(document.getElementById('monto-pago').value);
+             const metodoPago = document.getElementById('metodo-pago').value;
+             const institucion = document.getElementById('institucion').value;
+             const documento = document.getElementById('documento').value;
+             const referencia = document.getElementById('referencia').value;
+             const fechaPago = document.getElementById('fecha-pago').value;
+             const usuarioPago = document.getElementById('usuario-pago').value;
+             const observacion = document.getElementById('observacion').value;
 
+            // Validaciones
             if (!montoPago || montoPago <= 0) {
                 alert('Por favor ingrese un monto válido');
+                document.getElementById('monto-pago').focus();
                 return;
             }
 
             if (montoPago > parseFloat(facturaSeleccionada.saldo)) {
                 alert('El monto no puede ser mayor al saldo pendiente');
+                document.getElementById('monto-pago').focus();
                 return;
             }
 
-            // Aquí se implementaría la lógica para registrar el pago
-            // Por ahora solo cerramos el modal
-            alert('Pago registrado exitosamente');
-            cerrarModal();
-            cargarFacturas(); // Recargar para actualizar datos
+                         if (!metodoPago) {
+                 alert('Por favor seleccione un método de pago');
+                 document.getElementById('metodo-pago').focus();
+                 return;
+             }
+
+                         // Validar que si es transferencia, cheque o depósito, se ingrese institución
+             if ((metodoPago === 'transferencia' || metodoPago === 'cheque' || metodoPago === 'deposito') && !institucion) {
+                 alert('Por favor ingrese la institución bancaria');
+                 document.getElementById('institucion').focus();
+                 return;
+             }
+             
+             // Validar fecha de pago
+             if (!fechaPago) {
+                 alert('Por favor ingrese la fecha de pago');
+                 document.getElementById('fecha-pago').focus();
+                 return;
+             }
+
+                         // Preparar datos del pago
+             const pagoData = {
+                 id_info_factura: facturaSeleccionada.id_info_tributaria, // En realidad es id_info_tributaria
+                 monto: montoPago,
+                 metodo_pago: metodoPago,
+                 institucion: institucion,
+                 documento: documento,
+                 referencia: referencia,
+                 fecha_pago: fechaPago,
+                 usuario: usuarioPago,
+                 observacion: observacion
+             };
+             
+             // Debug: Mostrar datos que se van a enviar
+             console.log('DEBUG - Datos a enviar:', pagoData);
+             console.log('DEBUG - Factura seleccionada:', facturaSeleccionada);
+             console.log('DEBUG - Saldo mostrado en frontend:', facturaSeleccionada.saldo);
+
+                         // Mostrar confirmación
+             const confirmacion = confirm(`¿Confirmar pago de $${montoPago.toFixed(2)} por ${metodoPago}?`);
+            if (!confirmacion) return;
+
+            // Registrar el pago usando la API
+            fetch('api/registrar_pago.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(pagoData)
+            })
+                         .then(response => response.json())
+             .then(data => {
+                 console.log('DEBUG - Respuesta del API:', data);
+                 if (data.success) {
+                     alert(`Pago registrado exitosamente\nFactura: ${data.data.factura}\nMonto: $${data.data.monto.toFixed(2)}\nFecha: ${data.data.fecha_pago}\nUsuario: ${data.data.usuario}\nSaldo restante: $${data.data.saldo_restante.toFixed(2)}`);
+                     cerrarModal();
+                     cargarFacturas(); // Recargar para actualizar datos
+                 } else {
+                     alert(`Error al registrar el pago: ${data.message}`);
+                 }
+             })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error de conexión al registrar el pago');
+            });
         }
 
         // Cerrar modal al hacer clic fuera de él
@@ -880,6 +1076,28 @@
                 cerrarModal();
             }
         }
+
+                 // Función para mostrar/ocultar campo de institución según método de pago
+         document.addEventListener('DOMContentLoaded', function() {
+             const metodoPagoSelect = document.getElementById('metodo-pago');
+             const institucionGroup = document.getElementById('institucion').closest('.form-group');
+             
+             if (metodoPagoSelect) {
+                 metodoPagoSelect.addEventListener('change', function() {
+                     const metodoPago = this.value;
+                     const requiereInstitucion = ['transferencia', 'cheque', 'deposito'].includes(metodoPago);
+                     
+                     if (requiereInstitucion) {
+                         institucionGroup.style.display = 'block';
+                         document.getElementById('institucion').required = true;
+                     } else {
+                         institucionGroup.style.display = 'none';
+                         document.getElementById('institucion').required = false;
+                         document.getElementById('institucion').value = '';
+                     }
+                 });
+             }
+         });
     </script>
 </body>
 </html>

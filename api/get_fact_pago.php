@@ -78,7 +78,7 @@ try {
         (f.importe_total - COALESCE(f.valor_pagado, 0)) as saldo
     FROM info_factura f 
     JOIN info_tributaria it ON f.id_info_tributaria = it.id_info_tributaria
-    WHERE f.estatus = 'REGISTRADO' 
+    WHERE (f.estatus = 'REGISTRADO' OR f.estatus = 'PENDIENTE')
     AND f.importe_total > COALESCE(f.valor_pagado, 0)";
     
     // Construir WHERE y PARAMS para filtros adicionales
@@ -103,7 +103,7 @@ try {
     $sqlCount = "SELECT COUNT(*) as total 
                  FROM info_factura f 
                  JOIN info_tributaria it ON f.id_info_tributaria = it.id_info_tributaria
-                 WHERE f.estatus = 'REGISTRADO' 
+                 WHERE (f.estatus = 'REGISTRADO' OR f.estatus = 'PENDIENTE')
                  AND f.importe_total > COALESCE(f.valor_pagado, 0)";
     
     if (!empty($whereClauses)) {

@@ -102,14 +102,43 @@ CREATE TABLE IF NOT EXISTS factura_detalles (
 CREATE TABLE IF NOT EXISTS pagos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     factura_id INT,
+    clave_acceso VARCHAR(100) NOT NULL,
     monto DECIMAL(10,2) NOT NULL,
-    metodo_pago ENUM('efectivo', 'tarjeta', 'transferencia') NOT NULL,
+    metodo_pago ENUM('efectivo', 'tarjeta', 'transferencia', 'cheque', 'deposito', 'pago_movil', 'otro') NOT NULL,
+    institucion VARCHAR(100),
+    documento VARCHAR(100),
     referencia VARCHAR(100),
+    observacion TEXT,
     estado ENUM('pendiente', 'confirmado', 'rechazado') DEFAULT 'pendiente',
     fecha_pago TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    usuario_id INT,
+    usuario_id INT DEFAULT 1,
     FOREIGN KEY (factura_id) REFERENCES facturas(id),
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+    INDEX idx_clave_acceso (clave_acceso),
+    INDEX idx_fecha_pago (fecha_pago),
+    INDEX idx_metodo_pago (metodo_pago)
+);
+
+-- =====================================================
+-- TABLA DE PAGOS DE FACTURAS (MEJORADA)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS pagos_facturas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    factura_id INT NOT NULL,
+    clave_acceso VARCHAR(100) NOT NULL,
+    monto DECIMAL(10,2) NOT NULL,
+    forma_pago ENUM('EFECTIVO', 'TRANSFERENCIA', 'CHEQUE', 'TARJETA_CREDITO', 'TARJETA_DEBITO', 'DEPOSITO', 'PAGO_MOVIL', 'OTRO') NOT NULL,
+    institucion VARCHAR(100),
+    documento VARCHAR(100),
+    observacion TEXT,
+    fecha_pago DATE NOT NULL,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    usuario_id INT DEFAULT 1,
+    estado ENUM('ACTIVO', 'ANULADO') DEFAULT 'ACTIVO',
+    FOREIGN KEY (factura_id) REFERENCES facturas(id) ON DELETE CASCADE,
+    INDEX idx_clave_acceso (clave_acceso),
+    INDEX idx_fecha_pago (fecha_pago),
+    INDEX idx_forma_pago (forma_pago)
 );
 
 -- =====================================================

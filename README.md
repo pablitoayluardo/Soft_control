@@ -1,242 +1,244 @@
-# Sistema de Control - GloboCity
+# 💰 Sistema de Control de Pagos - GloboCity
 
-Sistema de gestión empresarial completo para GloboCity, incluyendo módulos de facturación, inventarios, pagos, gastos y productos.
+## 📋 Descripción
 
-## 🚀 Características
+Sistema completo de gestión de pagos de facturas electrónicas desarrollado en PHP, MySQL y JavaScript. Permite registrar, consultar y gestionar pagos de facturas con validaciones completas y reportes detallados.
 
-- **Interfaz moderna y responsiva** con diseño glass morphism
-- **Módulos integrados**: Facturación, Inventarios, Pagos, Gastos, Productos
-- **Dashboard en tiempo real** con estadísticas actualizadas
-- **Sistema de autenticación seguro** con JWT
-- **Base de datos MySQL** optimizada con índices y vistas
-- **APIs RESTful** para integración completa
-- **Sistema de logs** para auditoría
-- **Configuración flexible** para diferentes entornos
+## 🚀 Características Principales
 
-## 📋 Requisitos
+### ✅ Funcionalidades Implementadas
+- **Registro de Pagos**: Formulario completo con validaciones
+- **Consulta de Facturas**: Listado con filtros y paginación
+- **Validaciones**: Monto, saldo pendiente, métodos de pago
+- **Estados de Factura**: REGISTRADO, PENDIENTE, PAGADA
+- **Logs de Actividad**: Registro completo de transacciones
+- **Interfaz Responsiva**: Diseño moderno y funcional
 
-- PHP 7.4 o superior
-- MySQL 5.7 o superior
-- Servidor web (Apache/Nginx)
-- Extensiones PHP: PDO, PDO_MySQL, JSON, mbstring
+### 🔧 Tecnologías Utilizadas
+- **Backend**: PHP 7.4+, MySQL 5.7+
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Base de Datos**: MySQL con PDO
+- **APIs**: RESTful con JSON
+- **Validaciones**: Cliente y servidor
+
+## 📁 Estructura del Proyecto
+
+```
+📁 Sistema-Pagos/
+├── 📄 Pago_fac.html              # Módulo principal de pagos
+├── 📄 config.php                 # Configuración de base de datos
+├── 📄 verificar_sistema_pagos.php # Script de verificación
+├── 📄 test_apis.php              # Prueba de APIs
+├── 📄 probar_apis_directo.php    # Prueba directa de APIs
+├── 📄 limpiar_todo_completamente.sql # Script de limpieza total
+├── 📄 INSTRUCCIONES_LIMPIEZA_COMPLETA_TOTAL.md # Instrucciones
+└── 📁 api/
+    ├── 📄 get_fact_pago.php      # API de consulta de facturas
+    └── 📄 registrar_pago.php     # API de registro de pagos
+```
+
+## 🗄️ Estructura de Base de Datos
+
+### Tabla `pagos`
+```sql
+CREATE TABLE pagos (
+    id_pago INT AUTO_INCREMENT PRIMARY KEY,
+    id_info_factura INT NOT NULL,
+    estab VARCHAR(3) NOT NULL,
+    pto_emi VARCHAR(3) NOT NULL,
+    secuencial VARCHAR(9) NOT NULL,
+    monto DECIMAL(10,2) NOT NULL,
+    forma_pago ENUM('efectivo', 'tarjeta', 'transferencia', 'cheque', 'deposito', 'pago_movil', 'otro') NOT NULL,
+    nombre_banco VARCHAR(100) NULL,
+    numero_documento VARCHAR(50) NULL,
+    referencia VARCHAR(50) NULL,
+    descripcion TEXT NULL,
+    fecha_pago DATE NOT NULL,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Tabla `info_factura`
+```sql
+-- Campos principales:
+- id_info_factura (PK)
+- id_info_tributaria (FK)
+- valor_pagado
+- estatus (ENUM: 'REGISTRADO', 'PENDIENTE', 'PAGADA')
+```
 
 ## 🛠️ Instalación
 
-### 1. Clonar el repositorio
-```bash
-git clone [url-del-repositorio]
-cd soft_control
-```
+### 1. Requisitos Previos
+- PHP 7.4 o superior
+- MySQL 5.7 o superior
+- Servidor web (Apache/Nginx)
+- Extensión PDO habilitada
 
-### 2. Configurar la base de datos
+### 2. Configuración de Base de Datos
+1. Crear base de datos MySQL
+2. Ejecutar scripts de creación de tablas
+3. Configurar `config.php` con credenciales
 
-#### Opción A: Usar el script SQL automático
-```bash
-mysql -u globocit_globocit -p globocit_soft_control < database_setup.sql
-```
-
-#### Opción B: Ejecutar manualmente
-1. Crear la base de datos `globocit_soft_control`
-2. Ejecutar el script `database_setup.sql`
-3. Verificar que las tablas se crearon correctamente
-
-### 3. Configurar el archivo config.php
-
-El archivo `config.php` ya está configurado con las credenciales de GloboCity:
-
+### 3. Configuración del Sistema
 ```php
+// config.php
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'globocit_soft_control');
-define('DB_USER', 'globocit_globocit');
-define('DB_PASS', 'Correo2026+@');
+define('DB_NAME', 'tu_base_datos');
+define('DB_USER', 'tu_usuario');
+define('DB_PASS', 'tu_password');
+define('DB_CHARSET', 'utf8mb4');
 ```
 
-### 4. Configurar permisos de directorios
-```bash
-chmod 755 uploads/
-chmod 755 logs/
-chmod 644 config.php
+## 📖 Uso del Sistema
+
+### Acceso al Módulo
+```
+http://tu-dominio.com/Pago_fac.html
 ```
 
-### 5. Verificar la instalación
-Acceder a `https://www.globocity.com.ec/soft_control/`
-
-## 🔐 Credenciales por defecto
-
-- **Usuario**: `admin`
-- **Contraseña**: `password`
-
-⚠️ **Importante**: Cambiar la contraseña del administrador después de la primera instalación.
-
-## 📊 Estructura de la base de datos
-
-### Tablas principales:
-- `usuarios` - Gestión de usuarios del sistema
-- `productos` - Catálogo de productos
-- `clientes` - Base de datos de clientes
-- `facturas` - Facturación y ventas
-- `factura_detalles` - Detalles de facturas
-- `pagos` - Registro de pagos
-- `gastos` - Control de gastos
-- `movimientos_inventario` - Trazabilidad de inventario
-- `logs_actividad` - Auditoría del sistema
-- `configuraciones` - Configuraciones del sistema
-
-### Vistas útiles:
-- `v_productos_stock_bajo` - Productos con stock mínimo
-- `v_facturas_pendientes` - Facturas por cobrar
-- `v_ventas_mensual` - Resumen de ventas
-
-## 🔧 Configuración avanzada
-
-### Variables de entorno
-Las principales configuraciones están en `config.php`:
-
-```php
-// Base de datos
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'globocit_soft_control');
-define('DB_USER', 'globocit_globocit');
-define('DB_PASS', 'Correo2026+@');
-
-// Seguridad
-define('JWT_SECRET', 'soft_control_jwt_secret_2024');
-define('SESSION_EXPIRATION', 3600);
-define('MAX_LOGIN_ATTEMPTS', 5);
-
-// Aplicación
-define('BASE_URL', 'https://www.globocity.com.ec/soft_control');
-define('TIMEZONE', 'America/Guayaquil');
+### Verificación del Sistema
+```
+http://tu-dominio.com/verificar_sistema_pagos.php
 ```
 
-### Configuraciones del sistema
-Las configuraciones del sistema se almacenan en la tabla `configuraciones`:
-
-- `empresa_nombre` - Nombre de la empresa
-- `empresa_ruc` - RUC de la empresa
-- `iva_porcentaje` - Porcentaje de IVA
-- `moneda` - Moneda del sistema
-- `stock_minimo_global` - Stock mínimo global
-
-## 📱 Módulos disponibles
-
-### 1. Facturación
-- Crear y gestionar facturas
-- Generar números de factura automáticos
-- Calcular IVA automáticamente
-- Estados: pendiente, pagada, anulada
-
-### 2. Inventarios
-- Control de stock en tiempo real
-- Alertas de stock bajo
-- Movimientos de inventario
-- Categorización de productos
-
-### 3. Pagos
-- Registro de pagos por factura
-- Múltiples métodos de pago
-- Estados de confirmación
-- Trazabilidad completa
-
-### 4. Gastos
-- Control de gastos empresariales
-- Categorización de gastos
-- Estados de aprobación
-- Comprobantes adjuntos
-
-### 5. Productos
-- Catálogo completo de productos
-- Precios de costo y venta
-- Control de stock
-- Categorías y marcas
-
-## 🔌 APIs disponibles
-
-### Autenticación
-- `POST /api/login.php` - Iniciar sesión
-- `POST /api/logout.php` - Cerrar sesión
-
-### Dashboard
-- `GET /api/dashboard_stats.php` - Estadísticas del dashboard
-- `GET /api/recent_activity.php` - Actividad reciente
-
-### Módulos (en desarrollo)
-- `GET /api/facturas/` - Listar facturas
-- `POST /api/facturas/` - Crear factura
-- `GET /api/productos/` - Listar productos
-- `POST /api/productos/` - Crear producto
-- `GET /api/clientes/` - Listar clientes
-- `POST /api/clientes/` - Crear cliente
-
-## 🛡️ Seguridad
-
-- **Autenticación JWT** con tokens seguros
-- **Contraseñas hasheadas** con bcrypt
-- **Headers de seguridad** configurados
-- **Sesiones seguras** con httponly cookies
-- **Rate limiting** para APIs
-- **Logs de auditoría** completos
-- **Sanitización de inputs** automática
-
-## 📈 Monitoreo y logs
-
-### Archivos de log
-- `logs/YYYY-MM-DD.log` - Logs diarios del sistema
-- Logs de errores en el servidor web
-
-### Actividades registradas
-- Inicios de sesión
-- Creación/modificación de registros
-- Errores del sistema
-- Actividad de usuarios
-
-## 🔄 Mantenimiento
-
-### Backup de base de datos
-```bash
-mysqldump -u globocit_globocit -p globocit_soft_control > backup_$(date +%Y%m%d).sql
+### Prueba de APIs
+```
+http://tu-dominio.com/probar_apis_directo.php
 ```
 
-### Limpieza de logs
-Los logs se rotan automáticamente por fecha. Para limpiar logs antiguos:
-```bash
-find logs/ -name "*.log" -mtime +30 -delete
+## 🔍 Verificación y Diagnóstico
+
+### Scripts de Verificación
+- `verificar_sistema_pagos.php`: Verificación completa del sistema
+- `test_apis.php`: Prueba básica de APIs
+- `probar_apis_directo.php`: Prueba avanzada de APIs
+
+### Limpieza del Sistema
+- `limpiar_todo_completamente.sql`: Limpieza total de datos
+- `INSTRUCCIONES_LIMPIEZA_COMPLETA_TOTAL.md`: Instrucciones detalladas
+
+## 🔧 APIs Disponibles
+
+### GET `/api/get_fact_pago.php`
+**Obtiene facturas con saldo pendiente**
+```json
+{
+    "success": true,
+    "facturas": [...],
+    "pagination": {...}
+}
 ```
 
-### Actualización de estadísticas
-Las estadísticas se actualizan automáticamente cada vez que se accede al dashboard.
-
-## 🐛 Solución de problemas
-
-### Error de conexión a la base de datos
-1. Verificar credenciales en `config.php`
-2. Confirmar que MySQL esté ejecutándose
-3. Verificar permisos del usuario de base de datos
-
-### Error de permisos
-```bash
-chmod 755 uploads/
-chmod 755 logs/
-chmod 644 config.php
+### POST `/api/registrar_pago.php`
+**Registra un nuevo pago**
+```json
+{
+    "id_info_factura": 123,
+    "monto": 100.50,
+    "metodo_pago": "transferencia",
+    "fecha_pago": "2024-01-15",
+    "institucion": "Banco XYZ",
+    "documento": "REF123",
+    "referencia": "TRX456",
+    "observacion": "Pago parcial"
+}
 ```
 
-### Problemas de sesión
-1. Verificar configuración de cookies
-2. Limpiar caché del navegador
-3. Verificar configuración de SSL
+## 🎯 Funcionalidades del Frontend
 
-## 📞 Soporte
+### Formulario de Pago
+- **3 columnas** para mejor visualización
+- **Validaciones en tiempo real**
+- **Cálculo automático de saldo**
+- **Métodos de pago dinámicos**
 
-Para soporte técnico:
-- **Email**: admin@globocity.com.ec
-- **Teléfono**: +593 4 1234567
+### Listado de Facturas
+- **Filtros por cliente y secuencial**
+- **Ordenamiento por múltiples campos**
+- **Paginación**
+- **Estados con colores diferenciados**
+
+## 🔒 Seguridad
+
+### Validaciones Implementadas
+- **Monto no excede saldo pendiente**
+- **Formato de fecha válido**
+- **Métodos de pago permitidos**
+- **Campos requeridos**
+- **Sanitización de datos**
+
+### Logs de Actividad
+- **Registro de todas las transacciones**
+- **Información detallada de cambios**
+- **Auditoría completa**
+
+## 📊 Reportes y Estadísticas
+
+### Información Disponible
+- Total de facturas
+- Saldo total pendiente
+- Facturas pagadas
+- Distribución por estatus
+- Historial de pagos
+
+## 🚀 Despliegue
+
+### Hosting Compartido
+1. Subir archivos via FTP
+2. Configurar base de datos
+3. Ejecutar scripts de verificación
+4. Probar funcionalidades
+
+### Servidor Dedicado
+1. Configurar servidor web
+2. Instalar dependencias
+3. Configurar base de datos
+4. Desplegar aplicación
+
+## 🐛 Solución de Problemas
+
+### Problemas Comunes
+1. **Error de conexión a BD**: Verificar config.php
+2. **APIs no responden**: Verificar permisos de archivos
+3. **Validaciones fallan**: Revisar estructura de tablas
+4. **Frontend no carga**: Verificar rutas y archivos
+
+### Scripts de Diagnóstico
+- `verificar_sistema_pagos.php`: Diagnóstico completo
+- `probar_apis_directo.php`: Prueba de APIs
+- `limpiar_todo_completamente.sql`: Reset del sistema
+
+## 📝 Changelog
+
+### Versión 1.0.0 (2024-01-15)
+- ✅ Sistema completo de pagos
+- ✅ Validaciones implementadas
+- ✅ APIs funcionales
+- ✅ Interfaz responsiva
+- ✅ Scripts de verificación
+- ✅ Documentación completa
+
+## 👥 Contribución
+
+1. Fork el proyecto
+2. Crear rama para nueva funcionalidad
+3. Commit cambios
+4. Push a la rama
+5. Crear Pull Request
 
 ## 📄 Licencia
 
-Este proyecto es propiedad de GloboCity. Todos los derechos reservados.
+Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
+
+## 📞 Soporte
+
+Para soporte técnico o consultas:
+- Revisar documentación
+- Ejecutar scripts de diagnóstico
+- Verificar logs de error
+- Contactar al equipo de desarrollo
 
 ---
 
-**Versión**: 1.0.0  
-**Última actualización**: Enero 2024  
-**Desarrollado por**: GloboCity Team 
+**Desarrollado con ❤️ para GloboCity** 
