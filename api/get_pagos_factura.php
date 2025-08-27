@@ -62,9 +62,7 @@ try {
             p.fecha_pago,
             p.fecha_registro,
             f.razon_social_comprador,
-            f.importe_total,
-            f.saldo,
-            f.valor_pagado
+            f.importe_total
         FROM pagos p
         INNER JOIN info_factura f ON p.id_info_factura = f.id_info_factura
     ";
@@ -104,9 +102,7 @@ try {
                     'pto_emi' => $pagos[0]['pto_emi'],
                     'secuencial' => $pagos[0]['secuencial'],
                     'cliente' => $pagos[0]['razon_social_comprador'],
-                    'total_factura' => $pagos[0]['importe_total'],
-                    'saldo_actual' => $pagos[0]['saldo'],
-                    'valor_pagado' => $pagos[0]['valor_pagado']
+                    'total_factura' => $pagos[0]['importe_total']
                 ] : null
             ]
         ]
