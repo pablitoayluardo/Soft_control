@@ -2278,12 +2278,12 @@
                 data.pagos.forEach(pago => {
                     pagosHtml += `
                         <tr>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${new Date(pago.created_at).toLocaleDateString()}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.formaPago || 'N/A'}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">-</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">-</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">-</td>
-                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: bold;">$${parseFloat(pago.total).toFixed(2)}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${new Date(pago.fecha_pago).toLocaleDateString()}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.forma_pago || 'N/A'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.nombre_banco || 'N/A'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.numero_documento || 'N/A'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.referencia || 'N/A'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: bold;">$${parseFloat(pago.monto).toFixed(2)}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">
                                 <span class="status-paid">Confirmado</span>
                             </td>

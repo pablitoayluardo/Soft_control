@@ -50,12 +50,17 @@ try {
         SELECT 
             p.id_pago,
             p.id_info_factura,
-            p.formaPago,
-            p.total,
-            p.created_at,
-            f.estab,
-            f.pto_emi,
-            f.secuencial,
+            p.estab,
+            p.pto_emi,
+            p.secuencial,
+            p.monto,
+            p.forma_pago,
+            p.nombre_banco,
+            p.numero_documento,
+            p.referencia,
+            p.descripcion,
+            p.fecha_pago,
+            p.fecha_registro,
             f.razon_social_comprador,
             f.importe_total,
             f.saldo,
@@ -74,7 +79,7 @@ try {
         $params[] = $facturaId;
     }
     
-    $sql .= " ORDER BY p.created_at DESC";
+    $sql .= " ORDER BY p.fecha_pago DESC";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -83,7 +88,7 @@ try {
     // Calcular totales
     $totalPagado = 0;
     foreach ($pagos as $pago) {
-        $totalPagado += floatval($pago['total']);
+        $totalPagado += floatval($pago['monto']);
     }
     
     // Respuesta exitosa
