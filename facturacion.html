@@ -370,14 +370,22 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        .facturas-table td {
-            padding: 6px 4px; /* Reducido de 8px 6px a 6px 4px */
-            border: 1px solid #ddd;
-            vertical-align: top;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+                 .facturas-table td {
+             padding: 6px 4px; /* Reducido de 8px 6px a 6px 4px */
+             border: 1px solid #ddd;
+             vertical-align: top;
+             overflow: hidden;
+             text-overflow: ellipsis;
+             white-space: nowrap;
+         }
+         
+         /* Permitir que los estatus se muestren completos */
+         .facturas-table td:nth-child(8) {
+             overflow: visible;
+             white-space: nowrap;
+             word-wrap: normal;
+             text-align: center;
+         }
         
         .facturas-table tr:nth-child(even) {
             background: #f8f9fa;
@@ -407,18 +415,18 @@
             background: #a8a8a8;
         }
         
-        /* Ajustar anchos de columnas específicas */
-        .facturas-table th:nth-child(1), .facturas-table td:nth-child(1) { width: 6%; } /* ESTAB */
-        .facturas-table th:nth-child(2), .facturas-table td:nth-child(2) { width: 6%; } /* PTO EMI */
-        .facturas-table th:nth-child(3), .facturas-table td:nth-child(3) { width: 8%; } /* SECUENCIAL */
-        .facturas-table th:nth-child(4), .facturas-table td:nth-child(4) { width: 10%; } /* FECHA EMISIÓN */
-        .facturas-table th:nth-child(5), .facturas-table td:nth-child(5) { width: 19%; } /* CLIENTE */
-        .facturas-table th:nth-child(6), .facturas-table td:nth-child(6) { width: 19%; } /* DIRECCIÓN */
-        .facturas-table th:nth-child(7), .facturas-table td:nth-child(7) { width: 8%; } /* TOTAL */
-        .facturas-table th:nth-child(8), .facturas-table td:nth-child(8) { width: 8%; } /* ESTATUS */
-        .facturas-table th:nth-child(9), .facturas-table td:nth-child(9) { width: 8%; } /* RETENCIÓN */
-        .facturas-table th:nth-child(10), .facturas-table td:nth-child(10) { width: 8%; } /* VALOR PAGADO */
-        .facturas-table th:nth-child(11), .facturas-table td:nth-child(11) { width: 10%; } /* ACCIONES */
+                 /* Ajustar anchos de columnas específicas */
+         .facturas-table th:nth-child(1), .facturas-table td:nth-child(1) { width: 5%; } /* ESTAB */
+         .facturas-table th:nth-child(2), .facturas-table td:nth-child(2) { width: 5%; } /* PTO EMI */
+         .facturas-table th:nth-child(3), .facturas-table td:nth-child(3) { width: 7%; } /* SECUENCIAL */
+         .facturas-table th:nth-child(4), .facturas-table td:nth-child(4) { width: 9%; } /* FECHA EMISIÓN */
+         .facturas-table th:nth-child(5), .facturas-table td:nth-child(5) { width: 17%; } /* CLIENTE */
+         .facturas-table th:nth-child(6), .facturas-table td:nth-child(6) { width: 17%; } /* DIRECCIÓN */
+         .facturas-table th:nth-child(7), .facturas-table td:nth-child(7) { width: 7%; } /* TOTAL */
+         .facturas-table th:nth-child(8), .facturas-table td:nth-child(8) { width: 12%; } /* ESTATUS */
+         .facturas-table th:nth-child(9), .facturas-table td:nth-child(9) { width: 7%; } /* RETENCIÓN */
+         .facturas-table th:nth-child(10), .facturas-table td:nth-child(10) { width: 7%; } /* VALOR PAGADO */
+         .facturas-table th:nth-child(11), .facturas-table td:nth-child(11) { width: 9%; } /* ACCIONES */
         
         .file-input-hidden {
             display: none;
@@ -642,25 +650,109 @@
             }
         }
         
-        /* Estilos para diferentes estatus */
-        .status-registrado {
-            color: #28a745 !important;
-            font-weight: bold;
+                 /* Estilos para diferentes estatus - Colores distintivos */
+        .status-registered {
+            background: #e3f2fd !important;
+            color: #1565c0 !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            border: 1px solid #bbdefb !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            box-sizing: border-box !important;
         }
         
-        .status-pagado {
-            color: #007bff !important;
-            font-weight: bold;
+        .status-pending {
+            background: #fff8e1 !important;
+            color: #f57c00 !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            border: 1px solid #ffecb3 !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            box-sizing: border-box !important;
         }
         
-        .status-anulado {
-            color: #dc3545 !important;
-            font-weight: bold;
+        .status-paid {
+            background: #e8f5e8 !important;
+            color: #2e7d32 !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            border: 1px solid #c8e6c9 !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            box-sizing: border-box !important;
         }
         
-        .status-nota-cr {
-            color: #6f42c1 !important;
-            font-weight: bold;
+        .status-cancelled {
+            background: #ffebee !important;
+            color: #c62828 !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            border: 1px solid #ffcdd2 !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            box-sizing: border-box !important;
+        }
+        
+        .status-partial {
+            background: #f3e5f5 !important;
+            color: #7b1fa2 !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            border: 1px solid #e1bee7 !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* Asegurar que los estilos de status se apliquen correctamente en las celdas de tabla */
+        .facturas-table td .status-registered,
+        .facturas-table td .status-pending,
+        .facturas-table td .status-paid,
+        .facturas-table td .status-cancelled,
+        .facturas-table td .status-partial {
+            display: inline-block !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            overflow: visible !important;
         }
     </style>
 </head>
@@ -756,6 +848,30 @@
                 <div class="content-header">
                     <h1><i class="fas fa-list"></i> Ver Facturas</h1>
                     <p>Lista de todas las facturas registradas en el sistema</p>
+                    
+                    <!-- Leyenda de estatus -->
+                    <div class="status-legend" style="display: flex; justify-content: center; gap: 15px; margin: 8px 0; flex-wrap: wrap;">
+                        <div class="status-legend-item" style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: bold;">
+                            <div class="status-legend-color" style="width: 12px; height: 12px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.1); background: #e3f2fd; border-color: #bbdefb;"></div>
+                            <span>REGISTRADO</span>
+                        </div>
+                        <div class="status-legend-item" style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: bold;">
+                            <div class="status-legend-color" style="width: 12px; height: 12px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.1); background: #fff8e1; border-color: #ffecb3;"></div>
+                            <span>PENDIENTE</span>
+                        </div>
+                        <div class="status-legend-item" style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: bold;">
+                            <div class="status-legend-color" style="width: 12px; height: 12px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.1); background: #e8f5e8; border-color: #c8e6c9;"></div>
+                            <span>PAGADA</span>
+                        </div>
+                        <div class="status-legend-item" style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: bold;">
+                            <div class="status-legend-color" style="width: 12px; height: 12px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.1); background: #f3e5f5; border-color: #e1bee7;"></div>
+                            <span>PARCIAL</span>
+                        </div>
+                        <div class="status-legend-item" style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: bold;">
+                            <div class="status-legend-color" style="width: 12px; height: 12px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.1); background: #ffebee; border-color: #ffcdd2;"></div>
+                            <span>ANULADO</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Sección de subida de facturas - MISMAS DIMENSIONES QUE DIVISIÓN 1 + TÍTULO -->
@@ -1671,7 +1787,7 @@
                         <td>${factura.cliente || 'N/A'}</td>
                         <td>${factura.direccion || 'N/A'}</td>
                         <td>$${factura.total || '0.00'}</td>
-                        <td class="${getStatusClass(factura.estatus)}">${factura.estatus || 'REGISTRADO'}</td>
+                        <td><span class="${getStatusClass(factura.estatus)}">${factura.estatus || 'REGISTRADO'}</span></td>
                         <td>$${factura.retencion || '0.00'}</td>
                         <td>$${factura.valor_pagado || '0.00'}</td>
                         <td class="actions-cell">
@@ -1713,17 +1829,21 @@
         
         // Función para obtener la clase CSS del estatus
         function getStatusClass(status) {
-            switch(status) {
+            switch(status.toUpperCase()) {
                 case 'REGISTRADO':
-                    return 'status-registrado';
-                case 'PAGADO':
-                    return 'status-pagado';
+                    return 'status-registered';
+                case 'PENDIENTE':
+                    return 'status-pending';
+                case 'PAGADA':
+                    return 'status-paid';
+                case 'CANCELADA':
+                case 'ANULADA':
                 case 'ANULADO':
-                    return 'status-anulado';
-                case 'NOTA CR':
-                    return 'status-nota-cr';
+                    return 'status-cancelled';
+                case 'PARCIAL':
+                    return 'status-partial';
                 default:
-                    return 'status-registrado';
+                    return 'status-registered';
             }
         }
         
@@ -1761,9 +1881,10 @@
                     <select id="status-filter-select" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                         <option value="">Todos los estatus</option>
                         <option value="REGISTRADO" ${currentStatusFilter === 'REGISTRADO' ? 'selected' : ''}>REGISTRADO</option>
-                        <option value="PAGADO" ${currentStatusFilter === 'PAGADO' ? 'selected' : ''}>PAGADO</option>
-                        <option value="ANULADO" ${currentStatusFilter === 'ANULADO' ? 'selected' : ''}>ANULADO</option>
-                        <option value="NOTA CR" ${currentStatusFilter === 'NOTA CR' ? 'selected' : ''}>NOTA CR</option>
+                        <option value="PENDIENTE" ${currentStatusFilter === 'PENDIENTE' ? 'selected' : ''}>PENDIENTE</option>
+                        <option value="PAGADA" ${currentStatusFilter === 'PAGADA' ? 'selected' : ''}>PAGADA</option>
+                        <option value="PARCIAL" ${currentStatusFilter === 'PARCIAL' ? 'selected' : ''}>PARCIAL</option>
+                        <option value="CANCELADA" ${currentStatusFilter === 'CANCELADA' ? 'selected' : ''}>CANCELADA</option>
                     </select>
                 </div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">

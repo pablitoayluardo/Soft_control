@@ -84,6 +84,30 @@
             margin: 0;
         }
         
+        .status-legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 8px 0;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .status-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .status-legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -312,23 +336,112 @@
             background: #a8a8a8;
         }
         
+        /* Estilos para diferentes estatus - Colores distintivos */
         .status-registered {
-            background: #d4edda;
-            color: #155724;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: bold;
+            background: #e3f2fd !important;
+            color: #1565c0 !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            border: 1px solid #bbdefb !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            box-sizing: border-box !important;
         }
         
         .status-pending {
-            background: #fff3cd;
-            color: #856404;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: bold;
+            background: #fff8e1 !important;
+            color: #f57c00 !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            border: 1px solid #ffecb3 !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            box-sizing: border-box !important;
         }
+        
+        .status-paid {
+            background: #e8f5e8 !important;
+            color: #2e7d32 !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            border: 1px solid #c8e6c9 !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            box-sizing: border-box !important;
+        }
+        
+        .status-cancelled {
+            background: #ffebee !important;
+            color: #c62828 !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            border: 1px solid #ffcdd2 !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            box-sizing: border-box !important;
+        }
+        
+        .status-partial {
+            background: #f3e5f5 !important;
+            color: #7b1fa2 !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            border: 1px solid #e1bee7 !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* Asegurar que los estilos de status se apliquen correctamente en las celdas de tabla */
+        .facturas-table td .status-registered,
+        .facturas-table td .status-pending,
+        .facturas-table td .status-paid,
+        .facturas-table td .status-cancelled,
+        .facturas-table td .status-partial {
+            display: inline-block !important;
+            width: auto !important;
+            min-width: fit-content !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            overflow: visible !important;
+        }
+        
+
         
         .btn-pay {
             background: #007bff;
@@ -577,6 +690,30 @@
             <div class="content-header">
                 <h1>Gestión de Pagos</h1>
                 <p>Administra los pagos de facturas pendientes</p>
+                
+                <!-- Leyenda de estatus -->
+                <div class="status-legend">
+                    <div class="status-legend-item">
+                        <div class="status-legend-color" style="background: #e3f2fd; border-color: #bbdefb;"></div>
+                        <span>REGISTRADO</span>
+                    </div>
+                    <div class="status-legend-item">
+                        <div class="status-legend-color" style="background: #fff8e1; border-color: #ffecb3;"></div>
+                        <span>PENDIENTE</span>
+                    </div>
+                    <div class="status-legend-item">
+                        <div class="status-legend-color" style="background: #e8f5e8; border-color: #c8e6c9;"></div>
+                        <span>PAGADA</span>
+                    </div>
+                    <div class="status-legend-item">
+                        <div class="status-legend-color" style="background: #f3e5f5; border-color: #e1bee7;"></div>
+                        <span>PARCIAL</span>
+                    </div>
+                    <div class="status-legend-item">
+                        <div class="status-legend-color" style="background: #ffebee; border-color: #ffcdd2;"></div>
+                        <span>ANULADO</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Estadísticas -->
@@ -814,15 +951,25 @@
         }
 
         function getStatusClass(estatus) {
-            switch(estatus) {
+            switch(estatus.toUpperCase()) {
                 case 'REGISTRADO':
                     return 'status-registered';
                 case 'PENDIENTE':
                     return 'status-pending';
+                case 'PAGADA':
+                    return 'status-paid';
+                case 'CANCELADA':
+                case 'ANULADA':
+                case 'ANULADO':
+                    return 'status-cancelled';
+                case 'PARCIAL':
+                    return 'status-partial';
                 default:
                     return 'status-registered';
             }
         }
+        
+
 
         function mostrarFacturas() {
             const tbody = document.getElementById('facturas-tbody');

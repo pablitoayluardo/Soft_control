@@ -121,7 +121,8 @@ try {
     error_log("DEBUG - Saldo Calculado: " . $saldoActual);
     error_log("DEBUG - Monto a Pagar: " . $monto);
     
-    if ($monto > $saldoActual) {
+    // Usar comparación con tolerancia para manejar errores de precisión decimal
+    if ($monto > ($saldoActual + 0.01)) {
         throw new Exception("El monto excede el saldo pendiente de la factura. Saldo: $saldoActual, Monto: $monto");
     }
     
@@ -158,7 +159,8 @@ try {
         $nuevoValorPagado = $valorPagado + $monto;
         
         // Determinar el nuevo estatus basado en el saldo
-        $nuevoEstatus = ($nuevoSaldo <= 0) ? 'PAGADA' : 'PENDIENTE';
+        // Si el nuevo saldo es 0 o menor (con tolerancia), la factura está pagada
+        $nuevoEstatus = ($nuevoSaldo <= 0.01) ? 'PAGADA' : 'PENDIENTE';
         
         $stmt = $pdo->prepare("
             UPDATE info_factura 

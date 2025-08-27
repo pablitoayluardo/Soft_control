@@ -369,11 +369,13 @@ if (isset($_FILES['archivo_xml']) && $_FILES['archivo_xml']['error'] === UPLOAD_
                                 echo "<p style='color: green;'>✅ $adicionalesInsertados campos adicionales insertados</p>";
                             }
                             
-                            // 5. Insertar pagos
+                            // 5. Insertar pagos (COMENTADO - La tabla pagos se usa para registros manuales)
+                            // Los pagos del XML se manejan de forma diferente
+                            /*
                             if (!empty($pagos)) {
                                 $stmt = $pdo->prepare("
                                     INSERT INTO pagos (
-                                        id_info_factura, formaPago, total
+                                        id_info_factura, forma_pago, monto
                                     ) VALUES (?, ?, ?)
                                 ");
                                 
@@ -392,6 +394,7 @@ if (isset($_FILES['archivo_xml']) && $_FILES['archivo_xml']['error'] === UPLOAD_
                                 
                                 echo "<p style='color: green;'>✅ $pagosInsertados pagos insertados</p>";
                             }
+                            */
                             
                             // 6. Insertar impuestos totales
                             if (!empty($totalImpuestos)) {

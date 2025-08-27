@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Colores de Estatus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .test-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .status-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .status-item {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        /* Estilos de estatus */
+        .status-registered {
+            background: #d1ecf1 !important;
+            color: #0c5460 !important;
+            border: 1px solid #bee5eb;
+        }
+        
+        .status-pending {
+            background: #fff3cd !important;
+            color: #856404 !important;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-paid {
+            background: #d4edda !important;
+            color: #155724 !important;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da !important;
+            color: #721c24 !important;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-partial {
+            background: #ffeaa7 !important;
+            color: #6c5ce7 !important;
+            border: 1px solid #fdcb6e;
+        }
+        
+        /* Colores de texto para saldos */
+        .text-danger {
+            color: #dc3545 !important;
+        }
+        
+        .text-success {
+            color: #28a745 !important;
+        }
+        
+        .text-warning {
+            color: #ffc107 !important;
+        }
+        
+        .table-test {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .table-test th,
+        .table-test td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .table-test th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Test de Colores de Estatus</h1>
+        
+        <div class="test-section">
+            <div class="test-title">📋 Leyenda de Colores</div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #d1ecf1; border-color: #bee5eb;"></div>
+                    <span>Registrado (Azul)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fff3cd; border-color: #ffeaa7;"></div>
+                    <span>Pendiente (Amarillo)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #d4edda; border-color: #c3e6cb;"></div>
+                    <span>Pagado (Verde)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ffeaa7; border-color: #fdcb6e;"></div>
+                    <span>Parcial (Naranja)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f8d7da; border-color: #f5c6cb;"></div>
+                    <span>Cancelado (Rojo)</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">🔍 Test de Estilos CSS</div>
+            <div class="status-demo">
+                <div class="status-item status-registered">REGISTRADO</div>
+                <div class="status-item status-pending">PENDIENTE</div>
+                <div class="status-item status-paid">PAGADA</div>
+                <div class="status-item status-partial">PARCIAL</div>
+                <div class="status-item status-cancelled">CANCELADA</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">💰 Test de Colores de Saldos</div>
+            <div class="status-demo">
+                <div class="status-item text-danger">Saldo Pendiente: $1,250.00</div>
+                <div class="status-item text-success">Saldo Pagado: $0.00</div>
+                <div class="status-item text-warning">Saldo Parcial: $500.00</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">📊 Test de Tabla Simulada</div>
+            <table class="table-test">
+                <thead>
+                    <tr>
+                        <th>Factura</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                        <th>Saldo</th>
+                        <th>Estatus</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>001-001-000001</td>
+                        <td>Cliente A</td>
+                        <td>$1,000.00</td>
+                        <td class="text-danger">$1,000.00</td>
+                        <td><span class="status-item status-pending">PENDIENTE</span></td>
+                    </tr>
+                    <tr>
+                        <td>001-001-000002</td>
+                        <td>Cliente B</td>
+                        <td>$500.00</td>
+                        <td class="text-success">$0.00</td>
+                        <td><span class="status-item status-paid">PAGADA</span></td>
+                    </tr>
+                    <tr>
+                        <td>001-001-000003</td>
+                        <td>Cliente C</td>
+                        <td>$800.00</td>
+                        <td class="text-warning">$300.00</td>
+                        <td><span class="status-item status-partial">PARCIAL</span></td>
+                    </tr>
+                    <tr>
+                        <td>001-001-000004</td>
+                        <td>Cliente D</td>
+                        <td>$1,200.00</td>
+                        <td class="text-danger">$1,200.00</td>
+                        <td><span class="status-item status-cancelled">CANCELADA</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">✅ Verificación de Funciones JavaScript</div>
+            <div id="js-test-results">
+                <p>Cargando resultados...</p>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">📝 Instrucciones de Verificación</div>
+            <ol>
+                <li><strong>Registrado:</strong> Debe aparecer en azul claro (#d1ecf1)</li>
+                <li><strong>Pendiente:</strong> Debe aparecer en amarillo (#fff3cd)</li>
+                <li><strong>Pagada:</strong> Debe aparecer en verde (#d4edda)</li>
+                <li><strong>Parcial:</strong> Debe aparecer en naranja (#ffeaa7)</li>
+                <li><strong>Cancelada:</strong> Debe aparecer en rojo (#f8d7da)</li>
+                <li><strong>Saldos:</strong> Rojo para deuda, verde para pagado, amarillo para parcial</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Función para probar los colores
+        function testStatusColors() {
+            const results = document.getElementById('js-test-results');
+            let html = '';
+            
+            // Test de función getStatusClassBySaldo
+            function getStatusClassBySaldo(saldo, total) {
+                saldo = parseFloat(saldo);
+                total = parseFloat(total);
+                
+                if (saldo <= 0) {
+                    return 'status-paid';
+                } else if (saldo < total) {
+                    return 'status-partial';
+                } else {
+                    return 'status-pending';
+                }
+            }
+            
+            function getSaldoClass(saldo) {
+                if (saldo <= 0) {
+                    return 'text-success';
+                } else if (saldo > 0) {
+                    return 'text-danger';
+                } else {
+                    return 'text-warning';
+                }
+            }
+            
+            // Casos de prueba
+            const testCases = [
+                { saldo: 0, total: 1000, expectedStatus: 'status-paid', expectedSaldo: 'text-success' },
+                { saldo: 500, total: 1000, expectedStatus: 'status-partial', expectedSaldo: 'text-danger' },
+                { saldo: 1000, total: 1000, expectedStatus: 'status-pending', expectedSaldo: 'text-danger' },
+                { saldo: -100, total: 1000, expectedStatus: 'status-paid', expectedSaldo: 'text-success' }
+            ];
+            
+            let allPassed = true;
+            
+            testCases.forEach((testCase, index) => {
+                const actualStatus = getStatusClassBySaldo(testCase.saldo, testCase.total);
+                const actualSaldo = getSaldoClass(testCase.saldo);
+                
+                const statusPassed = actualStatus === testCase.expectedStatus;
+                const saldoPassed = actualSaldo === testCase.expectedSaldo;
+                
+                if (!statusPassed || !saldoPassed) {
+                    allPassed = false;
+                }
+                
+                html += `
+                    <div class="result ${statusPassed && saldoPassed ? 'success' : 'error'}">
+                        <strong>Test ${index + 1}:</strong> Saldo: $${testCase.saldo}, Total: $${testCase.total}<br>
+                        Estatus esperado: ${testCase.expectedStatus} → Actual: ${actualStatus} ${statusPassed ? '✅' : '❌'}<br>
+                        Saldo esperado: ${testCase.expectedSaldo} → Actual: ${actualSaldo} ${saldoPassed ? '✅' : '❌'}
+                    </div>
+                `;
+            });
+            
+            html += `
+                <div class="result ${allPassed ? 'success' : 'error'}">
+                    <strong>Resultado General:</strong> ${allPassed ? 'TODOS LOS TESTS PASARON ✅' : 'ALGUNOS TESTS FALLARON ❌'}
+                </div>
+            `;
+            
+            results.innerHTML = html;
+        }
+        
+        // Ejecutar test cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            testStatusColors();
+        });
+    </script>
+</body>
+</html>
