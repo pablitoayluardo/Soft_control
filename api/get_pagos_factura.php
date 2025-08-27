@@ -48,17 +48,11 @@ try {
     // Construir la consulta
     $sql = "
         SELECT 
-            p.id,
+            p.id_pago,
             p.id_info_factura,
-            p.clave_acceso,
-            p.monto,
-            p.metodo_pago,
-            p.institucion,
-            p.documento,
-            p.referencia,
-            p.observacion,
-            p.fecha_pago,
-            p.estado,
+            p.formaPago,
+            p.total,
+            p.created_at,
             f.estab,
             f.pto_emi,
             f.secuencial,
@@ -68,20 +62,19 @@ try {
             f.valor_pagado
         FROM pagos p
         INNER JOIN info_factura f ON p.id_info_factura = f.id_info_factura
-        WHERE p.estado = 'confirmado'
     ";
     
     $params = [];
     
     if (!empty($claveAcceso)) {
-        $sql .= " AND p.clave_acceso = ?";
+        $sql .= " WHERE f.clave_acceso = ?";
         $params[] = $claveAcceso;
     } else {
-        $sql .= " AND p.id_info_factura = ?";
+        $sql .= " WHERE p.id_info_factura = ?";
         $params[] = $facturaId;
     }
     
-    $sql .= " ORDER BY p.fecha_pago DESC";
+    $sql .= " ORDER BY p.created_at DESC";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -90,7 +83,7 @@ try {
     // Calcular totales
     $totalPagado = 0;
     foreach ($pagos as $pago) {
-        $totalPagado += floatval($pago['monto']);
+        $totalPagado += floatval($pago['total']);
     }
     
     // Respuesta exitosa

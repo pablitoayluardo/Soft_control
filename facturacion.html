@@ -1779,10 +1779,16 @@
                     <a href="#" onclick="event.preventDefault(); showVerFactura('${factura.clave_acceso}');">
                         <i class="fas fa-eye"></i> Ver Factura
                     </a>
-                    <a href="#" onclick="event.preventDefault(); showPagosFactura('${factura.clave_acceso}', ${factura.id});">
-                        <i class="fas fa-money-bill-wave"></i> Ver Pagos
-                    </a>
                 `;
+                
+                // Mostrar "Ver Pagos" solo para facturas PAGADA o PENDIENTE
+                if (factura.estatus === 'PAGADA' || factura.estatus === 'PENDIENTE') {
+                    dropdownItems += `
+                        <a href="#" onclick="event.preventDefault(); showPagosFactura('${factura.clave_acceso}', ${factura.id});">
+                            <i class="fas fa-money-bill-wave"></i> Ver Pagos
+                        </a>
+                    `;
+                }
 
                 if (factura.estatus === 'REGISTRADO') {
                     dropdownItems += `
@@ -2270,19 +2276,16 @@
                 `;
                 
                 data.pagos.forEach(pago => {
-                    const estadoClass = pago.estado === 'confirmado' ? 'status-paid' : 
-                                      pago.estado === 'pendiente' ? 'status-pending' : 'status-cancelled';
-                    
                     pagosHtml += `
                         <tr>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${new Date(pago.fecha_pago).toLocaleDateString()}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.metodo_pago || 'N/A'}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.institucion || 'N/A'}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.documento || 'N/A'}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.referencia || 'N/A'}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: bold;">$${parseFloat(pago.monto).toFixed(2)}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${new Date(pago.created_at).toLocaleDateString()}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.formaPago || 'N/A'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">-</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">-</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">-</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: bold;">$${parseFloat(pago.total).toFixed(2)}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">
-                                <span class="${estadoClass}">${pago.estado}</span>
+                                <span class="status-paid">Confirmado</span>
                             </td>
                         </tr>
                     `;

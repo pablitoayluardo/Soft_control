@@ -1004,29 +1004,38 @@
                 return;
             }
 
-            tbody.innerHTML = facturasPagina.map(factura => `
-                <tr>
-                    <td>${factura.estab}</td>
-                    <td>${factura.pto_emi}</td>
-                    <td>${factura.secuencial}</td>
-                    <td>${formatearFecha(factura.fecha_emision)}</td>
-                    <td>${factura.razon_social_comprador}</td>
-                    <td>${factura.direccion_comprador || '-'}</td>
-                    <td>$${parseFloat(factura.importe_total).toFixed(2)}</td>
-                    <td><span class="${getStatusClass(factura.estatus)}">${factura.estatus}</span></td>
-                    <td>$${parseFloat(factura.retencion || 0).toFixed(2)}</td>
-                    <td>$${parseFloat(factura.valor_pagado || 0).toFixed(2)}</td>
-                    <td>$${parseFloat(factura.saldo).toFixed(2)}</td>
-                    <td>
-                        <select class="actions-select" onchange="ejecutarAccion(this.value, '${factura.clave_acceso}')">
-                            <option value="">Seleccionar...</option>
-                            <option value="ver">Ver Factura</option>
-                            <option value="ver-pagos">Ver Pagos</option>
-                            <option value="pagar">Pagar Factura</option>
-                        </select>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = facturasPagina.map(factura => {
+                // Construir las opciones del select dinámicamente
+                let options = '<option value="">Seleccionar...</option><option value="ver">Ver Factura</option>';
+                
+                // Mostrar "Ver Pagos" solo para facturas PAGADA o PENDIENTE
+                if (factura.estatus === 'PAGADA' || factura.estatus === 'PENDIENTE') {
+                    options += '<option value="ver-pagos">Ver Pagos</option>';
+                }
+                
+                options += '<option value="pagar">Pagar Factura</option>';
+                
+                return `
+                    <tr>
+                        <td>${factura.estab}</td>
+                        <td>${factura.pto_emi}</td>
+                        <td>${factura.secuencial}</td>
+                        <td>${formatearFecha(factura.fecha_emision)}</td>
+                        <td>${factura.razon_social_comprador}</td>
+                        <td>${factura.direccion_comprador || '-'}</td>
+                        <td>$${parseFloat(factura.importe_total).toFixed(2)}</td>
+                        <td><span class="${getStatusClass(factura.estatus)}">${factura.estatus}</span></td>
+                        <td>$${parseFloat(factura.retencion || 0).toFixed(2)}</td>
+                        <td>$${parseFloat(factura.valor_pagado || 0).toFixed(2)}</td>
+                        <td>$${parseFloat(factura.saldo).toFixed(2)}</td>
+                        <td>
+                            <select class="actions-select" onchange="ejecutarAccion(this.value, '${factura.clave_acceso}')">
+                                ${options}
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
 
             actualizarPaginacion();
         }
@@ -1065,29 +1074,38 @@
                 return;
             }
 
-            tbody.innerHTML = facturasFiltradas.map(factura => `
-                <tr>
-                    <td>${factura.estab}</td>
-                    <td>${factura.pto_emi}</td>
-                    <td>${factura.secuencial}</td>
-                    <td>${formatearFecha(factura.fecha_emision)}</td>
-                    <td>${factura.razon_social_comprador}</td>
-                    <td>${factura.direccion_comprador || '-'}</td>
-                    <td>$${parseFloat(factura.importe_total).toFixed(2)}</td>
-                    <td><span class="${getStatusClass(factura.estatus)}">${factura.estatus}</span></td>
-                    <td>$${parseFloat(factura.retencion || 0).toFixed(2)}</td>
-                    <td>$${parseFloat(factura.valor_pagado || 0).toFixed(2)}</td>
-                    <td>$${parseFloat(factura.saldo).toFixed(2)}</td>
-                    <td>
-                        <select class="actions-select" onchange="ejecutarAccion(this.value, '${factura.clave_acceso}')">
-                            <option value="">Seleccionar...</option>
-                            <option value="ver">Ver Factura</option>
-                            <option value="ver-pagos">Ver Pagos</option>
-                            <option value="pagar">Pagar Factura</option>
-                        </select>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = facturasFiltradas.map(factura => {
+                // Construir las opciones del select dinámicamente
+                let options = '<option value="">Seleccionar...</option><option value="ver">Ver Factura</option>';
+                
+                // Mostrar "Ver Pagos" solo para facturas PAGADA o PENDIENTE
+                if (factura.estatus === 'PAGADA' || factura.estatus === 'PENDIENTE') {
+                    options += '<option value="ver-pagos">Ver Pagos</option>';
+                }
+                
+                options += '<option value="pagar">Pagar Factura</option>';
+                
+                return `
+                    <tr>
+                        <td>${factura.estab}</td>
+                        <td>${factura.pto_emi}</td>
+                        <td>${factura.secuencial}</td>
+                        <td>${formatearFecha(factura.fecha_emision)}</td>
+                        <td>${factura.razon_social_comprador}</td>
+                        <td>${factura.direccion_comprador || '-'}</td>
+                        <td>$${parseFloat(factura.importe_total).toFixed(2)}</td>
+                        <td><span class="${getStatusClass(factura.estatus)}">${factura.estatus}</span></td>
+                        <td>$${parseFloat(factura.retencion || 0).toFixed(2)}</td>
+                        <td>$${parseFloat(factura.valor_pagado || 0).toFixed(2)}</td>
+                        <td>$${parseFloat(factura.saldo).toFixed(2)}</td>
+                        <td>
+                            <select class="actions-select" onchange="ejecutarAccion(this.value, '${factura.clave_acceso}')">
+                                ${options}
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function formatearFecha(fecha) {
@@ -1310,19 +1328,16 @@
                 `;
                 
                 data.pagos.forEach(pago => {
-                    const estadoClass = pago.estado === 'confirmado' ? 'status-paid' : 
-                                      pago.estado === 'pendiente' ? 'status-pending' : 'status-cancelled';
-                    
                     pagosHtml += `
                         <tr>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${new Date(pago.fecha_pago).toLocaleDateString()}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.metodo_pago || 'N/A'}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.institucion || 'N/A'}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.documento || 'N/A'}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.referencia || 'N/A'}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: bold;">$${parseFloat(pago.monto).toFixed(2)}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${new Date(pago.created_at).toLocaleDateString()}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.formaPago || 'N/A'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">-</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">-</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">-</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: bold;">$${parseFloat(pago.total).toFixed(2)}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">
-                                <span class="${estadoClass}">${pago.estado}</span>
+                                <span class="status-paid">Confirmado</span>
                             </td>
                         </tr>
                     `;
