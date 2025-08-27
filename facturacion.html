@@ -1077,6 +1077,28 @@
         </div>
     </div>
 
+    <!-- Modal para visualizar pagos de la factura -->
+    <div id="ver-pagos-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-money-bill-wave"></i> Historial de Pagos de la Factura
+                </h3>
+                <button class="modal-close" onclick="closePagosModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="ver-pagos-content">
+                <!-- El contenido se cargará dinámicamente -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closePagosModal()">
+                    <i class="fas fa-times"></i> Salir
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let selectedFile = null;
         let facturaData = null;
@@ -1757,6 +1779,9 @@
                     <a href="#" onclick="event.preventDefault(); showVerFactura('${factura.clave_acceso}');">
                         <i class="fas fa-eye"></i> Ver Factura
                     </a>
+                    <a href="#" onclick="event.preventDefault(); showPagosFactura('${factura.clave_acceso}', ${factura.id});">
+                        <i class="fas fa-money-bill-wave"></i> Ver Pagos
+                    </a>
                 `;
 
                 if (factura.estatus === 'REGISTRADO') {
@@ -2179,6 +2204,114 @@
                 </div>
                 <h4 style="margin-top: 20px;">Detalles</h4>
                 ${detallesHtml}
+            `;
+            modalContent.innerHTML = html;
+        }
+
+        // --- FUNCIONES PARA VER PAGOS DE FACTURA ---
+        function showPagosFactura(claveAcceso, facturaId) {
+            if (!claveAcceso && !facturaId) {
+                alert('No se pudo obtener la información de la factura.');
+                return;
+            }
+            
+            const modal = document.getElementById('ver-pagos-modal');
+            const modalContent = document.getElementById('ver-pagos-content');
+            modalContent.innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Cargando pagos...</p></div>';
+            modal.classList.add('active');
+
+            // Construir la URL con los parámetros disponibles
+            let url = 'api/get_pagos_factura.php?';
+            if (claveAcceso) {
+                url += `clave_acceso=${claveAcceso}`;
+            } else {
+                url += `factura_id=${facturaId}`;
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayPagosFactura(data.data);
+                    } else {
+                        modalContent.innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al obtener pagos:', error);
+                    modalContent.innerHTML = `<p style="color: red;">Error de conexión al obtener los pagos.</p>`;
+                });
+        }
+
+        function closePagosModal() {
+            document.getElementById('ver-pagos-modal').classList.remove('active');
+        }
+
+        function displayPagosFactura(data) {
+            const modalContent = document.getElementById('ver-pagos-content');
+            
+            let pagosHtml = '<p>No se encontraron pagos para esta factura.</p>';
+            
+            if (data.pagos && data.pagos.length > 0) {
+                pagosHtml = `
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 15px;">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Fecha</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Método</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Institución</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Documento</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Referencia</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Monto</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                data.pagos.forEach(pago => {
+                    const estadoClass = pago.estado === 'confirmado' ? 'status-paid' : 
+                                      pago.estado === 'pendiente' ? 'status-pending' : 'status-cancelled';
+                    
+                    pagosHtml += `
+                        <tr>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${new Date(pago.fecha_pago).toLocaleDateString()}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.metodo_pago || 'N/A'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.institucion || 'N/A'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.documento || 'N/A'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">${pago.referencia || 'N/A'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: bold;">$${parseFloat(pago.monto).toFixed(2)}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">
+                                <span class="${estadoClass}">${pago.estado}</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                pagosHtml += '</tbody></table>';
+            }
+
+            // Información de resumen
+            let resumenHtml = '';
+            if (data.resumen && data.resumen.factura_info) {
+                const factura = data.resumen.factura_info;
+                resumenHtml = `
+                    <div class="factura-info" style="margin-bottom: 20px;">
+                        <div class="info-item"><strong>Cliente:</strong> ${factura.cliente}</div>
+                        <div class="info-item"><strong>Factura No:</strong> ${factura.estab}-${factura.pto_emi}-${factura.secuencial}</div>
+                        <div class="info-item"><strong>Total Factura:</strong> $${parseFloat(factura.total_factura).toFixed(2)}</div>
+                        <div class="info-item"><strong>Valor Pagado:</strong> $${parseFloat(factura.valor_pagado).toFixed(2)}</div>
+                        <div class="info-item"><strong>Saldo Actual:</strong> $${parseFloat(factura.saldo_actual).toFixed(2)}</div>
+                        <div class="info-item"><strong>Total Pagos:</strong> ${data.resumen.total_pagos}</div>
+                        <div class="info-item"><strong>Monto Total Pagado:</strong> $${parseFloat(data.resumen.total_pagado).toFixed(2)}</div>
+                    </div>
+                `;
+            }
+
+            const html = `
+                ${resumenHtml}
+                <h4 style="margin-top: 20px;">Historial de Pagos</h4>
+                ${pagosHtml}
             `;
             modalContent.innerHTML = html;
         }

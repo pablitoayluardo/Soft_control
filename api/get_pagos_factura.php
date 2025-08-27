@@ -49,7 +49,7 @@ try {
     $sql = "
         SELECT 
             p.id,
-            p.factura_id,
+            p.id_info_factura,
             p.clave_acceso,
             p.monto,
             p.metodo_pago,
@@ -67,7 +67,7 @@ try {
             f.saldo,
             f.valor_pagado
         FROM pagos p
-        INNER JOIN facturas f ON p.factura_id = f.id
+        INNER JOIN info_factura f ON p.id_info_factura = f.id_info_factura
         WHERE p.estado = 'confirmado'
     ";
     
@@ -77,7 +77,7 @@ try {
         $sql .= " AND p.clave_acceso = ?";
         $params[] = $claveAcceso;
     } else {
-        $sql .= " AND p.factura_id = ?";
+        $sql .= " AND p.id_info_factura = ?";
         $params[] = $facturaId;
     }
     
