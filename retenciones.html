@@ -450,11 +450,6 @@
                         <i class="fas fa-folder-open"></i> Buscar Archivo XML
                     </button>
                     <div style="margin-top: 10px;">
-                        <button class="btn-upload" onclick="probarModal()" style="background: #6c757d;">
-                            <i class="fas fa-test-tube"></i> Probar Modal
-                        </button>
-                    </div>
-                    <div style="margin-top: 10px;">
                         <small style="color: var(--text-secondary);">Selecciona un archivo XML de retención del SRI</small>
                     </div>
                 </div>
@@ -464,14 +459,6 @@
             <div class="table-container">
                 <div class="table-header">
                     <h3>Retenciones Procesadas</h3>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn-refresh" onclick="exportarRetenciones()" style="background: #28a745;">
-                            <i class="fas fa-download"></i> Exportar
-                        </button>
-                        <button class="btn-refresh" onclick="cargarRetenciones()">
-                            <i class="fas fa-sync-alt"></i> Actualizar
-                        </button>
-                    </div>
                 </div>
                 <div class="table-content">
                     <table class="retenciones-table">
@@ -545,43 +532,6 @@
             cargarRetenciones();
         });
 
-        // Función para probar el modal con datos de prueba
-        function probarModal() {
-            const datosPrueba = {
-                estado: 'AUTORIZADO',
-                numeroAutorizacion: '1234567890123456789012345678901234567890123456789',
-                fechaAutorizacion: '2024-01-15 10:30:00',
-                emisor: {
-                    razonSocial: 'EMPRESA DE PRUEBA S.A.',
-                    ruc: '1234567890123',
-                    estab: '001',
-                    ptoEmi: '001',
-                    secuencial: '000000001'
-                },
-                sujetoRetenido: {
-                    razonSocial: 'CLIENTE DE PRUEBA S.A.',
-                    identificacion: '9876543210987',
-                    periodoFiscal: '01/2024'
-                },
-                documentoSustento: {
-                    numero: 'FAC-001-001-000000001',
-                    fechaEmision: '2024-01-15',
-                    totalSinImpuestos: '1000.00',
-                    importeTotal: '20.00'
-                },
-                retenciones: [
-                    {
-                        codigo: '1',
-                        codigoRetencion: '1',
-                        baseImponible: '1000.00',
-                        porcentajeRetener: '2.00',
-                        valorRetenido: '20.00'
-                    }
-                ]
-            };
-            
-            mostrarModalConfirmacion(datosPrueba);
-        }
 
         // Función para seleccionar archivo XML
         function seleccionarArchivo() {
@@ -995,18 +945,6 @@
             if (!fecha) return '-';
             const fechaObj = new Date(fecha);
             return fechaObj.toLocaleDateString('es-ES');
-        }
-
-        // Exportar retenciones
-        function exportarRetenciones() {
-            const url = 'api/exportar_retenciones_excel.php';
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'retenciones_exportadas.csv';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            alert('Exportación iniciada. El archivo se descargará automáticamente.');
         }
 
         // Cerrar modal al hacer clic fuera
