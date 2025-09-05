@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo de Retenciones - Sistema de Control GloboCity</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+        /* Estilos específicos para retenciones */
+        .retenciones-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-height: 100vh;
+            margin: 0;
+            padding: 12px;
+            box-sizing: border-box;
+        }
+        
+        .top-navigation {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-filter);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        
+        .back-button {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 6px 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .back-button:hover {
+            background: rgba(74, 222, 128, 0.1);
+            transform: translateX(-5px);
+        }
+        
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+        
+        .content-header {
+            margin-bottom: 2px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .content-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1px;
+        }
+        
+        .content-header p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 6px;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+        
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 6px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-card .stat-icon {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-bottom: 2px;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1px;
+        }
+        
+        .stat-card .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            margin: 0;
+        }
+        
+        .upload-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 10px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .btn-upload {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        
+        .btn-upload:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        
+        .table-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            overflow: visible;
+            margin-top: 2px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .table-header {
+            background: rgba(74, 222, 128, 0.1);
+            padding: 4px 10px;
+            border-bottom: 1px solid var(--glass-border);
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .btn-refresh {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        
+        .btn-refresh:hover {
+            background: var(--primary-hover);
+        }
+        
+        .table-content {
+            padding: 4px;
+            overflow: auto;
+            flex: 1;
+            min-height: 0;
+        }
+        
+        .retenciones-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        
+        .retenciones-table th {
+            background: #007bff;
+            color: white;
+            padding: 8px 4px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .retenciones-table td {
+            padding: 6px 4px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        
+        .retenciones-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .retenciones-table tr:hover {
+            background: #e3f2fd;
+        }
+        
+        /* Modal de confirmación */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-filter);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 30px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        
+        .modal-close:hover {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        
+        .retencion-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .preview-item {
+            background: rgba(74, 222, 128, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .preview-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .preview-value {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+        
+        .btn-confirm {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-confirm:hover {
+            background: #28a745;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 10px;
+            color: var(--text-secondary);
+        }
+        
+        .loading i {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            color: var(--primary-color);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: var(--glass-bg);
+            border-top: 1px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+        
+        .pagination button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        
+        .pagination button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+        
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="retenciones-container">
+        <!-- Navegación superior -->
+        <div class="top-navigation">
+            <a href="dashboard.html" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Volver al Dashboard
+            </a>
+            <h2>Módulo de Retenciones</h2>
+        </div>
+
+        <div class="content-area">
+            <!-- Encabezado del contenido -->
+            <div class="content-header">
+                <h1>Gestión de Retenciones</h1>
+                <p>Procesa y administra archivos XML de retenciones del SRI</p>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <div class="stat-value" id="total-retenciones">0</div>
+                    <div class="stat-label">Total Retenciones</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-value" id="total-valor-retenido">$0.00</div>
+                    <div class="stat-label">Total Valor Retenido</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="stat-value" id="retenciones-mes">0</div>
+                    <div class="stat-label">Retenciones del Mes</div>
+                </div>
+            </div>
+
+            <!-- Sección de carga de archivos -->
+            <div class="upload-section">
+                <h3><i class="fas fa-upload"></i> Cargar Archivo XML de Retención</h3>
+                <div style="text-align: center; padding: 20px;">
+                    <button class="btn-upload" onclick="seleccionarArchivo()">
+                        <i class="fas fa-folder-open"></i> Buscar Archivo XML
+                    </button>
+                    <div style="margin-top: 10px;">
+                        <button class="btn-upload" onclick="probarModal()" style="background: #6c757d;">
+                            <i class="fas fa-test-tube"></i> Probar Modal
+                        </button>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <small style="color: var(--text-secondary);">Selecciona un archivo XML de retención del SRI</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de retenciones -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Retenciones Procesadas</h3>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-refresh" onclick="exportarRetenciones()" style="background: #28a745;">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                        <button class="btn-refresh" onclick="cargarRetenciones()">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                    </div>
+                </div>
+                <div class="table-content">
+                    <table class="retenciones-table">
+                        <thead>
+                            <tr>
+                                <th>FECHA</th>
+                                <th>N° AUTORIZACIÓN</th>
+                                <th>EMISOR</th>
+                                <th>SUJETO RETENIDO</th>
+                                <th>DOC. SUSTENTO</th>
+                                <th>BASE IMPONIBLE</th>
+                                <th>VALOR RETENIDO</th>
+                                <th>ESTADO</th>
+                            </tr>
+                        </thead>
+                        <tbody id="retenciones-tbody">
+                            <tr>
+                                <td colspan="8" class="loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <br>Cargando retenciones...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Paginación -->
+            <div class="pagination">
+                <button onclick="cambiarPagina(-1)" id="btn-prev">Anterior</button>
+                <span class="pagination-info" id="pagination-info">Página 1 de 1</span>
+                <button onclick="cambiarPagina(1)" id="btn-next">Siguiente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="modal-confirmacion" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-check-circle"></i> Confirmar Procesamiento de Retención
+                </h3>
+                <button class="modal-close" onclick="cerrarModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modal-content">
+                <!-- El contenido se cargará dinámicamente -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="cerrarModal()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-confirm" onclick="confirmarProcesamiento()">
+                    <i class="fas fa-check"></i> Confirmar y Procesar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let retenciones = [];
+        let paginaActual = 1;
+        let retencionesPorPagina = 20;
+        let archivoXMLSeleccionado = null;
+        let datosRetencion = null;
+
+        // Cargar retenciones al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarRetenciones();
+        });
+
+        // Función para probar el modal con datos de prueba
+        function probarModal() {
+            const datosPrueba = {
+                estado: 'AUTORIZADO',
+                numeroAutorizacion: '1234567890123456789012345678901234567890123456789',
+                fechaAutorizacion: '2024-01-15 10:30:00',
+                emisor: {
+                    razonSocial: 'EMPRESA DE PRUEBA S.A.',
+                    ruc: '1234567890123',
+                    estab: '001',
+                    ptoEmi: '001',
+                    secuencial: '000000001'
+                },
+                sujetoRetenido: {
+                    razonSocial: 'CLIENTE DE PRUEBA S.A.',
+                    identificacion: '9876543210987',
+                    periodoFiscal: '01/2024'
+                },
+                documentoSustento: {
+                    numero: 'FAC-001-001-000000001',
+                    fechaEmision: '2024-01-15',
+                    totalSinImpuestos: '1000.00',
+                    importeTotal: '20.00'
+                },
+                retenciones: [
+                    {
+                        codigo: '1',
+                        codigoRetencion: '1',
+                        baseImponible: '1000.00',
+                        porcentajeRetener: '2.00',
+                        valorRetenido: '20.00'
+                    }
+                ]
+            };
+            
+            mostrarModalConfirmacion(datosPrueba);
+        }
+
+        // Función para seleccionar archivo XML
+        function seleccionarArchivo() {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.xml';
+            fileInput.style.display = 'none';
+            
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    procesarArchivoXML(e.target.files[0]);
+                }
+                document.body.removeChild(fileInput);
+            });
+            
+            document.body.appendChild(fileInput);
+            fileInput.click();
+        }
+
+        // Procesar archivo XML seleccionado
+        function procesarArchivoXML(file) {
+            console.log('Procesando archivo:', file.name);
+            archivoXMLSeleccionado = file;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const xmlContent = e.target.result;
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+                    
+                    // Verificar errores de parsing
+                    const parseError = xmlDoc.querySelector('parsererror');
+                    if (parseError) {
+                        alert('Error al parsear el XML: ' + parseError.textContent);
+                        return;
+                    }
+                    
+                    // Extraer datos básicos para mostrar en el modal
+                    datosRetencion = extraerDatosRetencion(xmlDoc);
+                    
+                    if (datosRetencion) {
+                        mostrarModalConfirmacion(datosRetencion);
+                    } else {
+                        alert('Error al procesar el archivo XML. Verifica que sea un archivo de retención válido.');
+                    }
+                } catch (error) {
+                    console.error('Error al procesar XML:', error);
+                    alert('Error al procesar el archivo XML: ' + error.message);
+                }
+            };
+            
+            reader.onerror = function(error) {
+                console.error('Error al leer archivo:', error);
+                alert('Error al leer el archivo XML');
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // Extraer datos básicos de la retención
+        function extraerDatosRetencion(xmlDoc) {
+            try {
+                console.log('=== INICIO EXTRACCIÓN DE DATOS ===');
+                const root = xmlDoc.documentElement;
+                console.log('Elemento raíz:', root.tagName);
+                
+                // Verificar que sea un comprobante de retención o autorización
+                if (root.tagName !== 'comprobanteRetencion' && root.tagName !== 'autorizacion') {
+                    console.error('No es un comprobante de retención válido. TagName encontrado:', root.tagName);
+                    return null;
+                }
+                
+                let comprobanteRetencion = null;
+                
+                if (root.tagName === 'autorizacion') {
+                    // Si el elemento raíz es 'autorizacion', buscar el comprobante dentro del CDATA
+                    const comprobanteElement = root.getElementsByTagName('comprobante')[0];
+                    console.log('Buscando elemento comprobante dentro de autorizacion...');
+                    
+                    if (!comprobanteElement) {
+                        console.error('No se encontró elemento comprobante dentro de autorizacion');
+                        return null;
+                    }
+                    
+                    // Extraer el contenido CDATA y parsearlo
+                    const cdataContent = comprobanteElement.textContent;
+                    console.log('Contenido CDATA extraído (primeros 500 caracteres):', cdataContent.substring(0, 500));
+                    
+                    // Parsear el contenido CDATA como XML
+                    const parser = new DOMParser();
+                    const comprobanteDoc = parser.parseFromString(cdataContent, 'text/xml');
+                    
+                    // Verificar errores de parsing
+                    const parseError = comprobanteDoc.querySelector('parsererror');
+                    if (parseError) {
+                        console.error('Error al parsear el contenido CDATA:', parseError.textContent);
+                        return null;
+                    }
+                    
+                    comprobanteRetencion = comprobanteDoc.documentElement;
+                    console.log('Comprobante de retención parseado desde CDATA:', comprobanteRetencion.tagName);
+                    
+                } else {
+                    // Si el elemento raíz es directamente 'comprobanteRetencion'
+                    comprobanteRetencion = root;
+                    console.log('Usando elemento raíz como comprobanteRetencion');
+                }
+                
+                // Buscar elementos usando getElementsByTagName
+                const infoTributaria = comprobanteRetencion.getElementsByTagName('infoTributaria')[0];
+                const infoCompRetencion = comprobanteRetencion.getElementsByTagName('infoCompRetencion')[0];
+                
+                if (!infoTributaria || !infoCompRetencion) {
+                    console.error('Faltan elementos requeridos');
+                    return null;
+                }
+                
+                // Extraer datos de manera simple
+                const datos = {
+                    estado: root.tagName === 'autorizacion' ? root.getElementsByTagName('estado')[0]?.textContent || 'AUTORIZADO' : 'AUTORIZADO',
+                    numeroAutorizacion: root.tagName === 'autorizacion' ? root.getElementsByTagName('numeroAutorizacion')[0]?.textContent || 'N/A' : 'N/A',
+                    fechaAutorizacion: root.tagName === 'autorizacion' ? root.getElementsByTagName('fechaAutorizacion')[0]?.textContent || 'N/A' : 'N/A',
+                    emisor: {
+                        razonSocial: infoTributaria.getElementsByTagName('razonSocial')[0]?.textContent || 'N/A',
+                        ruc: infoTributaria.getElementsByTagName('ruc')[0]?.textContent || 'N/A',
+                        estab: infoTributaria.getElementsByTagName('estab')[0]?.textContent || 'N/A',
+                        ptoEmi: infoTributaria.getElementsByTagName('ptoEmi')[0]?.textContent || 'N/A',
+                        secuencial: infoTributaria.getElementsByTagName('secuencial')[0]?.textContent || 'N/A'
+                    },
+                    sujetoRetenido: {
+                        razonSocial: infoCompRetencion.getElementsByTagName('razonSocialSujetoRetenido')[0]?.textContent || 'N/A',
+                        identificacion: infoCompRetencion.getElementsByTagName('identificacionSujetoRetenido')[0]?.textContent || 'N/A',
+                        periodoFiscal: infoCompRetencion.getElementsByTagName('periodoFiscal')[0]?.textContent || 'N/A'
+                    },
+                    documentoSustento: {
+                        numero: '',
+                        fechaEmision: '',
+                        totalSinImpuestos: '',
+                        importeTotal: ''
+                    },
+                    retenciones: []
+                };
+                
+                // Extraer información de documentos sustentos
+                const docsSustento = comprobanteRetencion.getElementsByTagName('docsSustento')[0];
+                if (docsSustento) {
+                    const docSustento = docsSustento.getElementsByTagName('docSustento')[0];
+                    if (docSustento) {
+                        datos.documentoSustento.numero = docSustento.getElementsByTagName('numDocSustento')[0]?.textContent || 'N/A';
+                        datos.documentoSustento.fechaEmision = docSustento.getElementsByTagName('fechaEmisionDocSustento')[0]?.textContent || 'N/A';
+                        datos.documentoSustento.totalSinImpuestos = docSustento.getElementsByTagName('totalSinImpuestos')[0]?.textContent || '0.00';
+                        datos.documentoSustento.importeTotal = docSustento.getElementsByTagName('importeTotal')[0]?.textContent || '0.00';
+                        
+                        // Extraer retenciones
+                        const retenciones = docSustento.getElementsByTagName('retenciones')[0];
+                        if (retenciones) {
+                            const retencionElements = retenciones.getElementsByTagName('retencion');
+                            for (let i = 0; i < retencionElements.length; i++) {
+                                const retencion = retencionElements[i];
+                                datos.retenciones.push({
+                                    codigo: retencion.getElementsByTagName('codigo')[0]?.textContent || '1',
+                                    codigoRetencion: retencion.getElementsByTagName('codigoRetencion')[0]?.textContent || 'N/A',
+                                    baseImponible: retencion.getElementsByTagName('baseImponible')[0]?.textContent || '0.00',
+                                    porcentajeRetener: retencion.getElementsByTagName('porcentajeRetener')[0]?.textContent || '0.00',
+                                    valorRetenido: retencion.getElementsByTagName('valorRetenido')[0]?.textContent || '0.00'
+                                });
+                            }
+                        }
+                    }
+                }
+                
+                console.log('✅ Datos completos extraídos:', datos);
+                console.log('=== FIN EXTRACCIÓN DE DATOS ===');
+                
+                return datos;
+            } catch (error) {
+                console.error('Error al extraer datos:', error);
+                return null;
+            }
+        }
+
+        // Mostrar modal de confirmación
+        function mostrarModalConfirmacion(datos) {
+            const modal = document.getElementById('modal-confirmacion');
+            const modalContent = document.getElementById('modal-content');
+            
+            let html = `
+                <div class="retencion-preview">
+                    <div class="preview-item">
+                        <div class="preview-label">Estado SRI</div>
+                        <div class="preview-value">${datos.estado}</div>
+                    </div>
+                    <div class="preview-item">
+                        <div class="preview-label">N° Autorización</div>
+                        <div class="preview-value">${datos.numeroAutorizacion}</div>
+                    </div>
+                    <div class="preview-item">
+                        <div class="preview-label">Fecha Autorización</div>
+                        <div class="preview-value">${formatearFecha(datos.fechaAutorizacion)}</div>
+                    </div>
+                    <div class="preview-item">
+                        <div class="preview-label">Emisor</div>
+                        <div class="preview-value">${datos.emisor.razonSocial}<br><small>RUC: ${datos.emisor.ruc}</small></div>
+                    </div>
+                    <div class="preview-item">
+                        <div class="preview-label">Sujeto Retenido</div>
+                        <div class="preview-value">${datos.sujetoRetenido.razonSocial}<br><small>ID: ${datos.sujetoRetenido.identificacion}</small></div>
+                    </div>
+                    <div class="preview-item">
+                        <div class="preview-label">Documento Sustento</div>
+                        <div class="preview-value">${datos.documentoSustento.numero}<br><small>Fecha: ${datos.documentoSustento.fechaEmision}</small></div>
+                    </div>
+                    <div class="preview-item">
+                        <div class="preview-label">Total Sin Impuestos</div>
+                        <div class="preview-value">$${parseFloat(datos.documentoSustento.totalSinImpuestos).toFixed(2)}</div>
+                    </div>
+                    <div class="preview-item">
+                        <div class="preview-label">Importe Total</div>
+                        <div class="preview-value">$${parseFloat(datos.documentoSustento.importeTotal).toFixed(2)}</div>
+                    </div>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h4><i class="fas fa-list"></i> Detalle de Retenciones</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: rgba(74, 222, 128, 0.1);">
+                                    <th style="padding: 8px; border: 1px solid #ddd;">Código</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd;">Tipo Retención</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd;">Base Imponible</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd;">Porcentaje</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd;">Valor Retenido</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${datos.retenciones.map(ret => `
+                                    <tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${ret.codigo}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${ret.codigoRetencion}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">$${parseFloat(ret.baseImponible).toFixed(2)}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${parseFloat(ret.porcentajeRetener).toFixed(2)}%</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">$${parseFloat(ret.valorRetenido).toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; border-radius: 5px; padding: 15px; margin: 20px 0;">
+                    <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
+                    <strong>Importante:</strong> Verifica que los datos mostrados sean correctos antes de confirmar el procesamiento.
+                </div>
+            `;
+            
+            modalContent.innerHTML = html;
+            modal.classList.add('active');
+        }
+
+        // Confirmar procesamiento
+        function confirmarProcesamiento() {
+            if (!archivoXMLSeleccionado || !datosRetencion) {
+                alert('No hay archivo seleccionado para procesar');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('xml_file', archivoXMLSeleccionado);
+            
+            const btnConfirm = document.querySelector('.btn-confirm');
+            const originalText = btnConfirm.innerHTML;
+            btnConfirm.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+            btnConfirm.disabled = true;
+
+            fetch('api/procesar_retencion_limpio.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && typeof data === 'object') {
+                    if (data.success) {
+                        alert('Retención procesada exitosamente!\n\nN° Autorización: ' + datosRetencion.numeroAutorizacion);
+                        cerrarModal();
+                        cargarRetenciones();
+                    } else {
+                        alert('Error al procesar la retención: ' + (data.message || 'Error desconocido'));
+                    }
+                } else {
+                    throw new Error('Respuesta inválida del servidor');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                let errorMessage = 'Error al procesar la retención: ';
+                if (error.message.includes('HTTP error')) {
+                    errorMessage += 'Error de conexión con el servidor (HTTP ' + error.message.split('status: ')[1] + ')';
+                } else {
+                    errorMessage += error.message;
+                }
+                alert(errorMessage);
+            })
+            .finally(() => {
+                btnConfirm.innerHTML = originalText;
+                btnConfirm.disabled = false;
+            });
+        }
+
+        // Cerrar modal
+        function cerrarModal() {
+            document.getElementById('modal-confirmacion').classList.remove('active');
+            archivoXMLSeleccionado = null;
+            datosRetencion = null;
+        }
+
+        // Cargar retenciones
+        function cargarRetenciones() {
+            const tbody = document.getElementById('retenciones-tbody');
+            tbody.innerHTML = '<tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i><br>Cargando retenciones...</td></tr>';
+
+            fetch('api/get_retenciones_rete_tables.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        retenciones = data.retenciones;
+                        actualizarEstadisticas();
+                        mostrarRetenciones();
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red;">Error: ' + data.message + '</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red;">Error de conexión</td></tr>';
+                });
+        }
+
+        // Actualizar estadísticas
+        function actualizarEstadisticas() {
+            const totalRetenciones = retenciones.length;
+            const totalValorRetenido = retenciones.reduce((sum, ret) => sum + parseFloat(ret.total_valor_retenido || 0), 0);
+            
+            const mesActual = new Date().getMonth() + 1;
+            const anioActual = new Date().getFullYear();
+            const retencionesMes = retenciones.filter(ret => {
+                const fecha = new Date(ret.fecha_autorizacion);
+                return fecha.getMonth() + 1 === mesActual && fecha.getFullYear() === anioActual;
+            }).length;
+
+            document.getElementById('total-retenciones').textContent = totalRetenciones;
+            document.getElementById('total-valor-retenido').textContent = '$' + totalValorRetenido.toFixed(2);
+            document.getElementById('retenciones-mes').textContent = retencionesMes;
+        }
+
+        // Mostrar retenciones en la tabla
+        function mostrarRetenciones() {
+            const tbody = document.getElementById('retenciones-tbody');
+            const inicio = (paginaActual - 1) * retencionesPorPagina;
+            const fin = inicio + retencionesPorPagina;
+            const retencionesPagina = retenciones.slice(inicio, fin);
+
+            if (retencionesPagina.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #666;">No hay retenciones procesadas</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = retencionesPagina.map(retencion => `
+                <tr>
+                    <td>${formatearFecha(retencion.fecha_autorizacion)}</td>
+                    <td>${retencion.numero_autorizacion}</td>
+                    <td>${retencion.razon_social_emisor}<br><small>RUC: ${retencion.ruc_emisor}</small></td>
+                    <td>${retencion.razon_social_retenido}<br><small>ID: ${retencion.identificacion_retenido}</small></td>
+                    <td>${retencion.num_doc_sustento}<br><small>Fecha: ${formatearFecha(retencion.fecha_emision_doc_sustento)}</small></td>
+                    <td>$${parseFloat(retencion.total_base_imponible || 0).toFixed(2)}</td>
+                    <td>$${parseFloat(retencion.total_valor_retenido || 0).toFixed(2)}</td>
+                    <td><span class="status-${retencion.ambiente.toLowerCase()}">${retencion.ambiente}</span></td>
+                </tr>
+            `).join('');
+
+            actualizarPaginacion();
+        }
+
+        // Actualizar paginación
+        function actualizarPaginacion() {
+            const totalPaginas = Math.ceil(retenciones.length / retencionesPorPagina);
+            document.getElementById('pagination-info').textContent = `Página ${paginaActual} de ${totalPaginas}`;
+            document.getElementById('btn-prev').disabled = paginaActual <= 1;
+            document.getElementById('btn-next').disabled = paginaActual >= totalPaginas;
+        }
+
+        // Cambiar página
+        function cambiarPagina(direccion) {
+            const nuevaPagina = paginaActual + direccion;
+            const totalPaginas = Math.ceil(retenciones.length / retencionesPorPagina);
+            
+            if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+                paginaActual = nuevaPagina;
+                mostrarRetenciones();
+            }
+        }
+
+        // Formatear fecha
+        function formatearFecha(fecha) {
+            if (!fecha) return '-';
+            const fechaObj = new Date(fecha);
+            return fechaObj.toLocaleDateString('es-ES');
+        }
+
+        // Exportar retenciones
+        function exportarRetenciones() {
+            const url = 'api/exportar_retenciones_excel.php';
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'retenciones_exportadas.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            alert('Exportación iniciada. El archivo se descargará automáticamente.');
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal-confirmacion');
+            if (event.target === modal) {
+                cerrarModal();
+            }
+        }
+    </script>
+</body>
+</html>
+
