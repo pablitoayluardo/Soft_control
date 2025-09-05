@@ -851,14 +851,14 @@
             }
 
             const formData = new FormData();
-            formData.append('xml_file', archivoXMLSeleccionado);
+            formData.append('xmlFile', archivoXMLSeleccionado);
             
             const btnConfirm = document.querySelector('.btn-confirm');
             const originalText = btnConfirm.innerHTML;
             btnConfirm.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
             btnConfirm.disabled = true;
 
-            fetch('api/procesar_retencion_limpio.php', {
+            fetch('api/procesar_retencion_nuevas_tablas.php', {
                 method: 'POST',
                 body: formData
             })
@@ -909,7 +909,7 @@
             const tbody = document.getElementById('retenciones-tbody');
             tbody.innerHTML = '<tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i><br>Cargando retenciones...</td></tr>';
 
-            fetch('api/get_retenciones_rete_tables.php')
+            fetch('api/get_retenciones_nuevas_tablas.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -958,13 +958,13 @@
             tbody.innerHTML = retencionesPagina.map(retencion => `
                 <tr>
                     <td>${formatearFecha(retencion.fecha_autorizacion)}</td>
-                    <td>${retencion.numero_autorizacion}</td>
-                    <td>${retencion.razon_social_emisor}<br><small>RUC: ${retencion.ruc_emisor}</small></td>
-                    <td>${retencion.razon_social_retenido}<br><small>ID: ${retencion.identificacion_retenido}</small></td>
-                    <td>${retencion.num_doc_sustento}<br><small>Fecha: ${formatearFecha(retencion.fecha_emision_doc_sustento)}</small></td>
-                    <td>$${parseFloat(retencion.total_base_imponible || 0).toFixed(2)}</td>
+                    <td>${retencion.numero_comprobante}</td>
+                    <td>${retencion.emisor_razon_social}<br><small>RUC: ${retencion.emisor_ruc}</small></td>
+                    <td>${retencion.receptor_razon_social}<br><small>ID: ${retencion.receptor_ruc}</small></td>
+                    <td>${retencion.numero_documento_sustento}<br><small>Fecha: ${formatearFecha(retencion.fecha_emision_sustento)}</small></td>
+                    <td>$${parseFloat(retencion.total_sin_impuestos || 0).toFixed(2)}</td>
                     <td>$${parseFloat(retencion.total_valor_retenido || 0).toFixed(2)}</td>
-                    <td><span class="status-${retencion.ambiente.toLowerCase()}">${retencion.ambiente}</span></td>
+                    <td><span class="status-${retencion.estado_clase}">${retencion.estado}</span></td>
                 </tr>
             `).join('');
 
